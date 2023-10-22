@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. set working directory
+```{r}
+setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertation/dissertation")
+```
+
+2. Load packages
+```{r, message=FALSE}
+library(skimr)  #summary
+library(tidyverse)
+library(lubridate)  #dates management
+library(gridExtra)  #arrange plots
+```
+
+3. Load the data and see its structure
+```{r}
+data <- read.csv("Data_PAM_Scott_Base.csv") # load data
+skimr::skim(data)  # see a summary of the whole data
+str(data)  # see the structure of each variable
+tail(data)  # view the last 6 rows of data
+head(data)  # view the first 6 rows of data
+```
+
+Data is from Jan 2019 to Feb 2022. 
+I am going to consider summer form 1 Nov to 15 Feb. 
+I currently have data for 3 summers: 2019-2020, 2020-2021, 2021-2022.
+
