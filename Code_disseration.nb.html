@@ -1753,13 +1753,10 @@ display: none;
 
 <!-- rnb-text-begin -->
 <ol style="list-style-type: decimal">
-<li>set working directory</li>
+<li>Set working directory</li>
 </ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0d2QoXCJ+L0xpYnJhcnkvQ2xvdWRTdG9yYWdlL09uZURyaXZlLVVuaXZlcnNpdHlvZkVkaW5idXJnaC80dGggeWVhci9kaXNzZXJ0YXRpb24vZGlzc2VydGF0aW9uXCIpXG5gYGAifQ== -->
-<pre class="r"><code>setwd(&quot;~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertation/dissertation&quot;)</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <ol start="2" style="list-style-type: decimal">
@@ -1789,12 +1786,178 @@ head(data)  # view the first 6 rows of data</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Data is from Jan 2019 to Feb 2022. I am going to consider summer form
-1 Nov to 15 Feb.  I currently have data for 3 summers: 2019-2020,
+<p>Data of sensors 1,2 and 4 are for the moss and 3 is for the lichen.
+Data is from Jan 2019 to Feb 2022. I am going to consider summer form 1
+Nov to 15 Feb. I currently have data for 3 summers: 2019-2020,
 2020-2021, 2021-2022.</p>
+<div id="format-data-in-a-way-that-is-going-to-be-useful-to-me" class="section level2">
+<h2>4. Format data in a way that is going to be useful to me</h2>
+<p>4.1. Remove weird times and dates and divide the useful ones</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9jbGVhbiA8LSBkYXRhWywgLWMoMjoxMyldICAjIGNyZWF0ZSBhIG5ldyBkYXRhIHNldCB3aXRob3V0IGNvbHVtbnMgMiB0byAxM1xuXG5kYXRhX2NsZWFuIDwtIGRhdGFfY2xlYW4gJT4lIFxuICBtdXRhdGUoRGF0ZSA9IHBhcnNlX2RhdGVfdGltZShEYXRldGltZSwgJ2RteSBITScpKSAgICMgaW5kaWNhdGUgdGhlIGZvcm1hdCB0aGUgZGF0ZSBpcyB3YW50ZWRcblxucHJpbnQoZGF0YV9jbGVhbltpcy5uYShkYXRhX2NsZWFuJERhdGUpLCBdKSAgIyBDaGVjayBmb3Igcm93cyB3aXRoIHBhcnNpbmcgaXNzdWVzXG5cbiMgIFJvdyA1ODQgaXMgcHJvYmxlbWF0aWNcblxuZGF0YV9jbGVhbls1ODQsIDFdPC1cIjEwLzAyLzIwMTkgMTA6MDhcIiAgIyBDaGFuZ2UgdGhlIHZhbHVlIHRvIHRoZSBjb3JyZWN0IG9uZSBcblxuZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JSBcbiAgbXV0YXRlKERhdGUgPSBwYXJzZV9kYXRlX3RpbWUoRGF0ZXRpbWUsICdkbXkgSE0nKSkgICAjIHJlcGVhdCB3aXRoIGFsbCB0aGUgbGluZXMgd29ya2luZ1xuXG5kYXRhX2NsZWFuIDwtIGRhdGFfY2xlYW4gJT4lICAjIGNyZWF0ZSBuZXcgY29sdW1ucyB3aXRoIG1vbnRoLCB5ZWFyLFxuICBtdXRhdGUoTW9udGggPSBtb250aChEYXRlKSwgIyBkYXksIG1pbnV0ZSAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgWWVhciA9IHllYXIoRGF0ZSksXG4gICAgICAgICBEYXkgPSBkYXkoRGF0ZSksXG4gICAgICAgICBIb3VyID0gaG91cihEYXRlKSxcbiAgICAgICAgIE1pbnV0ZSA9IG1pbnV0ZShEYXRlKSlcblxuZGF0YV9jbGVhbls1ODQsXSAgIyBjaGVjayBpdCB3b3JrZWRcbmBgYCJ9 -->
+<pre class="r"><code>data_clean &lt;- data[, -c(2:13)]  # create a new data set without columns 2 to 13
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKMS4gc2V0IHdvcmtpbmcgZGlyZWN0b3J5CmBgYHtyfQpzZXR3ZCgifi9MaWJyYXJ5L0Nsb3VkU3RvcmFnZS9PbmVEcml2ZS1Vbml2ZXJzaXR5b2ZFZGluYnVyZ2gvNHRoIHllYXIvZGlzc2VydGF0aW9uL2Rpc3NlcnRhdGlvbiIpCmBgYAoKMi4gTG9hZCBwYWNrYWdlcwpgYGB7ciwgbWVzc2FnZT1GQUxTRX0KbGlicmFyeShza2ltcikgICNzdW1tYXJ5CmxpYnJhcnkodGlkeXZlcnNlKQpsaWJyYXJ5KGx1YnJpZGF0ZSkgICNkYXRlcyBtYW5hZ2VtZW50CmxpYnJhcnkoZ3JpZEV4dHJhKSAgI2FycmFuZ2UgcGxvdHMKYGBgCgozLiBMb2FkIHRoZSBkYXRhIGFuZCBzZWUgaXRzIHN0cnVjdHVyZQpgYGB7cn0KZGF0YSA8LSByZWFkLmNzdigiRGF0YV9QQU1fU2NvdHRfQmFzZS5jc3YiKSAjIGxvYWQgZGF0YQpza2ltcjo6c2tpbShkYXRhKSAgIyBzZWUgYSBzdW1tYXJ5IG9mIHRoZSB3aG9sZSBkYXRhCnN0cihkYXRhKSAgIyBzZWUgdGhlIHN0cnVjdHVyZSBvZiBlYWNoIHZhcmlhYmxlCnRhaWwoZGF0YSkgICMgdmlldyB0aGUgbGFzdCA2IHJvd3Mgb2YgZGF0YQpoZWFkKGRhdGEpICAjIHZpZXcgdGhlIGZpcnN0IDYgcm93cyBvZiBkYXRhCmBgYAoKRGF0YSBpcyBmcm9tIEphbiAyMDE5IHRvIEZlYiAyMDIyLiAKSSBhbSBnb2luZyB0byBjb25zaWRlciBzdW1tZXIgZm9ybSAxIE5vdiB0byAxNSBGZWIuIApJIGN1cnJlbnRseSBoYXZlIGRhdGEgZm9yIDMgc3VtbWVyczogMjAxOS0yMDIwLCAyMDIwLTIwMjEsIDIwMjEtMjAyMi4KCg==</div>
+data_clean &lt;- data_clean %&gt;% 
+  mutate(Date = parse_date_time(Datetime, &#39;dmy HM&#39;))   # indicate the format the date is wanted
+
+print(data_clean[is.na(data_clean$Date), ])  # Check for rows with parsing issues
+
+#  Row 584 is problematic
+
+data_clean[584, 1]&lt;-&quot;10/02/2019 10:08&quot;  # Change the value to the correct one 
+
+data_clean &lt;- data_clean %&gt;% 
+  mutate(Date = parse_date_time(Datetime, &#39;dmy HM&#39;))   # repeat with all the lines working
+
+data_clean &lt;- data_clean %&gt;%  # create new columns with month, year,
+  mutate(Month = month(Date), # day, minute                     
+         Year = year(Date),
+         Day = day(Date),
+         Hour = hour(Date),
+         Minute = minute(Date))
+
+data_clean[584,]  # check it worked</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>4.2. Check the new data</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>4.3. Change the diff columns names to match the rest of columns</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5kYXRhX2NsZWFuPC1kYXRhX2NsZWFuICU+JSBcbiAgcmVuYW1lKFgxLmRpZmYgPSBkaWZmLFxuICAgICAgICAgWDIuZGlmZiA9IGRpZmYuMSxcbiAgICAgICAgIFgzLmRpZmYgPSBkaWZmLjIsXG4gICAgICAgICBYNC5kaWZmID0gZGlmZi4zKVxuYGBgIn0= -->
+<pre class="r"><code>
+data_clean&lt;-data_clean %&gt;% 
+  rename(X1.diff = diff,
+         X2.diff = diff.1,
+         X3.diff = diff.2,
+         X4.diff = diff.3)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>4.4. Need to change some variables of format</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5kYXRhX2NsZWFuIDwtIGRhdGFfY2xlYW4gJT4lXG4gIG11dGF0ZShYMS5QQVIgPSBhcy5udW1lcmljKFgxLlBBUiksICAjIENoYW5nZSBQQVIgb2YgWDEsIFgyIGFuZCBYMyB0byBudW1lcmljXG4gICAgICAgICBYMi5QQVIgPSBhcy5udW1lcmljKFgyLlBBUiksIFxuICAgICAgICAgWDMuUEFSID0gYXMubnVtZXJpYyhYMy5QQVIpLCBcbiAgICAgICAgIFg0LlBBUiA9IGFzLm51bWVyaWMoWDQuUEFSKSxcbiAgICAgICAgIFgzLkYgPSBhcy5udW1lcmljKFgzLkYpLCAgIyBDaGFuZ2UgRiBhbmQgRm0gdG8gbnVtZXJpY1xuICAgICAgICAgWDMuRm0uID0gYXMubnVtZXJpYyhYMy5GbS4pLFxuICAgICAgICAgWDMuVGVtcCA9IGFzLm51bWVyaWMoWDMuVGVtcCksICAjIENoYW5nZSBUZW1wIDMgdG8gbnVtZXJpY1xuICAgICAgICAgWDEuZGlmZiA9IGFzLm51bWVyaWMoWDEuZGlmZiksICAjIENoYW5nZSBhbGwgZGlmZiB0byBudW1lcmljXG4gICAgICAgICBYMi5kaWZmID0gYXMubnVtZXJpYyhYMi5kaWZmKSxcbiAgICAgICAgIFgzLmRpZmYgPSBhcy5udW1lcmljKFgzLmRpZmYpLFxuICAgICAgICAgWDQuZGlmZiA9IGFzLm51bWVyaWMoWDQuZGlmZiksXG4gICAgICAgICBNb250aCA9IGFzLmZhY3RvcihNb250aCksICAjIENoYW5nZSBkYXksIG1vbnRoIGFuZCB5ZWFyIHRvIGNhdGVnb3JpZXNcbiAgICAgICAgIFllYXIgPSBhcy5mYWN0b3IoWWVhciksIFxuICAgICAgICAgRGF5ID0gYXMuZmFjdG9yKERheSkpXG5gYGAifQ== -->
+<pre class="r"><code>
+data_clean &lt;- data_clean %&gt;%
+  mutate(X1.PAR = as.numeric(X1.PAR),  # Change PAR of X1, X2 and X3 to numeric
+         X2.PAR = as.numeric(X2.PAR), 
+         X3.PAR = as.numeric(X3.PAR), 
+         X4.PAR = as.numeric(X4.PAR),
+         X3.F = as.numeric(X3.F),  # Change F and Fm to numeric
+         X3.Fm. = as.numeric(X3.Fm.),
+         X3.Temp = as.numeric(X3.Temp),  # Change Temp 3 to numeric
+         X1.diff = as.numeric(X1.diff),  # Change all diff to numeric
+         X2.diff = as.numeric(X2.diff),
+         X3.diff = as.numeric(X3.diff),
+         X4.diff = as.numeric(X4.diff),
+         Month = as.factor(Month),  # Change day, month and year to categories
+         Year = as.factor(Year), 
+         Day = as.factor(Day))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>4.5. Create column for month (in letters) and day-month</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JSBcbiAgbXV0YXRlKE1vbnRoX05hbWUgPSBhcy5mYWN0b3IoY2FzZV93aGVuKCAgIyBNYWtlIGEgY29sdW1uIHdpdGggdGhlIG5hbWVzIG9mIHRoZSBtb250aHMgYW5kIG1ha2UgdGhlbSBhIGZhY3RvclxuICBNb250aCA9PSAxIH4gXCJKYW5cIiwgICMgY2FzZV93aGVuIGZyb20gZHBseXIgcGFja2FnZVxuICBNb250aCA9PSAyIH4gXCJGZWJcIixcbiAgTW9udGggPT0gMyB+IFwiTWFyXCIsXG4gIE1vbnRoID09IDQgfiBcIkFwclwiLFxuICBNb250aCA9PSA1IH4gXCJNYXlcIixcbiAgTW9udGggPT0gNiB+IFwiSnVuXCIsXG4gIE1vbnRoID09IDcgfiBcIkp1bFwiLFxuICBNb250aCA9PSA4IH4gXCJBdWdcIixcbiAgTW9udGggPT0gOSB+IFwiU2VwXCIsXG4gIE1vbnRoID09IDEwIH4gXCJPY3RcIixcbiAgTW9udGggPT0gMTEgfiBcIk5vdlwiLFxuICBNb250aCA9PSAxMiB+IFwiRGVjXCIpKSkgJT4lIFxuICBtdXRhdGUoRGF0ZV9Db21iaW5lZCA9IGFzLmZhY3RvciggICMgTWFrZSBhIGNvbHVtbiB3aXRoIHRoZSBkYXkgYW5kIG1vbnRoIG5hbWUgc2VwYXJhdGVkIGJ5IC1cbiAgICBwYXN0ZShNb250aF9OYW1lLCBEYXksIHNlcCA9IFwiLVwiKSkpICAjIE1ha2UgdGhlIGNvbHVtbiBhIGZhY3RvclxuYGBgIn0= -->
+<pre class="r"><code>data_clean &lt;- data_clean %&gt;% 
+  mutate(Month_Name = as.factor(case_when(  # Make a column with the names of the months and make them a factor
+  Month == 1 ~ &quot;Jan&quot;,  # case_when from dplyr package
+  Month == 2 ~ &quot;Feb&quot;,
+  Month == 3 ~ &quot;Mar&quot;,
+  Month == 4 ~ &quot;Apr&quot;,
+  Month == 5 ~ &quot;May&quot;,
+  Month == 6 ~ &quot;Jun&quot;,
+  Month == 7 ~ &quot;Jul&quot;,
+  Month == 8 ~ &quot;Aug&quot;,
+  Month == 9 ~ &quot;Sep&quot;,
+  Month == 10 ~ &quot;Oct&quot;,
+  Month == 11 ~ &quot;Nov&quot;,
+  Month == 12 ~ &quot;Dec&quot;))) %&gt;% 
+  mutate(Date_Combined = as.factor(  # Make a column with the day and month name separated by -
+    paste(Month_Name, Day, sep = &quot;-&quot;)))  # Make the column a factor</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>4.6. Create a column for average moss values of yield,PAR, F, Fm,
+Temp, ETR and diff</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JSBcbiAgbXV0YXRlKGF2X21vc3NfeWllbGQgPSByb3dNZWFucyhkYXRhX2NsZWFuWywgYyhcIlgxLlkuLklJLlwiLCBcIlgyLlkuLklJLlwiLCBcIlg0LlkuLklJLlwiKV0pLCAgIyByb3dNZWFucyBnZXRzIHRoZSBtZWFuIG9mIGVhY2ggcm93IGluIHRoZSBkYXRhIGZyYW1lIGFuZCBzdG9yZXMgdGhlIHJlc3VsdCBpbiBhIG5ldyBjb2x1bW5cbiAgICAgICAgIGF2X21vc3NfUEFSID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoXCJYMS5QQVJcIiwgXCJYMi5QQVJcIiwgXCJYNC5QQVJcIildKSxcbiAgICAgICAgIGF2X21vc3NfRiA9IHJvd01lYW5zKGRhdGFfY2xlYW5bLCBjKFwiWDEuRlwiLCBcIlgyLkZcIiwgXCJYNC5GXCIpXSksXG4gICAgICAgICBhdl9tb3NzX0ZtID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoXCJYMS5GbS5cIiwgXCJYMi5GbS5cIiwgXCJYNC5GbS5cIildKSxcbiAgICAgICAgIGF2X21vc3NfdGVtcCA9IHJvd01lYW5zKGRhdGFfY2xlYW5bLCBjKFwiWDEuVGVtcFwiLCBcIlgyLlRlbXBcIiwgXCJYNC5UZW1wXCIpXSksXG4gICAgICAgICBhdl9tb3NzX0VUUiA9IHJvd01lYW5zKGRhdGFfY2xlYW5bLCBjKFwiWDEuRVRSXCIsIFwiWDIuRVRSXCIsIFwiWDQuRVRSXCIpXSksXG4gICAgICAgICBhdl9tb3NzX2RpZmYgPSByb3dNZWFucyhkYXRhX2NsZWFuWywgYyhcIlgxLmRpZmZcIiwgXCJYMi5kaWZmXCIsIFwiWDQuZGlmZlwiKV0pKVxuYGBgIn0= -->
+<pre class="r"><code>data_clean &lt;- data_clean %&gt;% 
+  mutate(av_moss_yield = rowMeans(data_clean[, c(&quot;X1.Y..II.&quot;, &quot;X2.Y..II.&quot;, &quot;X4.Y..II.&quot;)]),  # rowMeans gets the mean of each row in the data frame and stores the result in a new column
+         av_moss_PAR = rowMeans(data_clean[, c(&quot;X1.PAR&quot;, &quot;X2.PAR&quot;, &quot;X4.PAR&quot;)]),
+         av_moss_F = rowMeans(data_clean[, c(&quot;X1.F&quot;, &quot;X2.F&quot;, &quot;X4.F&quot;)]),
+         av_moss_Fm = rowMeans(data_clean[, c(&quot;X1.Fm.&quot;, &quot;X2.Fm.&quot;, &quot;X4.Fm.&quot;)]),
+         av_moss_temp = rowMeans(data_clean[, c(&quot;X1.Temp&quot;, &quot;X2.Temp&quot;, &quot;X4.Temp&quot;)]),
+         av_moss_ETR = rowMeans(data_clean[, c(&quot;X1.ETR&quot;, &quot;X2.ETR&quot;, &quot;X4.ETR&quot;)]),
+         av_moss_diff = rowMeans(data_clean[, c(&quot;X1.diff&quot;, &quot;X2.diff&quot;, &quot;X4.diff&quot;)]))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="subset-data-for-summers-2019-2020-2020-2021-2021-2022" class="section level2">
+<h2>5. Subset data for summers 2019-2020, 2020-2021, 2021-2022</h2>
+<p><strong>Summer 2019-2020</strong></p>
+<p>This includes the data from the 1-Nov 2019 to the 15 of Feb 2020</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWVyXzE5XzIwIDwtIGRhdGFfY2xlYW4gJT4lIFxuICBmaWx0ZXIoWWVhciA9PSAyMDE5ICYgTW9udGggJWluJSBjKDExLDEyKSB8ICAjIEZpbHRlciBhbGwgZGF0YSBwb2ludHMgaW4gTm92LCBEZWMgMjAxOSBhbmQgSmFuLCBGZWIgMjAyMFxuICAgICAgICAgICBZZWFyID09IDIwMjAgJiBNb250aCAlaW4lIGMoMSwyKSkgJT4lIFxuICBmaWx0ZXIoIShNb250aCA9PSAyICYgRGF5ID4gMTUpKSAgIyByZW1vdmUgZGF5cyBvdmVyIHRoZSAxNXRoIG9mIEZlYlxuXG4jIENoZWNrIG91ciBkYXRhXG5cbmhlYWQoc3VtbWVyXzE5XzIwKSAgIyBGaXJzdCA2IHJvd3MgXG50YWlsKHN1bW1lcl8xOV8yMCkgICMgTGFzdCA2IHJvd3NcbmBgYCJ9 -->
+<pre class="r"><code>summer_19_20 &lt;- data_clean %&gt;% 
+  filter(Year == 2019 &amp; Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2019 and Jan, Feb 2020
+           Year == 2020 &amp; Month %in% c(1,2)) %&gt;% 
+  filter(!(Month == 2 &amp; Day &gt; 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_19_20)  # First 6 rows 
+tail(summer_19_20)  # Last 6 rows</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Summer 2020-2021</strong></p>
+<p>This includes the data from the 1-Nov 2020 to the 15 of Feb 2021</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWVyXzIwXzIxIDwtIGRhdGFfY2xlYW4gJT4lIFxuICBmaWx0ZXIoWWVhciA9PSAyMDIwICYgTW9udGggJWluJSBjKDExLDEyKSB8ICAjIEZpbHRlciBhbGwgZGF0YSBwb2ludHMgaW4gTm92LCBEZWMgMjAyOSBhbmQgSmFuLCBGZWIgMjAyMVxuICAgICAgICAgICBZZWFyID09IDIwMjEgJiBNb250aCAlaW4lIGMoMSwyKSkgJT4lIFxuICBmaWx0ZXIoIShNb250aCA9PSAyICYgRGF5ID4gMTUpKSAgIyByZW1vdmUgZGF5cyBvdmVyIHRoZSAxNXRoIG9mIEZlYlxuXG4jIENoZWNrIG91ciBkYXRhXG5cbmhlYWQoc3VtbWVyXzIwXzIxKSAgIyBGaXJzdCA2IHJvd3MgXG50YWlsKHN1bW1lcl8yMF8yMSkgICMgTGFzdCA2IHJvd3NcbmBgYCJ9 -->
+<pre class="r"><code>summer_20_21 &lt;- data_clean %&gt;% 
+  filter(Year == 2020 &amp; Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2029 and Jan, Feb 2021
+           Year == 2021 &amp; Month %in% c(1,2)) %&gt;% 
+  filter(!(Month == 2 &amp; Day &gt; 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_20_21)  # First 6 rows 
+tail(summer_20_21)  # Last 6 rows</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Summer 2021-2022</strong></p>
+<p>This includes the data from the 1-Nov 2021 to the 15 of Feb 2022.</p>
+<p>* I only have the data until the 3rd of Feb yet</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWVyXzIxXzIyIDwtIGRhdGFfY2xlYW4gJT4lIFxuICBmaWx0ZXIoWWVhciA9PSAyMDIxICYgTW9udGggJWluJSBjKDExLDEyKSB8ICAjIEZpbHRlciBhbGwgZGF0YSBwb2ludHMgaW4gTm92LCBEZWMgMjAyMSBhbmQgSmFuLCBGZWIgMjAyMlxuICAgICAgICAgICBZZWFyID09IDIwMjIgJiBNb250aCAlaW4lIGMoMSwyKSkgJT4lIFxuICBmaWx0ZXIoIShNb250aCA9PSAyICYgRGF5ID4gMTUpKSAgIyByZW1vdmUgZGF5cyBvdmVyIHRoZSAxNXRoIG9mIEZlYlxuXG4jIENoZWNrIG91ciBkYXRhXG5cbmhlYWQoc3VtbWVyXzIxXzIyKSAgIyBGaXJzdCA2IHJvd3MgXG50YWlsKHN1bW1lcl8yMV8yMikgICMgTGFzdCA2IHJvd3NcbmBgYCJ9 -->
+<pre class="r"><code>summer_21_22 &lt;- data_clean %&gt;% 
+  filter(Year == 2021 &amp; Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2021 and Jan, Feb 2022
+           Year == 2022 &amp; Month %in% c(1,2)) %&gt;% 
+  filter(!(Month == 2 &amp; Day &gt; 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_21_22)  # First 6 rows 
+tail(summer_21_22)  # Last 6 rows</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKMS4gIFNldCB3b3JraW5nIGRpcmVjdG9yeQoKYGBge3J9CnNldHdkKCJ+L0xpYnJhcnkvQ2xvdWRTdG9yYWdlL09uZURyaXZlLVVuaXZlcnNpdHlvZkVkaW5idXJnaC80dGggeWVhci9kaXNzZXJ0YXRpb24vZGlzc2VydGF0aW9uIikKYGBgCgoyLiAgTG9hZCBwYWNrYWdlcwoKYGBge3IsIG1lc3NhZ2U9RkFMU0V9CmxpYnJhcnkoc2tpbXIpICAjc3VtbWFyeQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShsdWJyaWRhdGUpICAjZGF0ZXMgbWFuYWdlbWVudApsaWJyYXJ5KGdyaWRFeHRyYSkgICNhcnJhbmdlIHBsb3RzCmBgYAoKMy4gIExvYWQgdGhlIGRhdGEgYW5kIHNlZSBpdHMgc3RydWN0dXJlCgpgYGB7cn0KZGF0YSA8LSByZWFkLmNzdigiRGF0YV9QQU1fU2NvdHRfQmFzZS5jc3YiKSAjIGxvYWQgZGF0YQpza2ltcjo6c2tpbShkYXRhKSAgIyBzZWUgYSBzdW1tYXJ5IG9mIHRoZSB3aG9sZSBkYXRhCnN0cihkYXRhKSAgIyBzZWUgdGhlIHN0cnVjdHVyZSBvZiBlYWNoIHZhcmlhYmxlCnRhaWwoZGF0YSkgICMgdmlldyB0aGUgbGFzdCA2IHJvd3Mgb2YgZGF0YQpoZWFkKGRhdGEpICAjIHZpZXcgdGhlIGZpcnN0IDYgcm93cyBvZiBkYXRhCmBgYAoKRGF0YSBvZiBzZW5zb3JzIDEsMiBhbmQgNCBhcmUgZm9yIHRoZSBtb3NzIGFuZCAzIGlzIGZvciB0aGUgbGljaGVuLiBEYXRhIGlzIGZyb20gSmFuIDIwMTkgdG8gRmViIDIwMjIuIEkgYW0gZ29pbmcgdG8gY29uc2lkZXIgc3VtbWVyIGZvcm0gMSBOb3YgdG8gMTUgRmViLiBJIGN1cnJlbnRseSBoYXZlIGRhdGEgZm9yIDMgc3VtbWVyczogMjAxOS0yMDIwLCAyMDIwLTIwMjEsIDIwMjEtMjAyMi4KCiMjIDQuIEZvcm1hdCBkYXRhIGluIGEgd2F5IHRoYXQgaXMgZ29pbmcgdG8gYmUgdXNlZnVsIHRvIG1lCgo0LjEuIFJlbW92ZSB3ZWlyZCB0aW1lcyBhbmQgZGF0ZXMgYW5kIGRpdmlkZSB0aGUgdXNlZnVsIG9uZXMKCmBgYHtyfQpkYXRhX2NsZWFuIDwtIGRhdGFbLCAtYygyOjEzKV0gICMgY3JlYXRlIGEgbmV3IGRhdGEgc2V0IHdpdGhvdXQgY29sdW1ucyAyIHRvIDEzCgpkYXRhX2NsZWFuIDwtIGRhdGFfY2xlYW4gJT4lIAogIG11dGF0ZShEYXRlID0gcGFyc2VfZGF0ZV90aW1lKERhdGV0aW1lLCAnZG15IEhNJykpICAgIyBpbmRpY2F0ZSB0aGUgZm9ybWF0IHRoZSBkYXRlIGlzIHdhbnRlZAoKcHJpbnQoZGF0YV9jbGVhbltpcy5uYShkYXRhX2NsZWFuJERhdGUpLCBdKSAgIyBDaGVjayBmb3Igcm93cyB3aXRoIHBhcnNpbmcgaXNzdWVzCgojICBSb3cgNTg0IGlzIHByb2JsZW1hdGljCgpkYXRhX2NsZWFuWzU4NCwgMV08LSIxMC8wMi8yMDE5IDEwOjA4IiAgIyBDaGFuZ2UgdGhlIHZhbHVlIHRvIHRoZSBjb3JyZWN0IG9uZSAKCmRhdGFfY2xlYW4gPC0gZGF0YV9jbGVhbiAlPiUgCiAgbXV0YXRlKERhdGUgPSBwYXJzZV9kYXRlX3RpbWUoRGF0ZXRpbWUsICdkbXkgSE0nKSkgICAjIHJlcGVhdCB3aXRoIGFsbCB0aGUgbGluZXMgd29ya2luZwoKZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JSAgIyBjcmVhdGUgbmV3IGNvbHVtbnMgd2l0aCBtb250aCwgeWVhciwKICBtdXRhdGUoTW9udGggPSBtb250aChEYXRlKSwgIyBkYXksIG1pbnV0ZSAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICBZZWFyID0geWVhcihEYXRlKSwKICAgICAgICAgRGF5ID0gZGF5KERhdGUpLAogICAgICAgICBIb3VyID0gaG91cihEYXRlKSwKICAgICAgICAgTWludXRlID0gbWludXRlKERhdGUpKQoKZGF0YV9jbGVhbls1ODQsXSAgIyBjaGVjayBpdCB3b3JrZWQKYGBgCgo0LjIuIENoZWNrIHRoZSBuZXcgZGF0YQoKYGBge3IsIGVjaG89IFRSVUUsIHJlc3VsdHM9J2hpZGUnfQpzdHIoZGF0YV9jbGVhbikKc2tpbXI6OnNraW0oZGF0YV9jbGVhbikKYGBgCgo0LjMuIENoYW5nZSB0aGUgZGlmZiBjb2x1bW5zIG5hbWVzIHRvIG1hdGNoIHRoZSByZXN0IG9mIGNvbHVtbnMKCmBgYHtyfQoKZGF0YV9jbGVhbjwtZGF0YV9jbGVhbiAlPiUgCiAgcmVuYW1lKFgxLmRpZmYgPSBkaWZmLAogICAgICAgICBYMi5kaWZmID0gZGlmZi4xLAogICAgICAgICBYMy5kaWZmID0gZGlmZi4yLAogICAgICAgICBYNC5kaWZmID0gZGlmZi4zKQpgYGAKCjQuNC4gTmVlZCB0byBjaGFuZ2Ugc29tZSB2YXJpYWJsZXMgb2YgZm9ybWF0CgpgYGB7ciwgd2FybmluZyA9IEZBTFNFfQoKZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JQogIG11dGF0ZShYMS5QQVIgPSBhcy5udW1lcmljKFgxLlBBUiksICAjIENoYW5nZSBQQVIgb2YgWDEsIFgyIGFuZCBYMyB0byBudW1lcmljCiAgICAgICAgIFgyLlBBUiA9IGFzLm51bWVyaWMoWDIuUEFSKSwgCiAgICAgICAgIFgzLlBBUiA9IGFzLm51bWVyaWMoWDMuUEFSKSwgCiAgICAgICAgIFg0LlBBUiA9IGFzLm51bWVyaWMoWDQuUEFSKSwKICAgICAgICAgWDMuRiA9IGFzLm51bWVyaWMoWDMuRiksICAjIENoYW5nZSBGIGFuZCBGbSB0byBudW1lcmljCiAgICAgICAgIFgzLkZtLiA9IGFzLm51bWVyaWMoWDMuRm0uKSwKICAgICAgICAgWDMuVGVtcCA9IGFzLm51bWVyaWMoWDMuVGVtcCksICAjIENoYW5nZSBUZW1wIDMgdG8gbnVtZXJpYwogICAgICAgICBYMS5kaWZmID0gYXMubnVtZXJpYyhYMS5kaWZmKSwgICMgQ2hhbmdlIGFsbCBkaWZmIHRvIG51bWVyaWMKICAgICAgICAgWDIuZGlmZiA9IGFzLm51bWVyaWMoWDIuZGlmZiksCiAgICAgICAgIFgzLmRpZmYgPSBhcy5udW1lcmljKFgzLmRpZmYpLAogICAgICAgICBYNC5kaWZmID0gYXMubnVtZXJpYyhYNC5kaWZmKSwKICAgICAgICAgTW9udGggPSBhcy5mYWN0b3IoTW9udGgpLCAgIyBDaGFuZ2UgZGF5LCBtb250aCBhbmQgeWVhciB0byBjYXRlZ29yaWVzCiAgICAgICAgIFllYXIgPSBhcy5mYWN0b3IoWWVhciksIAogICAgICAgICBEYXkgPSBhcy5mYWN0b3IoRGF5KSkKYGBgCgo0LjUuIENyZWF0ZSBjb2x1bW4gZm9yIG1vbnRoIChpbiBsZXR0ZXJzKSBhbmQgZGF5LW1vbnRoCgpgYGB7cn0KZGF0YV9jbGVhbiA8LSBkYXRhX2NsZWFuICU+JSAKICBtdXRhdGUoTW9udGhfTmFtZSA9IGFzLmZhY3RvcihjYXNlX3doZW4oICAjIE1ha2UgYSBjb2x1bW4gd2l0aCB0aGUgbmFtZXMgb2YgdGhlIG1vbnRocyBhbmQgbWFrZSB0aGVtIGEgZmFjdG9yCiAgTW9udGggPT0gMSB+ICJKYW4iLCAgIyBjYXNlX3doZW4gZnJvbSBkcGx5ciBwYWNrYWdlCiAgTW9udGggPT0gMiB+ICJGZWIiLAogIE1vbnRoID09IDMgfiAiTWFyIiwKICBNb250aCA9PSA0IH4gIkFwciIsCiAgTW9udGggPT0gNSB+ICJNYXkiLAogIE1vbnRoID09IDYgfiAiSnVuIiwKICBNb250aCA9PSA3IH4gIkp1bCIsCiAgTW9udGggPT0gOCB+ICJBdWciLAogIE1vbnRoID09IDkgfiAiU2VwIiwKICBNb250aCA9PSAxMCB+ICJPY3QiLAogIE1vbnRoID09IDExIH4gIk5vdiIsCiAgTW9udGggPT0gMTIgfiAiRGVjIikpKSAlPiUgCiAgbXV0YXRlKERhdGVfQ29tYmluZWQgPSBhcy5mYWN0b3IoICAjIE1ha2UgYSBjb2x1bW4gd2l0aCB0aGUgZGF5IGFuZCBtb250aCBuYW1lIHNlcGFyYXRlZCBieSAtCiAgICBwYXN0ZShNb250aF9OYW1lLCBEYXksIHNlcCA9ICItIikpKSAgIyBNYWtlIHRoZSBjb2x1bW4gYSBmYWN0b3IKYGBgCgo0LjYuIENyZWF0ZSBhIGNvbHVtbiBmb3IgYXZlcmFnZSBtb3NzIHZhbHVlcyBvZiB5aWVsZCxQQVIsIEYsIEZtLCBUZW1wLCBFVFIgYW5kIGRpZmYKCmBgYHtyfQpkYXRhX2NsZWFuIDwtIGRhdGFfY2xlYW4gJT4lIAogIG11dGF0ZShhdl9tb3NzX3lpZWxkID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoIlgxLlkuLklJLiIsICJYMi5ZLi5JSS4iLCAiWDQuWS4uSUkuIildKSwgICMgcm93TWVhbnMgZ2V0cyB0aGUgbWVhbiBvZiBlYWNoIHJvdyBpbiB0aGUgZGF0YSBmcmFtZSBhbmQgc3RvcmVzIHRoZSByZXN1bHQgaW4gYSBuZXcgY29sdW1uCiAgICAgICAgIGF2X21vc3NfUEFSID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoIlgxLlBBUiIsICJYMi5QQVIiLCAiWDQuUEFSIildKSwKICAgICAgICAgYXZfbW9zc19GID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoIlgxLkYiLCAiWDIuRiIsICJYNC5GIildKSwKICAgICAgICAgYXZfbW9zc19GbSA9IHJvd01lYW5zKGRhdGFfY2xlYW5bLCBjKCJYMS5GbS4iLCAiWDIuRm0uIiwgIlg0LkZtLiIpXSksCiAgICAgICAgIGF2X21vc3NfdGVtcCA9IHJvd01lYW5zKGRhdGFfY2xlYW5bLCBjKCJYMS5UZW1wIiwgIlgyLlRlbXAiLCAiWDQuVGVtcCIpXSksCiAgICAgICAgIGF2X21vc3NfRVRSID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoIlgxLkVUUiIsICJYMi5FVFIiLCAiWDQuRVRSIildKSwKICAgICAgICAgYXZfbW9zc19kaWZmID0gcm93TWVhbnMoZGF0YV9jbGVhblssIGMoIlgxLmRpZmYiLCAiWDIuZGlmZiIsICJYNC5kaWZmIildKSkKYGBgCgojIyA1LiBTdWJzZXQgZGF0YSBmb3Igc3VtbWVycyAyMDE5LTIwMjAsIDIwMjAtMjAyMSwgMjAyMS0yMDIyCgoqKlN1bW1lciAyMDE5LTIwMjAqKgoKVGhpcyBpbmNsdWRlcyB0aGUgZGF0YSBmcm9tIHRoZSAxLU5vdiAyMDE5IHRvIHRoZSAxNSBvZiBGZWIgMjAyMAoKYGBge3J9CnN1bW1lcl8xOV8yMCA8LSBkYXRhX2NsZWFuICU+JSAKICBmaWx0ZXIoWWVhciA9PSAyMDE5ICYgTW9udGggJWluJSBjKDExLDEyKSB8ICAjIEZpbHRlciBhbGwgZGF0YSBwb2ludHMgaW4gTm92LCBEZWMgMjAxOSBhbmQgSmFuLCBGZWIgMjAyMAogICAgICAgICAgIFllYXIgPT0gMjAyMCAmIE1vbnRoICVpbiUgYygxLDIpKSAlPiUgCiAgZmlsdGVyKCEoTW9udGggPT0gMiAmIERheSA+IDE1KSkgICMgcmVtb3ZlIGRheXMgb3ZlciB0aGUgMTV0aCBvZiBGZWIKCiMgQ2hlY2sgb3VyIGRhdGEKCmhlYWQoc3VtbWVyXzE5XzIwKSAgIyBGaXJzdCA2IHJvd3MgCnRhaWwoc3VtbWVyXzE5XzIwKSAgIyBMYXN0IDYgcm93cwpgYGAKCioqU3VtbWVyIDIwMjAtMjAyMSoqCgpUaGlzIGluY2x1ZGVzIHRoZSBkYXRhIGZyb20gdGhlIDEtTm92IDIwMjAgdG8gdGhlIDE1IG9mIEZlYiAyMDIxCgpgYGB7cn0Kc3VtbWVyXzIwXzIxIDwtIGRhdGFfY2xlYW4gJT4lIAogIGZpbHRlcihZZWFyID09IDIwMjAgJiBNb250aCAlaW4lIGMoMTEsMTIpIHwgICMgRmlsdGVyIGFsbCBkYXRhIHBvaW50cyBpbiBOb3YsIERlYyAyMDI5IGFuZCBKYW4sIEZlYiAyMDIxCiAgICAgICAgICAgWWVhciA9PSAyMDIxICYgTW9udGggJWluJSBjKDEsMikpICU+JSAKICBmaWx0ZXIoIShNb250aCA9PSAyICYgRGF5ID4gMTUpKSAgIyByZW1vdmUgZGF5cyBvdmVyIHRoZSAxNXRoIG9mIEZlYgoKIyBDaGVjayBvdXIgZGF0YQoKaGVhZChzdW1tZXJfMjBfMjEpICAjIEZpcnN0IDYgcm93cyAKdGFpbChzdW1tZXJfMjBfMjEpICAjIExhc3QgNiByb3dzCmBgYAoKKipTdW1tZXIgMjAyMS0yMDIyKioKClRoaXMgaW5jbHVkZXMgdGhlIGRhdGEgZnJvbSB0aGUgMS1Ob3YgMjAyMSB0byB0aGUgMTUgb2YgRmViIDIwMjIuCgpcKiBJIG9ubHkgaGF2ZSB0aGUgZGF0YSB1bnRpbCB0aGUgM3JkIG9mIEZlYiB5ZXQKCmBgYHtyfQpzdW1tZXJfMjFfMjIgPC0gZGF0YV9jbGVhbiAlPiUgCiAgZmlsdGVyKFllYXIgPT0gMjAyMSAmIE1vbnRoICVpbiUgYygxMSwxMikgfCAgIyBGaWx0ZXIgYWxsIGRhdGEgcG9pbnRzIGluIE5vdiwgRGVjIDIwMjEgYW5kIEphbiwgRmViIDIwMjIKICAgICAgICAgICBZZWFyID09IDIwMjIgJiBNb250aCAlaW4lIGMoMSwyKSkgJT4lIAogIGZpbHRlcighKE1vbnRoID09IDIgJiBEYXkgPiAxNSkpICAjIHJlbW92ZSBkYXlzIG92ZXIgdGhlIDE1dGggb2YgRmViCgojIENoZWNrIG91ciBkYXRhCgpoZWFkKHN1bW1lcl8yMV8yMikgICMgRmlyc3QgNiByb3dzIAp0YWlsKHN1bW1lcl8yMV8yMikgICMgTGFzdCA2IHJvd3MKYGBgCg==</div>
 
 
 

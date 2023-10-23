@@ -3,12 +3,14 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-1. set working directory
+1.  Set working directory
+
 ```{r}
 setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertation/dissertation")
 ```
 
-2. Load packages
+2.  Load packages
+
 ```{r, message=FALSE}
 library(skimr)  #summary
 library(tidyverse)
@@ -16,7 +18,8 @@ library(lubridate)  #dates management
 library(gridExtra)  #arrange plots
 ```
 
-3. Load the data and see its structure
+3.  Load the data and see its structure
+
 ```{r}
 data <- read.csv("Data_PAM_Scott_Base.csv") # load data
 skimr::skim(data)  # see a summary of the whole data
@@ -25,7 +28,158 @@ tail(data)  # view the last 6 rows of data
 head(data)  # view the first 6 rows of data
 ```
 
-Data is from Jan 2019 to Feb 2022. 
-I am going to consider summer form 1 Nov to 15 Feb. 
-I currently have data for 3 summers: 2019-2020, 2020-2021, 2021-2022.
+Data of sensors 1,2 and 4 are for the moss and 3 is for the lichen. Data is from Jan 2019 to Feb 2022. I am going to consider summer form 1 Nov to 15 Feb. I currently have data for 3 summers: 2019-2020, 2020-2021, 2021-2022.
 
+## 4. Format data in a way that is going to be useful to me
+
+4.1. Remove weird times and dates and divide the useful ones
+
+```{r}
+data_clean <- data[, -c(2:13)]  # create a new data set without columns 2 to 13
+
+data_clean <- data_clean %>% 
+  mutate(Date = parse_date_time(Datetime, 'dmy HM'))   # indicate the format the date is wanted
+
+print(data_clean[is.na(data_clean$Date), ])  # Check for rows with parsing issues
+
+#  Row 584 is problematic
+
+data_clean[584, 1]<-"10/02/2019 10:08"  # Change the value to the correct one 
+
+data_clean <- data_clean %>% 
+  mutate(Date = parse_date_time(Datetime, 'dmy HM'))   # repeat with all the lines working
+
+data_clean <- data_clean %>%  # create new columns with month, year,
+  mutate(Month = month(Date), # day, minute                     
+         Year = year(Date),
+         Day = day(Date),
+         Hour = hour(Date),
+         Minute = minute(Date))
+
+data_clean[584,]  # check it worked
+```
+
+4.2. Check the new data
+
+```{r, echo= TRUE, results='hide'}
+str(data_clean)
+skimr::skim(data_clean)
+```
+
+4.3. Change the diff columns names to match the rest of columns
+
+```{r}
+
+data_clean<-data_clean %>% 
+  rename(X1.diff = diff,
+         X2.diff = diff.1,
+         X3.diff = diff.2,
+         X4.diff = diff.3)
+```
+
+4.4. Need to change some variables of format
+
+```{r, warning = FALSE}
+
+data_clean <- data_clean %>%
+  mutate(X1.PAR = as.numeric(X1.PAR),  # Change PAR of X1, X2 and X3 to numeric
+         X2.PAR = as.numeric(X2.PAR), 
+         X3.PAR = as.numeric(X3.PAR), 
+         X4.PAR = as.numeric(X4.PAR),
+         X3.F = as.numeric(X3.F),  # Change F and Fm to numeric
+         X3.Fm. = as.numeric(X3.Fm.),
+         X3.Temp = as.numeric(X3.Temp),  # Change Temp 3 to numeric
+         X1.diff = as.numeric(X1.diff),  # Change all diff to numeric
+         X2.diff = as.numeric(X2.diff),
+         X3.diff = as.numeric(X3.diff),
+         X4.diff = as.numeric(X4.diff),
+         Month = as.factor(Month),  # Change day, month and year to categories
+         Year = as.factor(Year), 
+         Day = as.factor(Day))
+```
+
+4.5. Create column for month (in letters) and day-month
+
+```{r}
+data_clean <- data_clean %>% 
+  mutate(Month_Name = as.factor(case_when(  # Make a column with the names of the months and make them a factor
+  Month == 1 ~ "Jan",  # case_when from dplyr package
+  Month == 2 ~ "Feb",
+  Month == 3 ~ "Mar",
+  Month == 4 ~ "Apr",
+  Month == 5 ~ "May",
+  Month == 6 ~ "Jun",
+  Month == 7 ~ "Jul",
+  Month == 8 ~ "Aug",
+  Month == 9 ~ "Sep",
+  Month == 10 ~ "Oct",
+  Month == 11 ~ "Nov",
+  Month == 12 ~ "Dec"))) %>% 
+  mutate(Date_Combined = as.factor(  # Make a column with the day and month name separated by -
+    paste(Month_Name, Day, sep = "-")))  # Make the column a factor
+```
+
+4.6. Create a column for average moss values of yield,PAR, F, Fm, Temp, ETR and diff
+
+```{r}
+data_clean <- data_clean %>% 
+  mutate(av_moss_yield = rowMeans(data_clean[, c("X1.Y..II.", "X2.Y..II.", "X4.Y..II.")]),  # rowMeans gets the mean of each row in the data frame and stores the result in a new column
+         av_moss_PAR = rowMeans(data_clean[, c("X1.PAR", "X2.PAR", "X4.PAR")]),
+         av_moss_F = rowMeans(data_clean[, c("X1.F", "X2.F", "X4.F")]),
+         av_moss_Fm = rowMeans(data_clean[, c("X1.Fm.", "X2.Fm.", "X4.Fm.")]),
+         av_moss_temp = rowMeans(data_clean[, c("X1.Temp", "X2.Temp", "X4.Temp")]),
+         av_moss_ETR = rowMeans(data_clean[, c("X1.ETR", "X2.ETR", "X4.ETR")]),
+         av_moss_diff = rowMeans(data_clean[, c("X1.diff", "X2.diff", "X4.diff")]))
+```
+
+## 5. Subset data for summers 2019-2020, 2020-2021, 2021-2022
+
+**Summer 2019-2020**
+
+This includes the data from the 1-Nov 2019 to the 15 of Feb 2020
+
+```{r}
+summer_19_20 <- data_clean %>% 
+  filter(Year == 2019 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2019 and Jan, Feb 2020
+           Year == 2020 & Month %in% c(1,2)) %>% 
+  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_19_20)  # First 6 rows 
+tail(summer_19_20)  # Last 6 rows
+```
+
+**Summer 2020-2021**
+
+This includes the data from the 1-Nov 2020 to the 15 of Feb 2021
+
+```{r}
+summer_20_21 <- data_clean %>% 
+  filter(Year == 2020 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2029 and Jan, Feb 2021
+           Year == 2021 & Month %in% c(1,2)) %>% 
+  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_20_21)  # First 6 rows 
+tail(summer_20_21)  # Last 6 rows
+```
+
+**Summer 2021-2022**
+
+This includes the data from the 1-Nov 2021 to the 15 of Feb 2022.
+
+\* I only have the data until the 3rd of Feb yet
+
+```{r}
+summer_21_22 <- data_clean %>% 
+  filter(Year == 2021 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2021 and Jan, Feb 2022
+           Year == 2022 & Month %in% c(1,2)) %>% 
+  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+
+# Check our data
+
+head(summer_21_22)  # First 6 rows 
+tail(summer_21_22)  # Last 6 rows
+```
