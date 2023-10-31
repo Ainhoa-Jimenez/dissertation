@@ -17,6 +17,19 @@ library(tidyverse)
 library(lubridate)  #dates management
 library(gridExtra)  #arrange plots
 ```
+2.2. Creates functions
+
+- Function for graph asthetics
+
+```{r, echo= TRUE, results="hide"}
+theme_graphs_env_cond <- function(){
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90))+
+   theme(axis.text = element_text(size = 11),  # Adjust the size as needed
+          axis.title = element_text(size = 18),
+        legend.text = element_text(size=14))
+  }
+```
 
 3.  Load the data and see its structure
 
@@ -35,13 +48,13 @@ Data of sensors 1,2 and 4 are for the moss and 3 is for the lichen. Data is from
 4.1. Remove weird times and dates and divide the useful ones
 
 ```{r}
-data_clean <- data[, -c(2:13)]  # create a new data set without columns 2 to 13
+data_clean <- data[, -c(2:13)] %>%   # create a new data set without columns 2 to 13
+  mutate(Day_cum = as.numeric(data$Date)) # maintain cumulative date but change column name to more informative one and make it numeric
 
 data_clean <- data_clean %>% 
   mutate(Date = parse_date_time(Datetime, 'dmy HM'))   # indicate the format the date is wanted
 
-print(data_clean[is.na(data_clean$Date), ])  # Check for rows with parsing issues
-
+print(data_clean[is.na(data_clean$Date), ])  # Check for rows with parsing issues\
 #  Row 584 is problematic
 
 data_clean[584, 1]<-"10/02/2019 10:08"  # Change the value to the correct one 
@@ -53,10 +66,11 @@ data_clean <- data_clean %>%  # create new columns with month, year,
   mutate(Month = month(Date), # day, minute                     
          Year = year(Date),
          Day = day(Date),
-         Hour = hour(Date),
+         Hour = hour(Date), 
          Minute = minute(Date))
 
 data_clean[584,]  # check it worked
+
 ```
 
 4.2. Check the new data
@@ -92,13 +106,13 @@ data_clean <- data_clean %>%
          X1.diff = as.numeric(X1.diff),  # Change all diff to numeric
          X2.diff = as.numeric(X2.diff),
          X3.diff = as.numeric(X3.diff),
-         X4.diff = as.numeric(X4.diff),
-         Month = as.factor(Month),  # Change day, month and year to categories
-         Year = as.factor(Year), 
-         Day = as.factor(Day))
+         X4.diff = as.numeric(X4.diff))
+         #Month = as.factor(Month),  # Change day, month and year to categories -> is it a great idea?
+         #Year = as.factor(Year), 
+         #Day = as.factor(Day))
 ```
 
-4.5. Create column for month (in letters) and day-month
+4.5. Create column for month (in letters) and day-month 
 
 ```{r}
 data_clean <- data_clean %>% 
@@ -117,9 +131,31 @@ data_clean <- data_clean %>%
   Month == 12 ~ "Dec"))) %>% 
   mutate(Date_Combined = as.factor(  # Make a column with the day and month name separated by -
     paste(Month_Name, Day, sep = "-")))  # Make the column a factor
+
 ```
 
-4.6. Create a column for average moss values of yield,PAR, F, Fm, Temp, ETR and diff
+4.6. Fix Day_cum
+
+```{r}
+print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day_cum
+
+# From 25/01/2022 the date format changes and it is not cummulative anymore
+
+data_clean <- data_clean %>%
+  mutate(Date_no_time = paste(year(Date), month(Date), day(Date), sep = "-")) %>%  # Create acolumn with the date but without the time
+  mutate(Day_cum = if_else(No. >= 26510, 44586 + as.numeric(difftime(Date_no_time, as.Date("2022-01-25"), units = "days")), Day_cum)) %>%  # Fix the format of Day_cum after the 25/01/2022
+  # Difftime weeks the time passed between 2 days in the units indicated
+  select(-Date_no_time)  # Remove Date_no_time from the data set
+  
+print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day_cum
+
+head(data_clean$Date_Combined)  # Check it worked
+tail(data_clean$Date_Combined)
+
+
+```
+
+4.7. Create a column for average moss values of yield,PAR, F, Fm, Temp, ETR and diff
 
 ```{r}
 data_clean <- data_clean %>% 
@@ -148,6 +184,10 @@ summer_19_20 <- data_clean %>%
 
 head(summer_19_20)  # First 6 rows 
 tail(summer_19_20)  # Last 6 rows
+
+summer_19_20$Date_Combined <- reorder(summer_19_20$Date_Combined, summer_19_20$Day_cum)  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+
+levels(summer_19_20$Date_Combined)
 ```
 
 **Summer 2020-2021**
@@ -183,3 +223,87 @@ summer_21_22 <- data_clean %>%
 head(summer_21_22)  # First 6 rows 
 tail(summer_21_22)  # Last 6 rows
 ```
+
+## Make plots for PAR and Temperature in each summer, in each sample
+
+1. Summer 2019-2020
+
+Sample X1 (moss)
+
+```{r}
+(temp_plot_19_20_X1 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X1.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond())
+
+(PAR_plot_19_20_X1 <-summer_19_20 %>% 
+    ggplot(aes(Date_Combined, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+  
+combined_plot_19_20 <- grid.arrange(temp_plot_19_20_X1, PAR_plot_19_20_X1, ncol = 1) 
+
+```
+
+Sample X2 (moss)
+
+```{r}
+(temp_plot_19_20_X2 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X2.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature Moss X2 (°C)") +
+   theme_graphs_env_cond())
+
+
+```
+
+Sample X3 (Lichen)
+
+```{r}
+(temp_plot_19_20_X2 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature Lichen X3 (°C)") +
+   theme_graphs_env_cond())
+
+
+```
+
+Sample X4 (Moss)
+
+```{r}
+(temp_plot_19_20_X2 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X4.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature Moss X4 (°C)") +
+   theme_graphs_env_cond())
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
