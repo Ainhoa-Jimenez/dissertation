@@ -12,10 +12,11 @@ setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertati
 2.  Load packages
 
 ```{r, message=FALSE}
-library(skimr)  #summary
+library(skimr)  # summary
 library(tidyverse)
-library(lubridate)  #dates management
-library(gridExtra)  #arrange plots
+library(lubridate)  # dates management
+library(gridExtra)  # arrange plots
+library(patchwork)  # combine plots
 ```
 2.2. Creates functions
 
@@ -204,6 +205,10 @@ summer_20_21 <- data_clean %>%
 
 head(summer_20_21)  # First 6 rows 
 tail(summer_20_21)  # Last 6 rows
+
+summer_20_21$Date_Combined <- reorder(summer_20_21$Date_Combined, summer_20_21$Day_cum)  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+
+levels(summer_20_21$Date_Combined)
 ```
 
 **Summer 2021-2022**
@@ -222,6 +227,10 @@ summer_21_22 <- data_clean %>%
 
 head(summer_21_22)  # First 6 rows 
 tail(summer_21_22)  # Last 6 rows
+
+summer_21_22$Date_Combined <- reorder(summer_21_22$Date_Combined, summer_21_22$Day_cum)  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+
+levels(summer_21_22$Date_Combined)
 ```
 
 ## Make plots for PAR and Temperature in each summer, in each sample
@@ -231,13 +240,16 @@ tail(summer_21_22)  # Last 6 rows
 Sample X1 (moss)
 
 ```{r}
+
 (temp_plot_19_20_X1 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X1.Temp)) +
    geom_point()+  # Add points for the data
-   geom_line()+  # add a line that joins the points
+   geom_line()+  # Add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
    labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
-   theme_graphs_env_cond())
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
 (PAR_plot_19_20_X1 <-summer_19_20 %>% 
     ggplot(aes(Date_Combined, X1.PAR)) +
@@ -245,8 +257,8 @@ Sample X1 (moss)
    geom_line()+  # add a line that joins the points
    labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
-  
-combined_plot_19_20 <- grid.arrange(temp_plot_19_20_X1, PAR_plot_19_20_X1, ncol = 1) 
+
+(combined_plot_19_20_X1 <- (temp_plot_19_20_X1/PAR_plot_19_20_X1) & plot_layout(ncol = 1))
 
 ```
 
@@ -258,46 +270,141 @@ Sample X2 (moss)
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature Moss X2 (°C)") +
-   theme_graphs_env_cond())
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X2 (°C)") +
+   theme_graphs_env_cond()+
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))
 
+(PAR_plot_19_20_X2 <-summer_19_20 %>% 
+    ggplot(aes(Date_Combined, X2.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+  
+(combined_plot_19_20_X2 <- (temp_plot_19_20_X2/PAR_plot_19_20_X2) & plot_layout(ncol = 1))
 
 ```
 
 Sample X3 (Lichen)
 
 ```{r}
-(temp_plot_19_20_X2 <- summer_19_20 %>% 
+(temp_plot_19_20_X3 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X3.Temp)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature Lichen X3 (°C)") +
-   theme_graphs_env_cond())
+   labs(x = "\nDate (day)", y = "Temperature \nLichen X3 (°C)") +
+   theme_graphs_env_cond()+
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))
 
+(PAR_plot_19_20_X3 <-summer_19_20 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+  
+(combined_plot_19_20_X3 <- (temp_plot_19_20_X3/PAR_plot_19_20_X3) & plot_layout(ncol = 1)) 
 
 ```
 
 Sample X4 (Moss)
 
 ```{r}
-(temp_plot_19_20_X2 <- summer_19_20 %>% 
+(temp_plot_19_20_X4 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X4.Temp)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature Moss X4 (°C)") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X4 (°C)") +
+   theme_graphs_env_cond()+
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))
+
+(PAR_plot_19_20_X4 <-summer_19_20 %>% 
+    ggplot(aes(Date_Combined, X4.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
+  
+(combined_plot_19_20_X4 <- (temp_plot_19_20_X4/PAR_plot_19_20_X4) & plot_layout(ncol = 1)) 
 
 
 ```
 
+2. Summer 2020-2021
 
+Sample X1 (Moss)
 
+```{r}
+(temp_plot_20_21_X1 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X1.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
+(PAR_plot_20_21_X1 <-summer_20_21 %>% 
+    ggplot(aes(Date_Combined, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
 
+(combined_plot_20_21_X1 <- (temp_plot_20_21_X1/PAR_plot_20_21_X1) & plot_layout(ncol = 1))
+```
 
+Sample X2 (Moss)
 
+```{r}
+(temp_plot_20_21_X2 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X2.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_20_21_X2 <-summer_20_21 %>% 
+    ggplot(aes(Date_Combined, X2.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(combined_plot_20_21_X2 <- (temp_plot_20_21_X2/PAR_plot_20_21_X2) & plot_layout(ncol = 1))
+```
+
+Saple X3 (Lichen)
+
+```{r}
+(temp_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_20_21_X3 <-summer_20_21 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(combined_plot_20_21_X3 <- (temp_plot_20_21_X3/PAR_plot_20_21_X3) & plot_layout(ncol = 1))
+```
 
 
 
