@@ -1,12 +1,14 @@
 ---
 title: "R Notebook"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
 
 1.  Set working directory
 
 ```{r}
-setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertation/dissertation")
+setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/dissertation/dissertation/dissertation")
 ```
 
 2.  Load packages
@@ -233,7 +235,7 @@ summer_21_22$Date_Combined <- reorder(summer_21_22$Date_Combined, summer_21_22$D
 levels(summer_21_22$Date_Combined)
 ```
 
-## Make plots for PAR and Temperature in each summer, in each sample
+## Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover)
 
 1. Summer 2019-2020
 
@@ -255,10 +257,19 @@ Sample X1 (moss)
     ggplot(aes(Date_Combined, X1.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
-(combined_plot_19_20_X1 <- (temp_plot_19_20_X1/PAR_plot_19_20_X1) & plot_layout(ncol = 1))
+(Yield_plot_19_20_X1 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X1.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(combined_plot_19_20_X1 <- (Yield_plot_19_20_X1/temp_plot_19_20_X1/PAR_plot_19_20_X1) & plot_layout(ncol = 1))
 
 ```
 
@@ -279,10 +290,19 @@ Sample X2 (moss)
     ggplot(aes(Date_Combined, X2.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
   
-(combined_plot_19_20_X2 <- (temp_plot_19_20_X2/PAR_plot_19_20_X2) & plot_layout(ncol = 1))
+(Yield_plot_19_20_X2 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X2.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(combined_plot_19_20_X2 <- (Yield_plot_19_20_X2/temp_plot_19_20_X2/PAR_plot_19_20_X2) & plot_layout(ncol = 1))
 
 ```
 
@@ -303,10 +323,19 @@ Sample X3 (Lichen)
     ggplot(aes(Date_Combined, X3.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
+
+(Yield_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
   
-(combined_plot_19_20_X3 <- (temp_plot_19_20_X3/PAR_plot_19_20_X3) & plot_layout(ncol = 1)) 
+(combined_plot_19_20_X3 <- (Yield_plot_19_20_X2/temp_plot_19_20_X3/PAR_plot_19_20_X3) & plot_layout(ncol = 1)) 
 
 ```
 
@@ -327,10 +356,19 @@ Sample X4 (Moss)
     ggplot(aes(Date_Combined, X4.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
+
+(Yield_plot_19_20_X4 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X4.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
   
-(combined_plot_19_20_X4 <- (temp_plot_19_20_X4/PAR_plot_19_20_X4) & plot_layout(ncol = 1)) 
+(combined_plot_19_20_X4 <- (Yield_plot_19_20_X4/temp_plot_19_20_X4/PAR_plot_19_20_X4) & plot_layout(ncol = 1)) 
 
 
 ```
@@ -350,14 +388,23 @@ Sample X1 (Moss)
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
-(PAR_plot_20_21_X1 <-summer_20_21 %>% 
+(PAR_plot_20_21_X1 <- summer_20_21 %>% 
     ggplot(aes(Date_Combined, X1.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
-(combined_plot_20_21_X1 <- (temp_plot_20_21_X1/PAR_plot_20_21_X1) & plot_layout(ncol = 1))
+(Yield_plot_20_21_X1 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X1.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(combined_plot_20_21_X1 <- (Yield_plot_20_21_X1/temp_plot_20_21_X1/PAR_plot_20_21_X1) & plot_layout(ncol = 1))
 ```
 
 Sample X2 (Moss)
@@ -368,7 +415,7 @@ Sample X2 (Moss)
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X2 (°C)") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
@@ -377,13 +424,22 @@ Sample X2 (Moss)
     ggplot(aes(Date_Combined, X2.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
-(combined_plot_20_21_X2 <- (temp_plot_20_21_X2/PAR_plot_20_21_X2) & plot_layout(ncol = 1))
+(Yield_plot_20_21_X2 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X2.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(combined_plot_20_21_X2 <- (Yield_plot_20_21_X2/temp_plot_20_21_X2/PAR_plot_20_21_X2) & plot_layout(ncol = 1))
 ```
 
-Saple X3 (Lichen)
+Sample X3 (Lichen)
 
 ```{r}
 (temp_plot_20_21_X3 <- summer_20_21 %>% 
@@ -391,7 +447,7 @@ Saple X3 (Lichen)
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   labs(x = "\nDate (day)", y = "Temperature \nLichen X3 (°C)") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
@@ -400,17 +456,180 @@ Saple X3 (Lichen)
     ggplot(aes(Date_Combined, X3.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2020-2021(day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
-(combined_plot_20_21_X3 <- (temp_plot_20_21_X3/PAR_plot_20_21_X3) & plot_layout(ncol = 1))
+(Yield_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(combined_plot_20_21_X3 <- (Yield_plot_20_21_X3/temp_plot_20_21_X3/PAR_plot_20_21_X3) & plot_layout(ncol = 1))
+```
+Sample X4 (moss)
+
+```{r}
+(temp_plot_20_21_X4 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X4.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X4 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_20_21_X4 <-summer_20_21 %>% 
+    ggplot(aes(Date_Combined, X4.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_20_21_X4 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X4.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(combined_plot_20_21_X4 <- (Yield_plot_20_21_X4/temp_plot_20_21_X4/PAR_plot_20_21_X4) & plot_layout(ncol = 1))
 ```
 
+3. Summer 2021-2022
 
+Sample X1 (moss)
 
+```{r}
+(temp_plot_21_22_X1 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X1.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
+(PAR_plot_21_22_X1 <-summer_21_22 %>% 
+    ggplot(aes(Date_Combined, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
 
+(Yield_plot_21_22_X1 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X1.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
+(combined_plot_21_22_X1 <- (Yield_plot_21_22_X1/temp_plot_21_22_X1/PAR_plot_21_22_X1) & plot_layout(ncol = 1))
+```
 
+Sample X2 (moss)
+
+```{r}
+(temp_plot_21_22_X2 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X2.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X2 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_21_22_X2 <-summer_21_22 %>% 
+    ggplot(aes(Date_Combined, X2.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_21_22_X2 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X2.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(combined_plot_21_22_X2 <- (Yield_plot_21_22_X2/temp_plot_21_22_X2/PAR_plot_21_22_X2) & plot_layout(ncol = 1))
+```
+
+Sample X3 (lichen)
+
+```{r}
+(temp_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X3 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_21_22_X3 <-summer_21_22 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(combined_plot_21_22_X3 <- (Yield_plot_21_22_X3/temp_plot_21_22_X3/PAR_plot_21_22_X3) & plot_layout(ncol = 1))
+```
+
+Sample X4 (moss)
+
+```{r}
+(temp_plot_21_22_X4 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X4.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_21_22_X4 <-summer_21_22 %>% 
+    ggplot(aes(Date_Combined, X4.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_21_22_X4 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X4.Y..II.)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(combined_plot_21_22_X4 <- (Yield_plot_21_22_X4/temp_plot_21_22_X4/PAR_plot_21_22_X4) & plot_layout(ncol = 1))
+```
 
 
