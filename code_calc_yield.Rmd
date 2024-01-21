@@ -1084,9 +1084,11 @@ ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, dev
 ```{r}
 ## Difference between yield and yield calculated is weird in November and early december. Make a close up look to it
 
+# Close up with day
+
 (Yield_closeup_22_23_X1 <- summer_22_23 %>% 
    filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
-   ggplot(aes(time_rel, X1.Y)) +
+   ggplot(aes(Date_Combined, X1.Y)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
@@ -1097,7 +1099,7 @@ ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, dev
 
 (Yield_calc_closeup_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
-   ggplot(aes(time_rel, X1.Y_calc)) +
+   ggplot(aes(Date_Combined, X1.Y_calc)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield_calc \nMoss X1 ") +
@@ -1106,15 +1108,60 @@ ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, dev
 
 (Diff_closeup_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
-   ggplot(aes(time_rel, X1.diff)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
+   ggplot(aes(Date_Combined, X1.diff)) +
+   geom_point() +  # Add points for the data
+   geom_line() +  # Add a line that joins the points
+     geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X1 ") +  # a.u. means arbitrary unit
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         panel.grid.major.y = element_line(color = "gray")) +
-    scale_y_continuous(breaks = seq(0, 500, by = 50)))
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))  # Define y scale
+
+(closeup_yield_22_23_X1 <- (Diff_closeup_22_23_X1/Yield_closeup_22_23_X1/Yield_calc_closeup_22_23_X1) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23_X1, device = "png")  # Save graph
+
+# Close up with time
+
+(Yield_closeupn_22_23_X1 <- summer_22_23 %>% 
+   filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(No., X1.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")))  # Remove axis label and text for the graph)
+
+(Yield_calc_closeupn_22_23_X1 <- summer_22_23 %>% 
+    filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(No., X1.Y_calc)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield_calc \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(panel.grid.major.y = element_line(color = "gray")))
+
+(Diff_closeupn_22_23_X1 <- summer_22_23 %>% 
+    filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(No., X1.diff)) +
+   geom_point() +  # Add points for the data
+   geom_line() +  # Add a line that joins the points
+     geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
+   labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X1 ") +  # a.u. means arbitrary unit
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))  # Define y scale
+
+(closeupn_yield_22_23_X1 <- (Diff_closeupn_22_23_X1/Yield_closeupn_22_23_X1/Yield_calc_closeupn_22_23_X1) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_yield/closeupn_yield_22_23_X1.png", closeup_yield_22_23_X1, device = "png")  # Save graph
+
 
 ```
 
