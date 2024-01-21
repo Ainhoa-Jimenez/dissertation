@@ -270,6 +270,12 @@ data_clean_23 <- data_clean_23 %>%  # create new columns with month, year,
          Hour = hour(Time), 
          Minute = minute(Time))
 
+#---
+# 21st- Jan -- Add Time (rel/ms)
+
+data_clean_23 <- data_clean_23 %>% 
+  mutate(time_rel = data_23$`Time (rel/ms)`)
+
 ```
 
 5.2.2. Check the new data
@@ -1072,11 +1078,15 @@ Sample X1 (moss)
 (ana_yield_22_23_X1 <- (Fm_plot_22_23_X1/Ft_plot_22_23_X1/Diff_plot_22_23_X1/Yield_plot_22_23_X1/Yield_calc_plot_22_23_X1) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, device = "png")  # Save graph
-
+```
 ## Difference between yield and yield calculated is weird in November. Make a close up look to it
 
+```{r}
+## Difference between yield and yield calculated is weird in November and early december. Make a close up look to it
+
 (Yield_closeup_22_23_X1 <- summer_22_23 %>% 
-   ggplot(aes(Date_Combined, X1.Y)) +
+   filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(time_rel, X1.Y)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
@@ -1086,7 +1096,8 @@ ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, dev
         panel.grid.major.y = element_line(color = "gray")))  # Remove axis label and text for the graph)
 
 (Yield_calc_closeup_22_23_X1 <- summer_22_23 %>% 
-   ggplot(aes(Date_Combined, X1.Y_calc)) +
+    filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(time_rel, X1.Y_calc)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield_calc \nMoss X1 ") +
@@ -1094,7 +1105,8 @@ ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, dev
     theme(panel.grid.major.y = element_line(color = "gray")))
 
 (Diff_closeup_22_23_X1 <- summer_22_23 %>% 
-   ggplot(aes(Date_Combined, X1.diff)) +
+    filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(time_rel, X1.diff)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X1 ") +  # a.u. means arbitrary unit
