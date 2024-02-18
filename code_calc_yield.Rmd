@@ -6,6 +6,17 @@ output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+##Index
+1-3 set working directory, load packages and load data
+4. Data formating for data 2019-2022
+5. Subset data for summers 2019-2020, 2020-2021, 2021-2022
+5.2 Format data set 2022-2023 and subset summer 2021-2022 and 2022-2023 
+6. Make plots with yield, Calc_yield, Fm and Ft to see what is the correct measure
+
+7. Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover). Different axis (use for characterising)
+
+
+
 
 1.  Set working directory
 
@@ -276,6 +287,9 @@ data_clean_23 <- data_clean_23 %>%  # create new columns with month, year,
 data_clean_23 <- data_clean_23 %>% 
   mutate(time_rel = data_23$`Time (rel/ms)`)
 
+# 16th feb -- Add 'date_time' that included date and time
+
+data_clean_23$DateTime <- as.POSIXct(paste(data_clean_23$Date, data_clean_23$Time), format="%Y-%m-%d %H:%M:%S")
 ```
 
 5.2.2. Check the new data
@@ -1138,7 +1152,7 @@ ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23
 
 (Yield_calc_closeupn_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
-   ggplot(aes(No., X1.Y_calc)) +
+   ggplot(aes(DateTime, X1.Y_calc)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield_calc \nMoss X1 ") +
@@ -1147,7 +1161,7 @@ ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23
 
 (Diff_closeupn_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
-   ggplot(aes(No., X1.diff)) +
+   ggplot(aes(DateTime, X1.diff)) +
    geom_point() +  # Add points for the data
    geom_line() +  # Add a line that joins the points
      geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
@@ -1428,7 +1442,7 @@ Sample X2 (moss)
    theme_graphs_env_cond())
   
 (Yield_plot_19_20_X2 <- summer_19_20 %>% 
-   ggplot(aes(Date_Combined, X2.Y..II.)) +
+   ggplot(aes(Date_Combined, X2.Y)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield \nMoss X2 ") +
