@@ -4,7 +4,7 @@ author: "Ainhoa"
 date: "2023-12-18"
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 ##Index
 1-3 set working directory, load packages and load data
@@ -406,6 +406,17 @@ Sample X1 (moss)
    theme_graphs_env_cond() +
     theme(panel.grid.major.y = element_line(color = "gray")))
 
+(Fm_plot_19_20_X1 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X1.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1800, by = 50)))  # Remove axis label and text for the graph
+
 (Ft_plot_19_20_X1 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X1.F)) +
    geom_point()+  # Add points for the data
@@ -421,6 +432,7 @@ Sample X1 (moss)
    ggplot(aes(Date_Combined, X1.diff)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
+         geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X1 ") +  # a.u. means arbitrary unit
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -455,6 +467,17 @@ Sample X2 (moss)
    theme_graphs_env_cond() +
     theme(panel.grid.major.y = element_line(color = "gray")))
 
+(Fm_plot_19_20_X2 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X2.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1800, by = 50)))  # Remove axis label and text for the graph
+
 (Ft_plot_19_20_X2 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X2.F)) +
    geom_point()+  # Add points for the data
@@ -470,6 +493,7 @@ Sample X2 (moss)
    ggplot(aes(Date_Combined, X2.diff)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X2 ") +  # a.u. means arbitrary unit
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -478,7 +502,7 @@ Sample X2 (moss)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_19_20_X2 <- (Ft_plot_19_20_X2/Diff_plot_19_20_X2/Yield_plot_19_20_X2/Yield_calc_plot_19_20_X2) & plot_layout(ncol = 1))
+(ana_yield_19_20_X2 <- (Fm_plot_19_20_X2/Ft_plot_19_20_X2/Diff_plot_19_20_X2/Yield_plot_19_20_X2/Yield_calc_plot_19_20_X2) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_19_20_X2.png", ana_yield_19_20_X2, device = "png")  # Save graph
 ```
@@ -497,12 +521,23 @@ Sample X3 (lichen)
         panel.grid.major.y = element_line(color = "gray")))  # Remove axis label and text for the graph)
 
 (Yield_calc_plot_19_20_X3 <- summer_19_20 %>% 
-   ggplot(aes(Date_Combined, X2.calc_yield)) +
+   ggplot(aes(Date_Combined, X3.calc_yield)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield_calc \nLichen X3 ") +
    theme_graphs_env_cond() +
     theme(panel.grid.major.y = element_line(color = "gray")))
+
+(Fm_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1800, by = 50)))  # Remove axis label and text for the graph
 
 (Ft_plot_19_20_X3 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X3.F)) +
@@ -519,6 +554,7 @@ Sample X3 (lichen)
    ggplot(aes(Date_Combined, X3.diff)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
+  geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nLichen X3 ") +  # a.u. means arbitrary unit
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -527,9 +563,54 @@ Sample X3 (lichen)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_19_20_X3 <- (Ft_plot_19_20_X3/Diff_plot_19_20_X3/Yield_plot_19_20_X3/Yield_calc_plot_19_20_X3) & plot_layout(ncol = 1))
+(ana_yield_19_20_X3 <- (Fm_plot_19_20_X3/Ft_plot_19_20_X3/Diff_plot_19_20_X3/Yield_plot_19_20_X3/Yield_calc_plot_19_20_X3) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_19_20_X3.png", ana_yield_19_20_X3, device = "png")  # Save graph
+```
+Create a closeup in Feb from Sample X3 19-20. There is a clear trend that decreases on February but that disappears in Yield because machine shuts down
+
+```{r}
+## There is a clear trend that decreases on February but that disappears in Yield because machine shuts down. Make a close up look to it
+
+# Close up with day
+
+(Yield_closeup_19_20_X3 <- summer_19_20 %>% 
+   filter(Day_cum > 43861 & Day_cum < 43870) %>% # filter days between Jan 31st and Feb 9th (when the difference isn't clear)
+   ggplot(aes(Date, X3.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")))  # Remove axis label and text for the graph)
+
+(Yield_calc_closeup_19_20_X3 <- summer_19_20 %>% 
+   filter(Day_cum > 43861 & Day_cum < 43870) %>% # filter days between Jan 31st and Feb 9th (when the difference isn't clear)
+   ggplot(aes(Date, X3.calc_yield)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield_calc \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(panel.grid.major.y = element_line(color = "gray")) +
+    scale_x_datetime(breaks = "1 day", labels = waiver()))
+
+(Diff_closeup_19_20_X3 <- summer_19_20 %>% 
+   filter(Day_cum > 43861 & Day_cum < 43870) %>% # filter days between Jan 31st and Feb 9th (when the difference isn't clear)
+   ggplot(aes(Date, X3.diff)) +
+   geom_point() +  # Add points for the data
+   geom_line() +  # Add a line that joins the points
+     geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
+   labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nLichen X3 ") +  # a.u. means arbitrary unit
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 50, by = 2)))  # Define y scale
+
+(closeup_yield_19_20_X3 <- (Diff_closeup_19_20_X3/Yield_closeup_19_20_X3/Yield_calc_closeup_19_20_X3) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_yield/closeup_yield_19_20_X3.png", closeup_yield_19_20_X3, device = "png")  # Save graph
 ```
 
 Sample X4 (moss)
@@ -552,6 +633,17 @@ Sample X4 (moss)
    labs(x = "\nDate (day)", y = "Yield_calc \nMoss X4 ") +
    theme_graphs_env_cond() +
     theme(panel.grid.major.y = element_line(color = "gray")))
+
+(Fm_plot_19_20_X4 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X4.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1800, by = 50)))  # Remove axis label and text for the graph
 
 (Ft_plot_19_20_X4 <- summer_19_20 %>% 
    ggplot(aes(Date_Combined, X4.F)) +
@@ -576,7 +668,7 @@ Sample X4 (moss)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_19_20_X4 <- (Ft_plot_19_20_X4/Diff_plot_19_20_X4/Yield_plot_19_20_X4/Yield_calc_plot_19_20_X4) & plot_layout(ncol = 1))
+(ana_yield_19_20_X4 <- (Fm_plot_19_20_X4/Ft_plot_19_20_X4/Diff_plot_19_20_X4/Yield_plot_19_20_X4/Yield_calc_plot_19_20_X4) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_19_20_X4.png", ana_yield_19_20_X4, device = "png")  # Save graph
 ```
@@ -630,6 +722,17 @@ Repeat Sample X1 (moss)
         panel.grid.major.y = element_line(color = "gray")) +
     scale_y_continuous(breaks = seq(0, 500, by = 50)))  # Remove axis label and text for the graph
 
+(Fm_plot_20_21_X1 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X1.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1000, by = 50)))  # Remove axis label and text for the graph
+
 (Diff_plot_20_21_X1 <- summer_20_21 %>% 
    ggplot(aes(Date_Combined, X1.diff)) +
    geom_point()+  # Add points for the data
@@ -642,7 +745,7 @@ Repeat Sample X1 (moss)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_20_21_X1 <- (Ft_plot_20_21_X1/Diff_plot_20_21_X1/Yield_plot_20_21_X1/Yield_calc_plot_20_21_X1) & plot_layout(ncol = 1))
+(ana_yield_20_21_X1 <- (Fm_plot_20_21_X1/Ft_plot_20_21_X1/Diff_plot_20_21_X1/Yield_plot_20_21_X1/Yield_calc_plot_20_21_X1) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_20_21_X1.png", ana_yield_20_21_X1, device = "png")  # Save graph
 
@@ -668,6 +771,17 @@ Sample X2 (moss)
    theme_graphs_env_cond() +
     theme(panel.grid.major.y = element_line(color = "gray")))
 
+(Fm_plot_20_21_X2 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X2.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1000, by = 50)))  # Remove axis label and text for the graph
+
 (Ft_plot_20_21_X2 <- summer_20_21 %>% 
    ggplot(aes(Date_Combined, X2.F)) +
    geom_point()+  # Add points for the data
@@ -691,7 +805,7 @@ Sample X2 (moss)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_20_21_X2 <- (Ft_plot_20_21_X2/Diff_plot_20_21_X2/Yield_plot_20_21_X2/Yield_calc_plot_20_21_X2) & plot_layout(ncol = 1))
+(ana_yield_20_21_X2 <- (Fm_plot_20_21_X2/Ft_plot_20_21_X2/Diff_plot_20_21_X2/Yield_plot_20_21_X2/Yield_calc_plot_20_21_X2) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_20_21_X2.png", ana_yield_20_21_X2, device = "png")  # Save graph
 ```
@@ -727,6 +841,17 @@ Sample X3 (lichen)
         panel.grid.major.y = element_line(color = "gray")) +
     scale_y_continuous(breaks = seq(0, 500, by = 50)))  # Remove axis label and text for the graph
 
+(Fm_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1000, by = 50)))  # Remove axis label and text for the graph
+
 (Diff_plot_20_21_X3 <- summer_20_21 %>% 
    ggplot(aes(Date_Combined, X3.diff)) +
    geom_point()+  # Add points for the data
@@ -739,7 +864,7 @@ Sample X3 (lichen)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_20_21_X3 <- (Ft_plot_20_21_X3/Diff_plot_20_21_X3/Yield_plot_20_21_X3/Yield_calc_plot_20_21_X3) & plot_layout(ncol = 1))
+(ana_yield_20_21_X3 <- (Fm_plot_20_21_X3/Ft_plot_20_21_X3/Diff_plot_20_21_X3/Yield_plot_20_21_X3/Yield_calc_plot_20_21_X3) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_20_21_X3.png", ana_yield_20_21_X3, device = "png")  # Save graph
 ```
@@ -775,6 +900,17 @@ Sample X4 (moss)
         panel.grid.major.y = element_line(color = "gray")) +
     scale_y_continuous(breaks = seq(0, 500, by = 50)))  # Remove axis label and text for the graph
 
+(Fm_plot_20_21_X4 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X4.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1000, by = 50)))  # Remove axis label and text for the graph
+
 (Diff_plot_20_21_X4 <- summer_20_21 %>% 
    ggplot(aes(Date_Combined, X4.diff)) +
    geom_point()+  # Add points for the data
@@ -787,7 +923,7 @@ Sample X4 (moss)
     scale_y_continuous(breaks = seq(0, 500, by = 50)))
 
 
-(ana_yield_20_21_X4 <- (Ft_plot_20_21_X4/Diff_plot_20_21_X4/Yield_plot_20_21_X4/Yield_calc_plot_20_21_X4) & plot_layout(ncol = 1))
+(ana_yield_20_21_X4 <- (Fm_plot_20_21_X4/Ft_plot_20_21_X4/Diff_plot_20_21_X4/Yield_plot_20_21_X4/Yield_calc_plot_20_21_X4) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_yield/ana_yield_20_21_X4.png", ana_yield_20_21_X4, device = "png")  # Save graph
 ```
@@ -1157,7 +1293,8 @@ ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield_calc \nMoss X1 ") +
    theme_graphs_env_cond() +
-    theme(panel.grid.major.y = element_line(color = "gray")))
+    theme(panel.grid.major.y = element_line(color = "gray")) +
+      scale_x_datetime(breaks = "1 day", labels = waiver()))
 
 (Diff_closeupn_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
@@ -1170,7 +1307,7 @@ ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         panel.grid.major.y = element_line(color = "gray")) +
-    scale_y_continuous(breaks = seq(0, 10, by = 1)))  # Define y scale
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))  # Add breaks for every measurement (every hour)
 
 (closeupn_yield_22_23_X1 <- (Diff_closeupn_22_23_X1/Yield_closeupn_22_23_X1/Yield_calc_closeupn_22_23_X1) & plot_layout(ncol = 1))
 
@@ -1244,7 +1381,7 @@ Sample X3 (Lichen)
 There is one row containing NA value in Y_calc
 
 ```{r}
-print(summer_22_23[is.na(summer_22_23$X3.Y_calc),]) 
+print(which(is.na(summer_22_23$X3.Y_calc))) 
 
 
 # Solve line 2280 (3-feb)
@@ -1302,12 +1439,13 @@ Repeat Sample X3 (lichen)
    ggplot(aes(Date_Combined, X3.diff)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
+     geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
    labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nLichen X3") +  # a.u. means arbitrary unit
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         panel.grid.major.y = element_line(color = "gray")) +
-    scale_y_continuous(breaks = seq(0, 500, by = 50)))
+    scale_y_continuous(breaks = seq(0, 100, by = 5)))
 
 
 (ana_yield_22_23_X3 <- (Fm_plot_22_23_X3/Ft_plot_22_23_X3/Diff_plot_22_23_X3/Yield_plot_22_23_X3/Yield_calc_plot_22_23_X3) & plot_layout(ncol = 1))
