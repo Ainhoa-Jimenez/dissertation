@@ -42,7 +42,7 @@ theme_graphs_env_cond <- function(){
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90))+
    theme(axis.text = element_text(size = 11),  # Adjust the size as needed
-          axis.title = element_text(size = 18),
+          axis.title = element_text(size = 14),
         legend.text = element_text(size=14))
   }
 ```
@@ -381,7 +381,7 @@ summer_22_23$Date_Combined <- reorder(summer_22_23$Date_Combined, summer_22_23$D
 levels(summer_22_23$Date_Combined)
 ```
 
-## 6. Make plots with yield, Calc_yield, Fm and Ft to see what is the correct measure
+## 6. Make plots with yield, Calc_yield, Fm and Ft to see what is the correct measure---
 
 1. Summer 2019-2020
 
@@ -1277,7 +1277,7 @@ Sample X1 (moss)
 
 ggsave(filename = "graphs_yield/ana_yield_22_23_X1.png", ana_yield_22_23_X1, device = "png")  # Save graph
 ```
-## Difference between yield and yield calculated is weird in November. Make a close up look to it
+Difference between yield and yield calculated is weird in November. Make a close up look to it
 
 ```{r}
 ## Difference between yield and yield calculated is weird in November and early december. Make a close up look to it
@@ -1721,28 +1721,265 @@ Make a close-up of Sample X4 22-23 until Deccember 3rd. The yield is positive bu
 ggsave(filename = "graphs_yield/closeup_yield_22_23_X4.png", closeup_yield_22_23_X4, device = "png")  # Save graph
 ```
 
-## 7. Create Chosen_yield column in the plots that require a change in the yield: summer_20_21 X3, summer_22_23 X3, summer_22_23 X4
+## 7. Create Chosen_yield and Chosen_ETR column in the plots that require a change in the yield: summer_20_21 X3, summer_22_23 X3, summer_22_23 X4 (2 lichens one moss)
 
-summer_20_21 X3
+
 ```{r}
+# summer_20_21 X3 yield
+
 summer_20_21 <- summer_20_21 %>% 
-  mutate(X3.chosen_yield = case_when(
-    Day_cum < 44165 ~ X3.Y,
-    Day_cum >= 44165 & Day_cum <= 44173 ~ X3.calc_yield,
-    Day_cum > 44173 ~ X3.Y))
+  mutate(X3.chosen_yield = case_when( # summer_20_21 X3 yield
+    Day_cum < 44165 ~ X3.Y,  # Days before the 30th of Nov stay with machine yield
+    Day_cum >= 44165 & Day_cum <= 44173 ~ X3.calc_yield,  # Days between the 30th of Nov and 8th of Dec change to calc_yield
+    Day_cum > 44173 ~ X3.Y),  # Days after the 8th of December stay with machine yield
+    X3.chosen_ETR = X3.chosen_yield * X3.PAR )  # summer_20_21 X3 ETR
+
+# Summer 22_23 yield X3 and X4
 
 summer_22_23 <- summer_22_23 %>% 
-  mutate(X3.chosen_yield = case_when(
-    Day_cum < 44884 ~ X3.Y,
-    Day_cum >= 44884 & Day_cum <= 44941 ~ X3.Y_calc,
-    Day_cum > 44941 ~ X3.Y),
-    X4.chosen_yield = case_when(
-    Day_cum < 44898 ~ 0,
-    Day_cum >= 44173 ~ X4.Y))
+  mutate(X3.chosen_yield = case_when(  # X3 yield
+    Day_cum <= 44905 ~ X3.Y,  # Days before the 10th of Dec stay with machine yield
+    Day_cum > 44905 & Day_cum <= 44913 ~ X3.Y_calc,  # Days between the 11th of Dec and the 18th of Dec stay with machine yield
+    Day_cum > 44913 & Day_cum <= 44918 ~ X3.Y, # Days between the 19th of Dec and the 23th of Dec stay with machine yield
+    Day_cum > 44918 & Day_cum < 44921 ~ X3.Y_calc, # Days between the 23th of Dec and the 26th of Dec stay with machine yield
+    Day_cum >= 44921 & Day_cum < 44927 ~ X3.Y, # Days between the 26th of Dec and the 1st of Jan stay with machine yield
+    Day_cum >= 44927 & Day_cum <= 44932 ~ X3.Y_calc, # Days between the 1st of Jan and the 6st of Jan stay with machine yield
+    Day_cum > 44932 ~ X3.Y),  # Days after the 7th of Jan stay with machine yield
+    X4.chosen_yield = case_when(  # X4 yield
+    Day_cum < 44898 ~ 0,  # Days before 3rd December change to 0
+    Day_cum >= 44173 ~ X4.Y), # Days after 3rd December keep machine yield
+    X3.chosen_ETR = X3.chosen_yield * X3.PAR, # Summer 22_23 ETR X3
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR) # Summer 22_23 ETR X4
+
 ```
 
 
-## 8. Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover). Different axis (use for characterising)
+## 8. Make plots for PAR and Temperature, yield and Fm in each summer, in each sample (check activity under snowcover). Different axis (use for characterising)
+
+### 8.1. Make plot for Austroplaca Soropelta (Sample X3)
+
+1. Summer 2019-2020
+
+Sample X3 (Lichen)
+
+```{r}
+(temp_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \n(ºC) X3 ") +
+   theme_graphs_env_cond()+
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))
+
+(PAR_plot_19_20_X3 <-summer_19_20 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR X3\n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Fm_plot_19_20_X3 <- summer_19_20 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),  # Remove axis label and text for the graph
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 500, by = 50)))  
+
+(combined_plot_19_20_X3 <- (ETR_plot_19_20_X3/Fm_plot_19_20_X3/Yield_plot_19_20_X3/temp_plot_19_20_X3/PAR_plot_19_20_X3) & plot_layout(ncol = 1)) 
+
+ggsave(filename = "graphs_characterise/austroplaca/combined_plot_19_20_X3.png", combined_plot_19_20_X3, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+
+```
+
+2. Summer 2020-2021
+
+Sample X3 (Lichen) **Changed yield!!**
+
+```{r}
+(temp_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature (ºC)\nLichen X3") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_20_21_X3 <-summer_20_21 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2020-2021(day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.chosen_yield)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.chosen_ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Fm_plot_20_21_X3 <- summer_20_21 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),  # Remove axis label and text for the graph
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 500, by = 50))) 
+
+(combined_plot_20_21_X3 <- (ETR_plot_20_21_X3/Fm_plot_20_21_X3/Yield_plot_20_21_X3/temp_plot_20_21_X3/PAR_plot_20_21_X3) & plot_layout(ncol = 1))
+```
+
+3. Summer 2021-2022
+
+Sample X3 (lichen)
+
+```{r}
+(temp_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X3 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_21_22_X3 <-summer_21_22 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(ETR_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Fm_plot_21_22_X3 <- summer_21_22 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),  # Remove axis label and text for the graph
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 1000, by = 50))) 
+
+(combined_plot_21_22_X3 <- (ETR_plot_21_22_X3/Fm_plot_21_22_X3/Yield_plot_21_22_X3/temp_plot_21_22_X3/PAR_plot_21_22_X3) & plot_layout(ncol = 1))
+```
+
+4. Summer 2022-2023
+
+Sample X3 (Lichen) **Changed yield!!**
+
+```{r}
+(temp_plot_22_23_X3 <- summer_22_23 %>% 
+   ggplot(aes(Date_Combined, X3.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X3 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_22_23_X3 <-summer_22_23 %>% 
+    ggplot(aes(Date_Combined, X3.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Fm_plot_22_23_X3 <- summer_22_23 %>% 
+   ggplot(aes(Date_Combined, X3.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),  # Remove axis label and text for the graph
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 500, by = 50)))  
+
+(Yield_plot_22_23_X3 <- summer_22_23 %>% 
+   ggplot(aes(Date_Combined, X3.chosen_yield)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(ETR_plot_22_23_X3 <- summer_22_23 %>% 
+  ggplot(aes(Date_Combined, X3.chosen_ETR))+
+  geom_point()+  # Add points for the data
+  geom_line()+  # Add a line that joins the points
+  labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \n Lichen X3 ") +  
+  theme_graphs_env_cond() +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray"))) # Remove axis label and text for the graph
+
+(combined_plot_22_23_X3 <- (ETR_plot_22_23_X3/Fm_plot_22_23_X3/Yield_plot_22_23_X3/temp_plot_22_23_X3/PAR_plot_22_23_X3) & plot_layout(ncol = 1))
+```
+
+
+### 8.2. Make plot for Bryum Argeteum (Sample X1, X2, X4)
 
 1. Summer 2019-2020
 
@@ -1817,39 +2054,6 @@ Sample X2 (moss)
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
 (combined_plot_19_20_X2 <- (Yield_plot_19_20_X2/temp_plot_19_20_X2/PAR_plot_19_20_X2) & plot_layout(ncol = 1))
-
-```
-
-Sample X3 (Lichen)
-
-```{r}
-(temp_plot_19_20_X3 <- summer_19_20 %>% 
-   ggplot(aes(Date_Combined, X3.Temp)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # add a line that joins the points
-   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \nLichen X3 (°C)") +
-   theme_graphs_env_cond()+
-   theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))
-
-(PAR_plot_19_20_X3 <-summer_19_20 %>% 
-    ggplot(aes(Date_Combined, X3.PAR)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2019-2020 (day)", y = "PAR \n(µmol m-2 s^-1)") +
-   theme_graphs_env_cond())
-
-(Yield_plot_19_20_X3 <- summer_19_20 %>% 
-   ggplot(aes(Date_Combined, X3.Y..II.)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
-  
-(combined_plot_19_20_X3 <- (Yield_plot_19_20_X2/temp_plot_19_20_X3/PAR_plot_19_20_X3) & plot_layout(ncol = 1)) 
 
 ```
 
@@ -1953,37 +2157,6 @@ Sample X2 (Moss)
 (combined_plot_20_21_X2 <- (Yield_plot_20_21_X2/temp_plot_20_21_X2/PAR_plot_20_21_X2) & plot_layout(ncol = 1))
 ```
 
-Sample X3 (Lichen)
-
-```{r}
-(temp_plot_20_21_X3 <- summer_20_21 %>% 
-   ggplot(aes(Date_Combined, X3.Temp)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
-   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \nLichen X3 (°C)") +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph
-
-(PAR_plot_20_21_X3 <-summer_20_21 %>% 
-    ggplot(aes(Date_Combined, X3.PAR)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2020-2021(day)", y = "PAR \n(µmol m-2 s^-1)") +
-   theme_graphs_env_cond())
-
-(Yield_plot_20_21_X3 <- summer_20_21 %>% 
-   ggplot(aes(Date_Combined, X3.Y..II.)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
-
-(combined_plot_20_21_X3 <- (Yield_plot_20_21_X3/temp_plot_20_21_X3/PAR_plot_20_21_X3) & plot_layout(ncol = 1))
-```
 Sample X4 (moss)
 
 ```{r}
@@ -2080,38 +2253,6 @@ Sample X2 (moss)
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
 (combined_plot_21_22_X2 <- (Yield_plot_21_22_X2/temp_plot_21_22_X2/PAR_plot_21_22_X2) & plot_layout(ncol = 1))
-```
-
-Sample X3 (lichen)
-
-```{r}
-(temp_plot_21_22_X3 <- summer_21_22 %>% 
-   ggplot(aes(Date_Combined, X3.Temp)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
-   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \nMoss X3 (°C)") +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph
-
-(PAR_plot_21_22_X3 <-summer_21_22 %>% 
-    ggplot(aes(Date_Combined, X3.PAR)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2021-2022 (day)", y = "PAR \n(µmol m-2 s^-1)") +
-   theme_graphs_env_cond())
-
-(Yield_plot_21_22_X3 <- summer_21_22 %>% 
-   ggplot(aes(Date_Combined, X3.Y..II.)) +
-   geom_point()+  # Add points for the data
-   geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph
-
-(combined_plot_21_22_X3 <- (Yield_plot_21_22_X3/temp_plot_21_22_X3/PAR_plot_21_22_X3) & plot_layout(ncol = 1))
 ```
 
 Sample X4 (moss)
