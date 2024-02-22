@@ -203,8 +203,8 @@ This includes the data from the 1-Nov 2019 to the 15 of Feb 2020
 ```{r}
 summer_19_20 <- data_clean %>% 
   filter(Year == 2019 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2019 and Jan, Feb 2020
-           Year == 2020 & Month %in% c(1,2)) %>% 
-  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+           Year == 2020 & Month %in% c(1,2)) #%>% 
+ # filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb (removed 22nd feb)
 
 # Check our data
 
@@ -223,8 +223,8 @@ This includes the data from the 1-Nov 2020 to the 15 of Feb 2021
 ```{r}
 summer_20_21 <- data_clean %>% 
   filter(Year == 2020 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2029 and Jan, Feb 2021
-           Year == 2021 & Month %in% c(1,2)) %>% 
-  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+           Year == 2021 & Month %in% c(1,2))  #%>% 
+  #filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb (removed 22nd feb)
 
 # Check our data
 
@@ -245,8 +245,8 @@ This includes the data from the 1-Nov 2021 to the 15 of Feb 2022.
 ```{r}
 summer_21_22 <- data_clean %>% 
   filter(Year == 2021 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2021 and Jan, Feb 2022
-           Year == 2022 & Month %in% c(1,2)) %>% 
-  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+           Year == 2022 & Month %in% c(1,2)) #%>% 
+  #filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb (removed 22nd feb)
 
 # Check our data
 
@@ -368,8 +368,8 @@ data_clean_23 <- data_clean_23 %>%
 ```{r}
 summer_22_23 <- data_clean_23 %>% 
   filter(Year == 2022 & Month %in% c(11,12) |  # Filter all data points in Nov, Dec 2022 and Jan, Feb 20223
-           Year == 2023 & Month %in% c(1,2)) %>% 
-  filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb
+           Year == 2023 & Month %in% c(1,2))# %>% 
+ # filter(!(Month == 2 & Day > 15))  # remove days over the 15th of Feb(removed 22nd feb)
 
 # Check our data
 
@@ -2148,7 +2148,7 @@ Sample X4 (Moss)
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),  # Remove axis label and text for the graph
         panel.grid.major.y = element_line(color = "gray")) +
-    scale_y_continuous(breaks = seq(0, 1000, by = 50))) 
+    scale_y_continuous(breaks = seq(0, 1700, by = 50))) 
 
 
 (combined_plot_19_20_X4 <- (ETR_plot_19_20_X4/Fm_plot_19_20_X4/Yield_plot_19_20_X4/temp_plot_19_20_X4/PAR_plot_19_20_X4) & plot_layout(ncol = 1)) 
@@ -2509,7 +2509,7 @@ Sample X1 (moss)
     ggplot(aes(Date_Combined, X1.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
 (Yield_plot_22_23_X1 <- summer_22_23 %>% 
@@ -2563,7 +2563,7 @@ Sample X2 (moss)
     ggplot(aes(Date_Combined, X2.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
 (Yield_plot_22_23_X2 <- summer_22_23 %>% 
@@ -2616,7 +2616,7 @@ Sample X4 (moss)
     ggplot(aes(Date_Combined, X4.PAR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # add a line that joins the points
-   labs(x = "\nDate 2020-2021 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
    theme_graphs_env_cond())
 
 (Yield_plot_22_23_X4 <- summer_22_23 %>% 
@@ -2653,10 +2653,27 @@ Sample X4 (moss)
 ggsave(filename = "graphs_characterise/bryum/combined_plot_22_23_X4.png", combined_plot_22_23_X4, width = 54,height = 18, units = "cm", device = "png")  # Save graph 
 ```
 
+## 9. Run descriptive statistics
+
+### 9.1. Austroplaca (X3)
+
+
+
 
 ## 9. Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover). Same axis (use for comparison)
 ## 10. Plot data for the heatwave March 2022
 
+## Graph for PAR year round
+
+```{r}
+(PAR_year_round_19_22 <- data_clean %>%
+  ggplot(aes(Date, X1.PAR)) +
+  geom_point() +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y"))
+
+ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_round_19_22, device = "png")  # Save graph
+```
 
 
 
