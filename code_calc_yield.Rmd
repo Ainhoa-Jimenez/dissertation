@@ -2710,8 +2710,8 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_22.png", yield_year_rou
 
 ### Graph for T year round
 ```{r}
-(PAR_year_round_19_22 <- data_clean %>%
-  ggplot(aes(Date, X1.PAR)) +
+(temp_year_round_19_22 <- data_clean %>%
+  ggplot(aes(Date, X1.Temp)) +
   geom_point() +
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
