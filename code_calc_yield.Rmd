@@ -2655,9 +2655,68 @@ ggsave(filename = "graphs_characterise/bryum/combined_plot_22_23_X4.png", combin
 
 ## 9. Run descriptive statistics
 
+1. Generate a big dataset with all the data
+
+```{r}
+data_comb_until_2022 <- data_clean[]
+```
+
 ### 9.1. Austroplaca (X3)
 
+1. Active time
 
+```{r}
+# active total time
+total_activetime_stats_X3 <- bind_rows(  # put both counts into one dataset
+  data_clean %>% count(Condition = X3.Y > 0, name = "Count_data_clean"),  # OCunt rows with active time (1 row = 1 hour)
+  data_clean_23 %>% count(Condition = X3.Y > 0, name = "Count_data_clean_23")) %>% 
+group_by(Condition) %>% 
+    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
+ summarise_all(sum) %>%  # join rows that have the same condition
+mutate(Total_time = Count_data_clean + Count_data_clean_23) # add both columns to get the total active time of the year
+  
+(total_active_hours <- activetime_stats_X3 %>% # filter form thw dataset the total number of active hours
+  filter(Condition == TRUE) %>%
+  select(Total_time))
+
+(Percentage_active_days <- total_active_hours/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
+
+# Active time each summer
+
+summer_activetime_stats_X3 <-bind_rows(
+  summer_19_20 %>% count(Condition = X3.Y > 0, name = "Count_19_20"),
+  summer_20_21 %>% count(Condition = X3.Y > 0, name = "Count_20_21"),
+summer_21_22 %>% count(Condition = X3.Y > 0, name = "Count_21_22"),
+summer_22_23 %>% count(Condition = X3.Y > 0, name = "Count_22_23")) %>% 
+group_by(Condition) %>% 
+    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
+ summarise_all(sum) 
+
+(total_active_hours_19_20 <- summer_activetime_stats_X3 %>%
+  filter(Condition == TRUE) %>%
+  select(Count_19_20))
+
+(total_active_hours_20_21 <- summer_activetime_stats_X3 %>%
+  filter(Condition == TRUE) %>%
+  select(Count_20_21))
+
+(total_active_hours_21_22 <- summer_activetime_stats_X3 %>%
+  filter(Condition == TRUE) %>%
+  select(Count_21_22))
+
+(total_active_hours_22_23 <- summer_activetime_stats_X3 %>%
+  filter(Condition == TRUE) %>%
+  select(Count_22_23))
+
+(Percentage_active_hours_19_20 <- total_active_hours_19_20 /nrow(summer_19_20) * 100)
+
+(Percentage_active_hours_20_21 <- total_active_hours_20_21 /nrow(summer_20_21) * 100)
+
+(Percentage_active_hours_21_22 <- total_active_hours_21_22 /nrow(summer_21_22) * 100)
+
+(Percentage_active_hours_22_23 <- total_active_hours_22_23 /nrow(summer_22_23) * 100)
+```
+2. 
 
 
 ## 9. Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover). Same axis (use for comparison)
@@ -2669,7 +2728,7 @@ ggsave(filename = "graphs_characterise/bryum/combined_plot_22_23_X4.png", combin
 (PAR_year_round_19_22 <- data_clean %>%
   mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calcualte mean PAR across all samples
   ggplot(aes(Date, mean_PAR)) +  # plot it
-  geom_point() +
+  geom_line() +
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
   ylab("PAR\n(µmol m-2 s^-1)"))
@@ -2711,13 +2770,14 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_22.png", yield_year_rou
 ### Graph for T year round
 ```{r}
 (temp_year_round_19_22 <- data_clean %>%
-  ggplot(aes(Date, X1.Temp)) +
-  geom_point() +
+  mutate(mean_Temp = rowMeans(select(., c("X1.Temp", "X2.Temp", "X3.Temp", "X4.Temp")), na.rm = TRUE)) %>%  # calcualte mean PAR across all samples
+  ggplot(aes(Date, mean_Temp)) +
+  geom_line() +
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
-  ylab("PAR\n(µmol m-2 s^-1)"))
+  ylab("Temperature ºC"))
 
-ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_round_19_22, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+ggsave(filename = "graphs_env_conditions/temp_year_round_19_22.png", temp_year_round_19_22, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 ```
 
 
