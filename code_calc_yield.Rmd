@@ -33,6 +33,7 @@ library(lubridate)  # dates management
 library(gridExtra)  # arrange plots
 library(patchwork)  # combine plots
 library(hms)  # use function as.Time()
+library(openxlsx) # write.xlsx 
 ```
 2.2. Creates functions
 
@@ -2162,7 +2163,7 @@ Sample X4 (Moss)
    ggplot(aes(Date_Combined, X4.ETR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X2 ") +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X4 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
@@ -2171,7 +2172,7 @@ Sample X4 (Moss)
    ggplot(aes(Date_Combined, X4.Fm)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Fm \nMoss X2 ") +
+   labs(x = "\nDate (day)", y = "Fm \nMoss X4 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),  # Remove axis label and text for the graph
@@ -2274,7 +2275,7 @@ Sample X2 (Moss)
    ggplot(aes(Date_Combined, X2.ETR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X1 ") +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X2 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
@@ -2283,7 +2284,7 @@ Sample X2 (Moss)
    ggplot(aes(Date_Combined, X2.Fm)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Fm \nMoss X1 ") +
+   labs(x = "\nDate (day)", y = "Fm \nMoss X2 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),  # Remove axis label and text for the graph
@@ -2320,7 +2321,7 @@ Sample X4 (moss)
    ggplot(aes(Date_Combined, X4.Y)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   labs(x = "\nDate (day)", y = "Yield \nMoss X4 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
@@ -2724,7 +2725,7 @@ mutate(Total_time = Count_data_clean + Count_data_clean_23) # add both columns t
   filter(Condition == TRUE) %>%
   select(Total_time))
 
-(Percentage_active_day_X3 <- total_active_hours_X3/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
+(Percentage_active_hours_X3 <- total_active_hours_X3/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
 ```
 
 ```{r}
@@ -2916,7 +2917,7 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
             max_temp = max(X3.Temp),  # get the maximum temperature
             min_temp = min(X3.Temp)))  # get the minimum temperature
 
-# Mean temperature whole active period-------------------
+# Mean temperature whole active period -------------------
 
 (mean_Temp_active_X3_data <- bind_rows(  # Make into a single dataset
   data_clean %>% 
@@ -3043,6 +3044,8 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
             max_temp = max(X3.Temp),  # get the maximum temperature
             min_temp = min(X3.Temp)))
 
+write.xlsx(month_temp_stats_X3, file = "stats/austroplaca/month_temp_stats_X3.xlsx") # save table
+
 (month_active_temp_stats_X3 <- bind_rows(  # Monthly stats for active period
   summer_19_20 %>% filter(Month == 11, X1.Y > 0),
   summer_19_20 %>% filter(Month == 12, X1.Y > 0),
@@ -3065,6 +3068,7 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
             max_temp = max(X3.Temp),  # get the maximum temperature
             min_temp = min(X3.Temp)))
 
+write.xlsx(month_active_temp_stats_X3, file = "stats/austroplaca/month_active_temp_stats_X3.xlsx") # save table
 ```
 
 **4. PAR**
@@ -3127,6 +3131,36 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
 
 ```
 
+4.3. Monthly PAR
+
+```{r}
+(month_PAR_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_20_21 %>% filter(Month == 11),
+  summer_20_21 %>% filter(Month == 12),
+  summer_20_21 %>% filter(Month == 1),
+  summer_20_21 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2),
+  summer_22_23 %>% filter(Month == 11),
+  summer_22_23 %>% filter(Month == 12),
+  summer_22_23 %>% filter(Month == 1),
+  summer_22_23 %>% filter(Month == 2)) %>% 
+   group_by(Year, Month) %>% 
+ summarise(mean_PAR = mean(X3.PAR),
+            max_PAR = max(X3.PAR),  # get the maximum temperature
+            min_PAR = min(X3.PAR)))
+
+write.xlsx(month_PAR_stats_X3, file = "stats/austroplaca/month_PAR_stats_X3.xlsx") # save table
+
+```
+
+
 **5. YIELD and ETR**
 
 5.1. Total Active period
@@ -3155,7 +3189,7 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
 
 ```
 
-5.2 Monthly yield/ ETR
+5.2 Summerly yield/ ETR
 
 ```{r}
 # Mean YIED/ETR summer 19-20
@@ -3222,6 +3256,59 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
     max_ETR = max(X3.chosen_ETR),
     min_ETR = min(X3.chosen_ETR)))
 
+```
+
+5.3. Monthly yield
+
+```{r}
+(month_Y_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_20_21 %>% filter(Month == 11),
+  summer_20_21 %>% filter(Month == 12),
+  summer_20_21 %>% filter(Month == 1),
+  summer_20_21 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2),
+  summer_22_23 %>% filter(Month == 11),
+  summer_22_23 %>% filter(Month == 12),
+  summer_22_23 %>% filter(Month == 1),
+  summer_22_23 %>% filter(Month == 2)) %>% 
+   group_by(Year, Month) %>% 
+ summarise(mean_Y= mean(X3.Y),
+            max_Y = max(X3.Y),  # get the maximum temperature
+            min_Y = min(X3.Y)))
+
+write.xlsx(month_Y_stats_X3, file = "stats/austroplaca/month_Y_stats_X3.xlsx") # save table
+
+
+(month_ETR_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_20_21 %>% filter(Month == 11),
+  summer_20_21 %>% filter(Month == 12),
+  summer_20_21 %>% filter(Month == 1),
+  summer_20_21 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2),
+  summer_22_23 %>% filter(Month == 11),
+  summer_22_23 %>% filter(Month == 12),
+  summer_22_23 %>% filter(Month == 1),
+  summer_22_23 %>% filter(Month == 2)) %>% 
+   group_by(Year, Month) %>% 
+ summarise(mean_ETR= mean(X3.ETR),
+            max_ETR = max(X3.ETR),  # get the maximum temperature
+            min_ETR = min(X3.ETR)))
+
+write.xlsx(month_ETR_stats_X3, file = "stats/austroplaca/month_ETR_stats_X3.xlsx") # save table
 ```
 
 ### 9.2. Bryum (X1)
@@ -3581,6 +3668,8 @@ month_activetime_stats_X1 <- bind_rows(
             max_temp = max(X1.Temp),  # get the maximum temperature
             min_temp = min(X1.Temp)))
 
+write.xlsx(month_temp_stats_X1, file = "stats/bryum/month_temp_stats_X1.xlsx") # save table
+
 (month_active_temp_stats_X1 <- bind_rows(  # Monthly stats for active period
   summer_19_20 %>% filter(Month == 11, X1.Active == TRUE),
   summer_19_20 %>% filter(Month == 12, X1.Active == TRUE),
@@ -3602,6 +3691,8 @@ month_activetime_stats_X1 <- bind_rows(
  summarise(mean_temp = mean(X1.Temp),
             max_temp = max(X1.Temp),  # get the maximum temperature
             min_temp = min(X1.Temp)))
+
+write.xlsx(month_active_temp_stats_X1, file = "stats/bryum/month_active_temp_stats_X1.xlsx") # save table
 
 ```
 
@@ -3634,7 +3725,7 @@ month_activetime_stats_X1 <- bind_rows(
     max_PAR = max(X1.PAR),
     min_PAR = min(X1.PAR)))
 
-# Mean temperature summer 20-21
+# Mean PAR summer 20-21
 
 (mean_PAR_X1_20_21 <- summer_20_21 %>% 
   group_by(X1.Active) %>% 
@@ -3643,7 +3734,7 @@ month_activetime_stats_X1 <- bind_rows(
     max_PAR = max(X1.PAR),
     min_PAR = min(X1.PAR)))
 
-# Mean temperature summer 21-22
+# Mean PAR summer 21-22
 
 (mean_PAR_X1_21_22 <- summer_21_22 %>% 
   group_by(X1.Active) %>% 
@@ -3652,7 +3743,7 @@ month_activetime_stats_X1 <- bind_rows(
     max_PAR = max(X1.PAR),
     min_PAR = min(X1.PAR)))
 
-# Mean temperature summer 22-23
+# Mean PAR summer 22-23
 
 (mean_PAR_X1_22_23 <- summer_22_23 %>% 
   group_by(X1.Active) %>% 
@@ -3687,6 +3778,9 @@ month_activetime_stats_X1 <- bind_rows(
  summarise(mean_PAR = mean(X1.PAR),
             max_PAR = max(X1.PAR),  # get the maximum temperature
             min_PAR = min(X1.PAR)))
+
+write.xlsx(month_PAR_stats_X1, file = "stats/bryum/month_PAR_stats_X1.xlsx") # save table
+
 ```
 
 
@@ -3810,6 +3904,8 @@ month_activetime_stats_X1 <- bind_rows(
             max_Y = max(X1.Y),  # get the maximum temperature
             min_Y = min(X1.Y)))
 
+write.xlsx(month_Y_stats_X1, file = "stats/bryum/month_Y_stats_X1.xlsx") # save table
+
 (month_ETR_stats_X1 <- bind_rows(  # Monthly stats fro total measuring period
   summer_19_20 %>% filter(Month == 11),
   summer_19_20 %>% filter(Month == 12),
@@ -3831,6 +3927,8 @@ month_activetime_stats_X1 <- bind_rows(
  summarise(mean_ETR= mean(X1.ETR),
             max_ETR = max(X1.ETR),  # get the maximum temperature
             min_ETR = min(X1.ETR)))
+
+write.xlsx(month_ETR_stats_X1, file = "stats/bryum/month_ETR_stats_X1.xlsx") # save table
 ```
 ### 9.3. Bryum (X2)
 
@@ -5026,6 +5124,12 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
 ```{r}
 (list_act_time <- list(total_activetime_stats_X1,total_activetime_stats_X2, total_activetime_stats_X4)) # put all datasets in a list
 (total_activetime_stats_moss <- Reduce(`+`, list_act_time)/length(list_act_time)) # average them 
+
+(total_active_hours_moss <- total_activetime_stats_moss %>% # filter from the dataset the total number of active hours
+  filter(Condition == TRUE) %>%
+  select(Total_time))
+
+(percentage_active_days_moss <- total_active_hours_moss/(nrow(data_clean) + nrow(data_clean_23)) * 100)
 ```
 
 1.2 Active time each summer
@@ -5283,14 +5387,14 @@ data_met<- data_met %>%  # create new columns with month, year,
 3.3. Mean temperature of the whole measuring period
 
 ```{r}
-mean_air_t_measuring_per <- data_met %>% 
+(mean_air_t_measuring_per <- data_met %>% 
   summarise(MeanT = mean(Tmean),
             MaxT =  max(Tmax),
             MinT = min(Tmin),
             Max_meanT = max(Tmean),
             Min_meanT = min(Tmean),
             mean_maxT = mean(Tmax),
-            mean_minT = mean(Tmin))
+            mean_minT = mean(Tmin)))
 
 ```
 
@@ -5305,7 +5409,7 @@ data_met <- data_met %>% # Create a column specifying the summer
     Year == 2021 & Month %in% c(11,12) |  Year == 2022 & Month %in% c(1,2) ~ "Summer_21_22",
     Year == 2022 & Month %in% c(11,12) |  Year == 2023 & Month %in% c(1,2) ~ "Summer_22_23"))
 
-mean_air_t_summer <- data_met %>% 
+(mean_air_t_summer <- data_met %>% 
   group_by(Summer) %>% 
   summarise(MeanT = mean(Tmean),
             MaxT =  max(Tmax),
@@ -5313,7 +5417,7 @@ mean_air_t_summer <- data_met %>%
             Max_meanT = max(Tmean),
             Min_meanT = min(Tmean),
             mean_maxT = mean(Tmax),
-            mean_minT = mean(Tmin))
+            mean_minT = mean(Tmin)))
 ```
 
 3.5. Mean temperature per month
@@ -5336,8 +5440,58 @@ mean_air_t_month <- data_met %>%
             Month = unique(Month),
             Year = unique(Year)) %>% 
   arrange(Year, Month, .by_group = TRUE) # arrange variables chronologically
+
+write.xlsx(mean_air_t_month, file = "stats/met/mean_air_t_month.xlsx") # save table
+
 ```
 
+3.6. Mean RH of the whole measuring period
+
+```{r}
+(mean_air_Rh_measuring_per <- data_met %>% 
+  summarise(MeanRh = mean(Rhmean),
+            Max_meanRh = max(Rhmean),
+            Min_meanRh = min(Rhmean)))
+
+```
+
+3.4. Mean RH per summer
+
+```{r}
+
+data_met <- data_met %>% # Create a column specifying the summer
+  mutate(Summer = case_when(
+    Year == 2019 & Month %in% c(11,12) |  Year == 2020 & Month %in% c(1,2) ~ "Summer_19_20",
+    Year == 2020 & Month %in% c(11,12) |  Year == 2021 & Month %in% c(1,2) ~ "Summer_20_21",
+    Year == 2021 & Month %in% c(11,12) |  Year == 2022 & Month %in% c(1,2) ~ "Summer_21_22",
+    Year == 2022 & Month %in% c(11,12) |  Year == 2023 & Month %in% c(1,2) ~ "Summer_22_23"))
+
+(mean_air_rh_summer <- data_met %>% 
+  group_by(Summer) %>% 
+  summarise(MeanRh = mean(Rhmean),
+            Max_meanRh = max(Rhmean),
+            Min_meanRh = min(Rhmean)))
+```
+
+3.5. Mean RH per month
+
+```{r}
+
+data_met <- data_met %>% # Create a column specifying the month-year
+  mutate(Year_month = paste(Year, Month, sep = "-"))
+
+mean_air_rh_month <- data_met %>% 
+  filter(!is.na(Summer)) %>%  # remove the values that are not in any summer. They aren't part of measuring period
+ group_by(Year_month) %>% 
+  summarise(MeanRh = mean(Rhmean),
+            Max_meanRh = max(Rhmean),
+            Min_meanRh = min(Rhmean),
+            Month = unique(Month),
+            Year = unique(Year)) %>% 
+  arrange(Year, Month, .by_group = TRUE) # arrange variables chronologically
+
+write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save table
+```
 
 ## 11. Plot data for all the measuring period
 
