@@ -32,6 +32,7 @@ library(tidyverse)
 library(lubridate)  # dates management
 library(gridExtra)  # arrange plots
 library(patchwork)  # combine plots
+library(hms)  # use function as.Time()
 ```
 2.2. Creates functions
 
@@ -3283,6 +3284,8 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
     mutate_all(~ifelse(is.na(.), 0, .)) %>% 
  summarise_all(sum)  # join rows that have the same condition (True or False)
 
+# filter from the dataset the total number of active hours---
+
 (total_active_hours_19_20_X1 <- summer_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
   select(Count_19_20))
@@ -3298,6 +3301,8 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
 (total_active_hours_22_23_X1 <- summer_activetime_stats_X1 %>%
   filter(Condition == TRUE) %>%
   select(Count_22_23))
+
+# put active hours as a percentage
 
 (Percentage_active_hours_19_20_X1 <- total_active_hours_19_20_X1 /nrow(summer_19_20) * 100) # put active hours as a percentage
 
@@ -3333,6 +3338,8 @@ month_activetime_stats_X1 <- bind_rows(
   group_by(Condition) %>% 
     mutate_all(~ifelse(is.na(.), 0, .)) %>% 
  summarise_all(sum)
+
+# filter from the dataset the total number of active hours
 
 (total_active_hours_19_20_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
@@ -3397,6 +3404,8 @@ month_activetime_stats_X1 <- bind_rows(
 (total_active_hours_22_23_feb_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
   select(Count_22_23_feb))
+
+# put active hours as a percentage
 
 (Percentage_active_hours_19_20_nov_X1 <- total_active_hours_19_20_nov_X1 /nrow(summer_19_20 %>% filter(Month == 11)) * 100) # put active hours as a percentage
 
@@ -5217,10 +5226,122 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
 ```
 
 
-## 10. Make plots for PAR and Temperature in each summer, in each sample (check activity under snowcover). Same axis (use for comparison)
+### 9.6. Meteorological
+
+1. Import and take a look at data
+```{r}
+data_met <- read_csv("data_meteorology_complete.csv")
+skimr::skim(data_met)  # see a summary of the whole data
+str(data_met)  # see the structure of each variable
+tail(data_met)  # view the last 6 rows of data
+head(data_met)  # view the first 6 rows of data
+```
+3. Structure data so it is useful
+
+```{r}
+# Clean Names and remove unnecessary columns
+
+data_met$DateTime <- paste(data_met$Date.UTC, data_met$Time.UTC)
+
+# Check whether there are NAs (affect calculations)
+
+(colSums(is.na(data_met[, c("Tmean", "Tmax", "Tmin", "Rhmean")]))) # COunt number of NAs in each column
+# remove NAs
+
+# Some of the dates have data from 2 stations. Average both to get 1 useful value
+data_met <- data_met %>% 
+   filter(!is.na(Tmean) & !is.na(Tmax) & !is.na(Tmin) & !is.na(Rhmean)) %>% # remove NAs before grouping
+  group_by(DateTime) %>% # Group by the measurements that have the same date and time
+  summarise(Tmean = mean(Tmean),
+            Tmax = mean(Tmax),
+            Tmin = mean(Tmin),
+            Rhmean = mean(Rhmean),
+            Date.UTC = unique(as.Date(Date.UTC)),
+            Time.UTC = unique(hms::as_hms(Time.UTC))) %>% 
+  ungroup()
+
+# check wether there are any NAs
+(which(is.na(data_met$Tmean) | is.na(data_met$Tmax) | is.na(data_met$Tmin) | is.na(data_met$Rhmean))) # Gives row of NAs
+# No more NAs
+
+```
+
+3.2. Create column for year and month
+
+```{r}
+data_met$DateTime <- as.POSIXct(data_met$DateTime, format="%d/%m/%Y %H:%M:%S", tz="UTC") # put the object as a date
+
+data_met<- data_met %>%  # create new columns with month, year,
+  mutate(Month = month(DateTime), # day, minute                     
+         Year = year(DateTime),
+         Day = day(DateTime),
+         Hour = hour(DateTime), 
+         Minute = minute(DateTime))
+
+```
+
+3.3. Mean temperature of the whole measuring period
+
+```{r}
+mean_air_t_measuring_per <- data_met %>% 
+  summarise(MeanT = mean(Tmean),
+            MaxT =  max(Tmax),
+            MinT = min(Tmin),
+            Max_meanT = max(Tmean),
+            Min_meanT = min(Tmean),
+            mean_maxT = mean(Tmax),
+            mean_minT = mean(Tmin))
+
+```
+
+3.4. Mean temperature per summer
+
+```{r}
+
+data_met <- data_met %>% # Create a column specifying the summer
+  mutate(Summer = case_when(
+    Year == 2019 & Month %in% c(11,12) |  Year == 2020 & Month %in% c(1,2) ~ "Summer_19_20",
+    Year == 2020 & Month %in% c(11,12) |  Year == 2021 & Month %in% c(1,2) ~ "Summer_20_21",
+    Year == 2021 & Month %in% c(11,12) |  Year == 2022 & Month %in% c(1,2) ~ "Summer_21_22",
+    Year == 2022 & Month %in% c(11,12) |  Year == 2023 & Month %in% c(1,2) ~ "Summer_22_23"))
+
+mean_air_t_summer <- data_met %>% 
+  group_by(Summer) %>% 
+  summarise(MeanT = mean(Tmean),
+            MaxT =  max(Tmax),
+            MinT = min(Tmin),
+            Max_meanT = max(Tmean),
+            Min_meanT = min(Tmean),
+            mean_maxT = mean(Tmax),
+            mean_minT = mean(Tmin))
+```
+
+3.5. Mean temperature per month
+
+```{r}
+
+data_met <- data_met %>% # Create a column specifying the month-year
+  mutate(Year_month = paste(Year, Month, sep = "-"))
+
+mean_air_t_month <- data_met %>% 
+  filter(!is.na(Summer)) %>%  # remove the values that are not in any summer. They aren't part of measuring period
+ group_by(Year_month) %>% 
+  summarise(MeanT = mean(Tmean),
+            MaxT =  max(Tmax),
+            MinT = min(Tmin),
+            Max_meanT = max(Tmean),
+            Min_meanT = min(Tmean),
+            mean_maxT = mean(Tmax),
+            mean_minT = mean(Tmin),
+            Month = unique(Month),
+            Year = unique(Year)) %>% 
+  arrange(Year, Month, .by_group = TRUE) # arrange variables chronologically
+```
+
+
 ## 11. Plot data for all the measuring period
 
-### Graph for PAR year round (This need to be changed to include 2022-2023)
+### 11.1. Graph for PAR year round (This need to be changed to include 2022-2023)
 
 ```{r}
 (PAR_year_round_19_22 <- data_clean %>%
@@ -5235,7 +5356,7 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_rou
 
 ```
 
-### Graph for yield year round
+### 11.2. Graph for yield year round
 
 ```{r}
 
@@ -5278,7 +5399,7 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_rou
 ggsave(filename = "graphs_year_round/yield_year_round_19_22.png", yield_year_round_19_22, width = 54,height = 18, units = "cm",device = "png")  # Save graph
 ```
 
-### Graph for T year round
+### 11.3. Graph for T year round
 ```{r}
 (temp_year_round_19_22 <- data_clean %>%
   mutate(mean_Temp = rowMeans(select(., c("X1.Temp", "X2.Temp", "X3.Temp", "X4.Temp")), na.rm = TRUE)) %>%  # calcualte mean PAR across all samples
@@ -5292,6 +5413,6 @@ ggsave(filename = "graphs_env_conditions/temp_year_round_19_22.png", temp_year_r
 ```
 
 
-## 10. Plot data for the heatwave March 2022
+## 12. Plot data for the heatwave March 2022
 
 
