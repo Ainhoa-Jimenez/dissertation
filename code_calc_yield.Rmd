@@ -52,7 +52,7 @@ theme_graphs_env_cond <- function(){
 3.  Load the data and see its structure
 
 ```{r}
-data <- read_csv("Data_set_PAM_ScottBase_with_ calc_yield.csv") # load data until 22
+data <- read_csv("Data_set_PAM_ScottBase_with_calc_yield_until_11-22.csv.csv") # load data until 22
 data_23 <- read_csv("Datset_until_11-23_paste.csv") # load data until nov-23
 skimr::skim(data)  # see a summary of the whole data
 skimr::skim(data_23)
@@ -171,12 +171,16 @@ print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day
 # From 25/01/2022 the date format changes and it is not cummulative anymore
 
 data_clean <- data_clean %>%
-  mutate(Date_no_time = paste(year(Date), month(Date), day(Date), sep = "-")) %>%  # Create acolumn with the date but without the time
+  mutate(Date_no_time = as.Date(paste(year(Date), month(Date), day(Date), sep = "-"))) %>%  # Create acolumn with the date but without the time
   mutate(Day_cum = if_else(No. >= 26510, 44586 + as.numeric(difftime(Date_no_time, as.Date("2022-01-25"), units = "days")), Day_cum)) %>%  # Fix the format of Day_cum after the 25/01/2022
   # Difftime weeks the time passed between 2 days in the units indicated
   select(-Date_no_time)  # Remove Date_no_time from the data set
   
 print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day_cum
+# There are 256 rows of just NAs at the end
+
+data_clean <- data_clean %>%  # remoove the NAs
+  filter(!is.na(Datetime))
 
 head(data_clean$Date_Combined)  # Check it worked
 tail(data_clean$Date_Combined)
@@ -1738,14 +1742,29 @@ summer_20_21 <- summer_20_21 %>%
     Day_cum > 44173 ~ X3.Y),  # Days after the 8th of December stay with machine yield
     X3.chosen_ETR = X3.chosen_yield * X3.PAR )  # summer_20_21 X3 ETR
 
-# summer_20_21 X3 yield in data_clean
+# summer_21_22 X4 yield (6th March)
+
+summer_21_22 <- summer_21_22 %>% 
+  mutate(X4.chosen_yield = case_when( # summer_21_22 X4 yield
+    Day_cum <= 44606 ~ X4.Y,  # Days before the 14th of Feb stay with machine yield
+    Day_cum > 44606 & Day_cum <= 44620 ~ 0,  # Days between the 14th of Feb and 28th of Feb change to calc_yield
+    Day_cum >= 44620 ~ X4.Y),  # Days after the 28th of Feb stay with machine yield
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR)  # summer_21_2 X4 ETR
+    
+  
+# summer_20_21 X3  and summer_21_22 X4 yield in data_clean
 
 data_clean <- data_clean %>% 
   mutate(X3.chosen_yield = case_when( # summer_20_21 X3 yield
     Day_cum < 44165 ~ X3.Y,  # Days before the 30th of Nov stay with machine yield
     Day_cum >= 44165 & Day_cum <= 44173 ~ X3.calc_yield,  # Days between the 30th of Nov and 8th of Dec change to calc_yield
     Day_cum > 44173 ~ X3.Y),  # Days after the 8th of December stay with machine yield
-    X3.chosen_ETR = X3.chosen_yield * X3.PAR )  # summer_20_21 X3 ETR
+    X3.chosen_ETR = X3.chosen_yield * X3.PAR, # summer_20_21 X3 ETR
+    X4.chosen_yield = case_when( # summer_21_22 X4 yield
+    Day_cum <= 44606 ~ X4.Y,  # Days before the 14th of Feb stay with machine yield
+    Day_cum > 44606 & Day_cum <= 44620 ~ 0,  # Days between the 14th of Feb and 28th of Feb change to calc_yield
+    Day_cum >= 44620 ~ X4.Y),  # Days after the 28th of Feb stay with machine yield
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR)  # summer_21_2 X4 ETR
 
 # Summer 22_23 yield X3 and X4
 
@@ -5564,6 +5583,13 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_22.png", yield_year_rou
   ylab("Temperature ºC"))
 
 ggsave(filename = "graphs_env_conditions/temp_year_round_19_22.png", temp_year_round_19_22, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+
+(air_temp_year_round_19_22 <- data_met %>%
+  ggplot(aes(DateTime, Tmean)) +
+  geom_line() +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  ylab("Temperature ºC"))
 ```
 
 
