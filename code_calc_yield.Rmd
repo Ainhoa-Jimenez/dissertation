@@ -2703,2652 +2703,6 @@ ggsave(filename = "graphs_characterise/bryum/combined_plot_22_23_X4.png", combin
 
 ## 9. Run descriptive statistics
 
-### 9.1. Austroplaca (X3)
-
-1. Create columns for activity
-
-```{r}
-data_clean <- data_clean %>% 
-  mutate(X3.Active = if_else(X3.chosen_yield > 0, TRUE, FALSE))  # If the yield is above 0 the plant is active = TRUE
-
-data_clean_23 <- data_clean_23 %>% 
-  mutate(X3.Active = if_else(X3.chosen_yield > 0, TRUE, FALSE)) 
-
-summer_19_20 <- summer_19_20 %>% 
-  mutate(X3.Active = if_else(X3.Y > 0, TRUE, FALSE)) 
-
-summer_20_21 <- summer_20_21 %>% 
-  mutate(X3.Active = if_else(X3.chosen_yield > 0, TRUE, FALSE)) 
-
-summer_21_22 <- summer_21_22 %>% 
-  mutate(X3.Active = if_else(X3.Y > 0, TRUE, FALSE)) 
-
-summer_22_23 <- summer_22_23 %>% 
-  mutate(X3.Active = if_else(X3.chosen_yield > 0, TRUE, FALSE)) 
-```
-
-2. Active time
-
-```{r}
-# Active total time
-
-total_activetime_stats_X3 <- bind_rows(  # put both counts into one dataset
-  data_clean %>% count(Condition = X3.chosen_yield > 0, name = "Count_data_clean"),  # Count rows with active time (1 row = 1 hour)
-  data_clean_23 %>% count(Condition = X3.chosen_yield > 0, name = "Count_data_clean_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>%  # join rows that have the same condition (True or False)
-mutate(Total_time = Count_data_clean + Count_data_clean_23) # add both columns to get the total active time of the year
-  
-(total_active_hours_X3 <- total_activetime_stats_X3 %>% # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Total_time))
-
-(Percentage_active_hours_X3 <- total_active_hours_X3/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
-```
-
-```{r}
-# Active time each summer
-
-summer_activetime_stats_X3 <-bind_rows(
-  summer_19_20 %>% count(Condition = X3.Y > 0, name = "Count_19_20"), # Count rows in summer 20_21 with active time (1 row = 1 hour) // no chosen yield  becaue didn't make any ajustments
-  summer_20_21 %>% count(Condition = X3.chosen_yield > 0, name = "Count_20_21"), # Chosen yield because made ajustments
-summer_21_22 %>% count(Condition = X3.Y > 0, name = "Count_21_22"),
-summer_22_23 %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)  # join rows that have the same condition (True or False)
-
-(total_active_hours_19_20_X3 <- summer_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20))
-
-(total_active_hours_20_21_X3 <- summer_activetime_stats_X3 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_20_21))
-
-(total_active_hours_21_22_X3 <- summer_activetime_stats_X3 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_21_22))
-
-(total_active_hours_22_23_X3 <- summer_activetime_stats_X3 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_22_23))
-
-(Percentage_active_hours_19_20_X3 <- total_active_hours_19_20_X3 /nrow(summer_19_20) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_X3 <- total_active_hours_20_21_X3 /nrow(summer_20_21) * 100)
-
-(Percentage_active_hours_21_22_X3 <- total_active_hours_21_22_X3 /nrow(summer_21_22) * 100)
-
-(Percentage_active_hours_22_23_X3 <- total_active_hours_22_23_X3 /nrow(summer_22_23) * 100)
-```
-
-```{r}
-# Active time each month
-
-month_activetime_stats_X3 <- bind_rows(
-  summer_19_20 %>% filter(Month == 11) %>% count(Condition = X3.Y > 0, name = "Count_19_20_nov"),
-  summer_19_20 %>% filter(Month == 12) %>% count(Condition = X3.Y > 0, name = "Count_19_20_dec"),
-  summer_19_20 %>% filter(Month == 1) %>% count(Condition = X3.Y > 0, name = "Count_19_20_jan"),
-  summer_19_20 %>% filter(Month == 2) %>% count(Condition = X3.Y > 0, name = "Count_19_20_feb"),
-  summer_20_21 %>% filter(Month == 11) %>% count(Condition = X3.chosen_yield > 0, name = "Count_20_21_nov"),
-  summer_20_21 %>% filter(Month == 12) %>% count(Condition = X3.chosen_yield > 0, name = "Count_20_21_dec"),
-  summer_20_21 %>% filter(Month == 1) %>% count(Condition = X3.chosen_yield > 0, name = "Count_20_21_jan"),
-  summer_20_21 %>% filter(Month == 2) %>% count(Condition = X3.chosen_yield > 0, name = "Count_20_21_feb"),
-  summer_21_22 %>% filter(Month == 11) %>% count(Condition = X3.Y > 0, name = "Count_21_22_nov"),
-  summer_21_22 %>% filter(Month == 12) %>% count(Condition = X3.Y > 0, name = "Count_21_22_dec"),
-  summer_21_22 %>% filter(Month == 1) %>% count(Condition = X3.Y > 0, name = "Count_21_22_jan"),
-  summer_21_22 %>% filter(Month == 2) %>% count(Condition = X3.Y > 0, name = "Count_21_22_feb"),
-  summer_22_23 %>% filter(Month == 11) %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23_nov"),
-  summer_22_23 %>% filter(Month == 12) %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23_dec"),
-  summer_22_23 %>% filter(Month == 1) %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23_jan"),
-  summer_22_23 %>% filter(Month == 2) %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23_feb")) %>% 
-  group_by(Condition) %>% 
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)
-
-(total_active_hours_19_20_nov_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_nov))
-
-(total_active_hours_19_20_dec_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_dec))
-
-(total_active_hours_19_20_jan_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_jan))
-
-(total_active_hours_19_20_feb_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_feb))
-
-(total_active_hours_20_21_nov_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_nov))
-
-(total_active_hours_20_21_dec_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_dec))
-
-(total_active_hours_20_21_jan_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_jan))
-
-(total_active_hours_20_21_feb_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_feb))
-
-(total_active_hours_21_22_nov_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_nov))
-
-(total_active_hours_21_22_dec_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_dec))
-
-(total_active_hours_21_22_jan_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_jan))
-
-(total_active_hours_21_22_feb_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_feb))
-
-(total_active_hours_22_23_nov_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_dec_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_jan_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_jan))
-
-(total_active_hours_22_23_feb_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_feb))
-
-(Percentage_active_hours_19_20_nov_X3 <- total_active_hours_19_20_nov_X3 /nrow(summer_19_20 %>% filter(Month == 11)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_dec_X3 <- total_active_hours_19_20_dec_X3 /nrow(summer_19_20 %>% filter(Month == 12)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_jan_X3 <- total_active_hours_19_20_nov_X3 /nrow(summer_19_20 %>% filter(Month == 1)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_feb_X3 <- total_active_hours_19_20_nov_X3 /nrow(summer_19_20 %>% filter(Month == 2)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_nov_X3 <- total_active_hours_20_21_nov_X3 /nrow(summer_20_21 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_20_21_dec_X3 <- total_active_hours_20_21_dec_X3 /nrow(summer_20_21 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_20_21_jan_X3 <- total_active_hours_20_21_jan_X3 /nrow(summer_20_21 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_20_21_feb_X3 <- total_active_hours_20_21_feb_X3 /nrow(summer_20_21 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_21_22_nov_X3 <- total_active_hours_21_22_nov_X3 /nrow(summer_21_22 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_21_22_dec_X3 <- total_active_hours_21_22_dec_X3 /nrow(summer_21_22 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_21_22_jan_X3 <- total_active_hours_21_22_jan_X3 /nrow(summer_21_22 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_21_22_feb_X3 <- total_active_hours_21_22_feb_X3 /nrow(summer_21_22 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_22_23_nov_X3 <- total_active_hours_22_23_nov_X3 /nrow(summer_22_23 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_22_23_dec_X3 <- total_active_hours_22_23_dec_X3 /nrow(summer_22_23 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_22_23_jan_X3 <- total_active_hours_22_23_jan_X3 /nrow(summer_22_23 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_22_23_feb_X3 <- total_active_hours_22_23_feb_X3 /nrow(summer_22_23 %>% filter(Month == 2)) * 100)
-```
-
-**3. Thallus Temperature**
-
-3.1. Total measuring and active time
-
-```{r}
-# Mean temperature during the whole measuring period ------------------
-
-(mean_Temp_X3_data <- bind_rows(  # Make into a single dataset
-  data_clean,  # get the rows in data_clean where the lichen is active
-  data_clean_23) %>% # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp)))  # calculate the mean Temp of the active period
-   
-       # Mean is Na, which means one of the values is NA
-
-(which(is.na(data_clean$X3.Temp))) # the row 20762 is NA
-(which(is.na(data_clean_23$X3.Temp))) # the row 2280 is NA
-
-print(data_clean[20762, ]) # there are a lot of NA --> remove observation
-data_clean <- na.omit(data_clean, cols = "X3.Temp") # code to remove it
-
-print(data_clean_23[2280, ]) # change NA value in Temp to -5ºC
-data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.Temp), -5) # code to replace it
-
-(mean_Temp_X3_data <- bind_rows(
-  data_clean  %>% select(X3.Temp), 
-  data_clean_23  %>% select(X3.Temp)) %>% 
-  summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))  # get the minimum temperature
-
-# Mean temperature whole active period -------------------
-
-(mean_Temp_active_X3_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X3.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X3.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp),
-    max_temp = max(X3.Temp),
-    min_temp = min(X3.Temp)))  # calculate the mean Temp of the active period
-
-(mean_Temp_active_X3 <- mean_Temp_active_X3_data %>%  # extract the mean Temp of the active period
-  filter( X3.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.2. Monthly Temperature
-
-```{r}
-# Mean temperature summer 19-20
-
-(mean_Temp_X3_19_20 <- summer_19_20  %>%  # Mean Temp for 19-20
-    select(X3.Temp) %>% 
-  summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X3_19_20 <- summer_19_20 %>% # Mean Temp for active 19-20
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp),
-    max_temp = max(X3.Temp),
-    min_temp = min(X3.Temp)))
-
-(mean_Temp_active_X3_19_20 <- mean_Temp_active_X3_19_20 %>%  # extract the mean Temp of the active period
-  filter( X3.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 20-21
-
-(mean_Temp_X3_20_21 <- summer_20_21  %>%  # Mean Temp for 20-21
-    select(X3.Temp) %>% 
-  summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X3_20_21 <- summer_20_21 %>% # Mean Temp for active 20-21
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp),
-    max_temp = max(X3.Temp),
-    min_temp = min(X3.Temp)))
-
-(mean_Temp_active_X3_20_21 <- mean_Temp_active_X3_20_21 %>%  # extract the mean Temp of the active period
-  filter( X3.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 21-22
-
-(mean_Temp_X3_21_22 <- summer_21_22  %>%  # Mean Temp for 21-22
-    select(X3.Temp) %>% 
-  summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X3_21_22 <- summer_21_22 %>% # Mean Temp for active 21-22
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp),
-    max_temp = max(X3.Temp),
-    min_temp = min(X3.Temp)))
-
-(mean_Temp_active_X3_21_22 <- mean_Temp_active_X3_21_22 %>%  # extract the mean Temp of the active period
-  filter( X3.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 22-23
-
-(mean_Temp_X3_22_23 <- summer_22_23  %>%  # Mean Temp for 22-23
-    select(X3.Temp) %>% 
-  summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X3_22_23 <- summer_22_23 %>% # Mean Temp for active 22-23
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X3.Temp),
-    max_temp = max(X3.Temp),
-    min_temp = min(X3.Temp)))
-
-(mean_Temp_active_X3_22_23 <- mean_Temp_active_X3_22_23 %>%  # extract the mean Temp of the active period
-  filter( X3.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.3. Monthly temperature
-
-```{r}
-
-(month_temp_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))
-
-write.xlsx(month_temp_stats_X3, file = "stats/austroplaca/month_temp_stats_X3.xlsx") # save table
-
-(month_active_temp_stats_X3 <- bind_rows(  # Monthly stats for active period
-  summer_19_20 %>% filter(Month == 11, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 12, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 1, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 2, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 11, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 12, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 1, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 2, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 11, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 12, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 1, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 2, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 11, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 12, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 1, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 2, X1.Y > 0)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X3.Temp),
-            max_temp = max(X3.Temp),  # get the maximum temperature
-            min_temp = min(X3.Temp)))
-
-write.xlsx(month_active_temp_stats_X3, file = "stats/austroplaca/month_active_temp_stats_X3.xlsx") # save table
-```
-
-**4. PAR**
-
-4.1. Active Period
-
-```{r}
-# Active period----
-
-(mean_PAR_active_X3_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X3.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X3.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_PAR = mean(X3.PAR),
-    max_PAR = max(X3.PAR),
-    min_PAR = min(X3.PAR)))  # calculate the mean PAR of the active period
-
-```
-
-4.2. Monthly PAR
-
-```{r}
-# Mean PAR summer 19-20
-
-(mean_PAR_X3_19_20 <- summer_19_20 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X3.PAR),
-    max_PAR = max(X3.PAR),
-    min_PAR = min(X3.PAR)))
-
-# Mean temperature summer 20-21
-
-(mean_PAR_X3_20_21 <- summer_20_21 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X3.PAR),
-    max_PAR = max(X3.PAR),
-    min_PAR = min(X3.PAR)))
-
-# Mean temperature summer 21-22
-
-(mean_PAR_X3_21_22 <- summer_21_22 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X3.PAR),
-    max_PAR = max(X3.PAR),
-    min_PAR = min(X3.PAR)))
-
-# Mean temperature summer 22-23
-
-(mean_PAR_active_X3_22_23 <- summer_22_23 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X3.PAR),
-    max_PAR = max(X3.PAR),
-    min_PAR = min(X3.PAR)))
-
-```
-
-4.3. Monthly PAR
-
-```{r}
-(month_PAR_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_PAR = mean(X3.PAR),
-            max_PAR = max(X3.PAR),  # get the maximum temperature
-            min_PAR = min(X3.PAR)))
-
-write.xlsx(month_PAR_stats_X3, file = "stats/austroplaca/month_PAR_stats_X3.xlsx") # save table
-
-```
-
-
-**5. YIELD and ETR**
-
-5.1. Total Active period
-```{r}
-# Active period----
-
-(mean_yield_active_X3_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X3.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X3.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_Y = mean(X3.chosen_yield),
-    max_Y = max(X3.chosen_yield),
-    min_Y = min(X3.chosen_yield)))  # calculate the mean yield of the active period
-
-(mean_ETR_active_X3_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X3.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X3.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_ETR = mean(X3.chosen_ETR),
-    max_ETR = max(X3.chosen_ETR),
-    min_ETR = min(X3.chosen_ETR)))  # calculate the mean ETR of the active period
-
-```
-
-5.2 Summerly yield/ ETR
-
-```{r}
-# Mean YIED/ETR summer 19-20
-
-(mean_yield_X3_19_20 <- summer_19_20 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X3.Y),
-    max_Y = max(X3.Y),
-    min_Y = min(X3.Y)))
-
-(mean_ETR_X3_19_20 <- summer_19_20 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X3.ETR),
-    max_ETR = max(X3.ETR),
-    min_ETR = min(X3.ETR)))
-
-# Mean YIED/ETR summer 20-21
-
-(mean_yield_X3_20_21 <- summer_20_21 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X3.chosen_yield),
-    max_Y = max(X3.chosen_yield),
-    min_Y = min(X3.chosen_yield)))
-
-(mean_ETR_X3_20_21 <- summer_20_21 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X3.chosen_ETR),
-    max_ETR = max(X3.chosen_ETR),
-    min_ETR = min(X3.chosen_ETR)))
-
-# Mean YIED/ETR summer 21-22
-
-(mean_yield_X3_21_22 <- summer_21_22 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X3.Y),
-    max_Y = max(X3.Y),
-    min_Y = min(X3.Y)))
-
-(mean_ETR_X3_21_22 <- summer_21_22 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X3.ETR),
-    max_ETR = max(X3.ETR),
-    min_ETR = min(X3.ETR)))
-
-# Mean YIED/ETR summer 22-23
-
-(mean_yield_X3_22_23 <- summer_22_23 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X3.chosen_yield),
-    max_Y = max(X3.chosen_yield),
-    min_Y = min(X3.chosen_yield)))
-
-(mean_ETR_X3_22_23 <- summer_22_23 %>% 
-  group_by(X3.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X3.chosen_ETR),
-    max_ETR = max(X3.chosen_ETR),
-    min_ETR = min(X3.chosen_ETR)))
-
-```
-
-5.3. Monthly yield
-
-```{r}
-(month_Y_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X3.Y),
-            max_Y = max(X3.Y),  # get the maximum temperature
-            min_Y = min(X3.Y)))
-
-write.xlsx(month_Y_stats_X3, file = "stats/austroplaca/month_Y_stats_X3.xlsx") # save table
-
-
-(month_ETR_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X3.ETR),
-            max_ETR = max(X3.ETR),  # get the maximum temperature
-            min_ETR = min(X3.ETR)))
-
-write.xlsx(month_ETR_stats_X3, file = "stats/austroplaca/month_ETR_stats_X3.xlsx") # save table
-```
-
-### 9.2. Bryum (X1)
-
-1. Create columns for activity
-
-```{r}
-data_clean <- data_clean %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE))  # If the yield is above 0 the plant is active = TRUE
-
-data_clean_23 <- data_clean_23 %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE)) 
-
-summer_19_20 <- summer_19_20 %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE)) 
-
-summer_20_21 <- summer_20_21 %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE)) 
-
-summer_21_22 <- summer_21_22 %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE)) 
-
-summer_22_23 <- summer_22_23 %>% 
-  mutate(X1.Active = if_else(X1.Y > 0, TRUE, FALSE)) 
-```
-
-2. Active time
-
-2.1. Active total time
-
-```{r}
-# Active total time
-
-total_activetime_stats_X1 <- bind_rows(  # put both counts into one dataset
-  data_clean %>% count(Condition = X1.Y > 0, name = "Count_data_clean"),  # Count rows with active time (1 row = 1 hour)
-  data_clean_23 %>% count(Condition = X1.Y > 0, name = "Count_data_clean_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>%  # join rows that have the same condition (True or False)
-mutate(Total_time = Count_data_clean + Count_data_clean_23) # add both columns to get the total active time of the year
-  
-(total_active_hours_X1 <- total_activetime_stats_X1 %>% # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Total_time))
-
-(Percentage_active_days_X1 <- total_active_hours_X1/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
-```
-
-2.2. Active time each summer
-
-```{r}
-# Active time each summer
-
-summer_activetime_stats_X1 <-bind_rows(
-  summer_19_20 %>% count(Condition = X1.Y > 0, name = "Count_19_20"), # Count rows in summer 20_21 with active time (1 row = 1 hour) // no chosen yield  becaue didn't make any ajustments
-  summer_20_21 %>% count(Condition = X1.Y > 0, name = "Count_20_21"), # Chosen yield because made ajustments
-summer_21_22 %>% count(Condition = X1.Y > 0, name = "Count_21_22"),
-summer_22_23 %>% count(Condition = X1.Y > 0, name = "Count_22_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)  # join rows that have the same condition (True or False)
-
-# filter from the dataset the total number of active hours---
-
-(total_active_hours_19_20_X1 <- summer_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20))
-
-(total_active_hours_20_21_X1 <- summer_activetime_stats_X1 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_20_21))
-
-(total_active_hours_21_22_X1 <- summer_activetime_stats_X1 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_21_22))
-
-(total_active_hours_22_23_X1 <- summer_activetime_stats_X1 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_22_23))
-
-# put active hours as a percentage
-
-(Percentage_active_hours_19_20_X1 <- total_active_hours_19_20_X1 /nrow(summer_19_20) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_X1 <- total_active_hours_20_21_X1 /nrow(summer_20_21) * 100)
-
-(Percentage_active_hours_21_22_X1 <- total_active_hours_21_22_X1 /nrow(summer_21_22) * 100)
-
-(Percentage_active_hours_22_23_X1 <- total_active_hours_22_23_X1 /nrow(summer_22_23) * 100)
-```
-
-2.3. Active time each month
-
-```{r}
-# Active time each month
-
-month_activetime_stats_X1 <- bind_rows(
-  summer_19_20 %>% filter(Month == 11) %>% count(Condition = X1.Y > 0, name = "Count_19_20_nov"),
-  summer_19_20 %>% filter(Month == 12) %>% count(Condition = X1.Y > 0, name = "Count_19_20_dec"),
-  summer_19_20 %>% filter(Month == 1) %>% count(Condition = X1.Y > 0, name = "Count_19_20_jan"),
-  summer_19_20 %>% filter(Month == 2) %>% count(Condition = X1.Y > 0, name = "Count_19_20_feb"),
-  summer_20_21 %>% filter(Month == 11) %>% count(Condition = X1.Y > 0, name = "Count_20_21_nov"),
-  summer_20_21 %>% filter(Month == 12) %>% count(Condition = X1.Y > 0, name = "Count_20_21_dec"),
-  summer_20_21 %>% filter(Month == 1) %>% count(Condition = X1.Y > 0, name = "Count_20_21_jan"),
-  summer_20_21 %>% filter(Month == 2) %>% count(Condition = X1.Y > 0, name = "Count_20_21_feb"),
-  summer_21_22 %>% filter(Month == 11) %>% count(Condition = X1.Y > 0, name = "Count_21_22_nov"),
-  summer_21_22 %>% filter(Month == 12) %>% count(Condition = X1.Y > 0, name = "Count_21_22_dec"),
-  summer_21_22 %>% filter(Month == 1) %>% count(Condition = X1.Y > 0, name = "Count_21_22_jan"),
-  summer_21_22 %>% filter(Month == 2) %>% count(Condition = X1.Y > 0, name = "Count_21_22_feb"),
-  summer_22_23 %>% filter(Month == 11) %>% count(Condition = X1.Y > 0, name = "Count_22_23_nov"),
-  summer_22_23 %>% filter(Month == 12) %>% count(Condition = X1.Y > 0, name = "Count_22_23_dec"),
-  summer_22_23 %>% filter(Month == 1) %>% count(Condition = X1.Y > 0, name = "Count_22_23_jan"),
-  summer_22_23 %>% filter(Month == 2) %>% count(Condition = X1.Y > 0, name = "Count_22_23_feb")) %>% 
-  group_by(Condition) %>% 
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)
-
-# filter from the dataset the total number of active hours
-
-(total_active_hours_19_20_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_nov))
-
-(total_active_hours_19_20_dec_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_dec))
-
-(total_active_hours_19_20_jan_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_jan))
-
-(total_active_hours_19_20_feb_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_feb))
-
-(total_active_hours_20_21_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_nov))
-
-(total_active_hours_20_21_dec_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_dec))
-
-(total_active_hours_20_21_jan_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_jan))
-
-(total_active_hours_20_21_feb_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_feb))
-
-(total_active_hours_21_22_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_nov))
-
-(total_active_hours_21_22_dec_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_dec))
-
-(total_active_hours_21_22_jan_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_jan))
-
-(total_active_hours_21_22_feb_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_feb))
-
-(total_active_hours_22_23_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_dec_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_jan_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_jan))
-
-(total_active_hours_22_23_feb_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_22_23_feb))
-
-# put active hours as a percentage
-
-(Percentage_active_hours_19_20_nov_X1 <- total_active_hours_19_20_nov_X1 /nrow(summer_19_20 %>% filter(Month == 11)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_dec_X1 <- total_active_hours_19_20_dec_X1 /nrow(summer_19_20 %>% filter(Month == 12)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_jan_X1 <- total_active_hours_19_20_nov_X1 /nrow(summer_19_20 %>% filter(Month == 1)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_feb_X1 <- total_active_hours_19_20_nov_X1 /nrow(summer_19_20 %>% filter(Month == 2)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_nov_X1 <- total_active_hours_20_21_nov_X1 /nrow(summer_20_21 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_20_21_dec_X1 <- total_active_hours_20_21_dec_X1 /nrow(summer_20_21 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_20_21_jan_X1 <- total_active_hours_20_21_jan_X1 /nrow(summer_20_21 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_20_21_feb_X1 <- total_active_hours_20_21_feb_X1 /nrow(summer_20_21 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_21_22_nov_X1 <- total_active_hours_21_22_nov_X1 /nrow(summer_21_22 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_21_22_dec_X1 <- total_active_hours_21_22_dec_X1 /nrow(summer_21_22 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_21_22_jan_X1 <- total_active_hours_21_22_jan_X1 /nrow(summer_21_22 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_21_22_feb_X1 <- total_active_hours_21_22_feb_X1 /nrow(summer_21_22 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_22_23_nov_X1 <- total_active_hours_22_23_nov_X1 /nrow(summer_22_23 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_22_23_dec_X1 <- total_active_hours_22_23_dec_X1 /nrow(summer_22_23 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_22_23_jan_X1 <- total_active_hours_22_23_jan_X1 /nrow(summer_22_23 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_22_23_feb_X1 <- total_active_hours_22_23_feb_X1 /nrow(summer_22_23 %>% filter(Month == 2)) * 100)
-```
-
-**3. Thallus Temperature**
-
-3.1. Total measuring and active time
-
-```{r}
-# Mean temperature during the whole measuring period ------------------
-
-(mean_Temp_X1_data <- bind_rows(
-  data_clean  %>% select(X1.Temp), 
-  data_clean_23  %>% select(X1.Temp)) %>% 
-  summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))  # get the minimum temperature
-
-# Mean temperature whole active period-------------------
-
-(mean_Temp_active_X1_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X1.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X1.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_temp = mean(X1.Temp),
-    max_temp = max(X1.Temp),
-    min_temp = min(X1.Temp)))  # calculate the mean Temp of the active period
-
-(mean_Temp_active_X1 <- mean_Temp_active_X1_data %>%  # extract the mean Temp of the active period
-  filter( X1.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.2. Summer Temperature
-
-```{r}
-# Mean temperature summer 19-20
-
-(mean_Temp_X1_19_20 <- summer_19_20  %>%  # Mean Temp for 19-20
-    select(X1.Temp) %>% 
-  summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X1_19_20 <- summer_19_20 %>%  # Mean Temp for active 19-20
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X1.Temp),
-    max_temp = max(X1.Temp),
-    min_temp = min(X1.Temp)))
-
-(mean_Temp_active_X1_19_20 <- mean_Temp_active_X1_19_20 %>%  # extract the mean Temp of the active period
-  filter( X1.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 20-21
-
-(mean_Temp_X1_20_21 <- summer_20_21  %>%  # Mean Temp for 20-21
-    select(X1.Temp) %>% 
-  summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X1_20_21 <- summer_20_21 %>% # Mean Temp for active 20-21
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X1.Temp),
-    max_temp = max(X1.Temp),
-    min_temp = min(X1.Temp)))
-
-(mean_Temp_active_X1_20_21 <- mean_Temp_active_X1_20_21 %>%  # extract the mean Temp of the active period
-  filter( X1.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 21-22
-
-(mean_Temp_X1_21_22 <- summer_21_22  %>%  # Mean Temp for 21-22
-    select(X1.Temp) %>% 
-  summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X1_21_22 <- summer_21_22 %>% # Mean Temp for active 21-22
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X1.Temp),
-    max_temp = max(X1.Temp),
-    min_temp = min(X1.Temp)))
-
-(mean_Temp_active_X1_21_22 <- mean_Temp_active_X1_21_22 %>%  # extract the mean Temp of the active period
-  filter( X1.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 22-23
-
-(mean_Temp_X1_22_23 <- summer_22_23  %>%  # Mean Temp for 22-23
-    select(X1.Temp) %>% 
-  summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X1_22_23 <- summer_22_23 %>% # Mean Temp for active 22-23
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X1.Temp),
-    max_temp = max(X1.Temp),
-    min_temp = min(X1.Temp)))
-
-(mean_Temp_active_X1_22_23 <- mean_Temp_active_X1_22_23 %>%  # extract the mean Temp of the active period
-  filter( X1.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.3. Monthly temperature
-
-```{r}
-
-(month_temp_stats_X1 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))
-
-write.xlsx(month_temp_stats_X1, file = "stats/bryum/month_temp_stats_X1.xlsx") # save table
-
-(month_active_temp_stats_X1 <- bind_rows(  # Monthly stats for active period
-  summer_19_20 %>% filter(Month == 11, X1.Active == TRUE),
-  summer_19_20 %>% filter(Month == 12, X1.Active == TRUE),
-  summer_19_20 %>% filter(Month == 1, X1.Active == TRUE),
-  summer_19_20 %>% filter(Month == 2, X1.Active == TRUE),
-  summer_20_21 %>% filter(Month == 11, X1.Active == TRUE),
-  summer_20_21 %>% filter(Month == 12, X1.Active == TRUE),
-  summer_20_21 %>% filter(Month == 1, X1.Active == TRUE),
-  summer_20_21 %>% filter(Month == 2, X1.Active == TRUE),
-  summer_21_22 %>% filter(Month == 11, X1.Active == TRUE),
-  summer_21_22 %>% filter(Month == 12, X1.Active == TRUE),
-  summer_21_22 %>% filter(Month == 1, X1.Active == TRUE),
-  summer_21_22 %>% filter(Month == 2, X1.Active == TRUE),
-  summer_22_23 %>% filter(Month == 11, X1.Active == TRUE),
-  summer_22_23 %>% filter(Month == 12, X1.Active == TRUE),
-  summer_22_23 %>% filter(Month == 1, X1.Active == TRUE),
-  summer_22_23 %>% filter(Month == 2, X1.Active == TRUE)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X1.Temp),
-            max_temp = max(X1.Temp),  # get the maximum temperature
-            min_temp = min(X1.Temp)))
-
-write.xlsx(month_active_temp_stats_X1, file = "stats/bryum/month_active_temp_stats_X1.xlsx") # save table
-
-```
-
-**4. PAR**
-
-```{r}
-# Active period----
-
-(mean_PAR_active_X1_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X1.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X1.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_PAR = mean(X1.PAR),
-    max_PAR = max(X1.PAR),
-    min_PAR = min(X1.PAR)))  # calculate the mean PAR of the active period
-
-```
-
-4.2. Summerly PAR
-
-```{r}
-# Mean PAR summer 19-20
-
-(mean_PAR_X1_19_20 <- summer_19_20 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X1.PAR),
-    max_PAR = max(X1.PAR),
-    min_PAR = min(X1.PAR)))
-
-# Mean PAR summer 20-21
-
-(mean_PAR_X1_20_21 <- summer_20_21 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X1.PAR),
-    max_PAR = max(X1.PAR),
-    min_PAR = min(X1.PAR)))
-
-# Mean PAR summer 21-22
-
-(mean_PAR_X1_21_22 <- summer_21_22 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X1.PAR),
-    max_PAR = max(X1.PAR),
-    min_PAR = min(X1.PAR)))
-
-# Mean PAR summer 22-23
-
-(mean_PAR_X1_22_23 <- summer_22_23 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X1.PAR),
-    max_PAR = max(X1.PAR),
-    min_PAR = min(X1.PAR)))
-
-```
-
-4.3. Monthly PAR
-
-```{r}
-(month_PAR_stats_X1 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_PAR = mean(X1.PAR),
-            max_PAR = max(X1.PAR),  # get the maximum temperature
-            min_PAR = min(X1.PAR)))
-
-write.xlsx(month_PAR_stats_X1, file = "stats/bryum/month_PAR_stats_X1.xlsx") # save table
-
-```
-
-
-**5. YIELD and ETR**
-
-```{r}
-# Active period----
-
-(mean_yield_active_X1_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X1.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X1.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_Y = mean(X1.Y),
-    max_Y = max(X1.Y),
-    min_Y = min(X1.Y)))  # calculate the mean yield of the active period
-
-(mean_ETR_active_X1_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X1.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X1.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_ETR = mean(X1.ETR),
-    max_ETR = max(X1.ETR),
-    min_ETR = min(X1.ETR)))  # calculate the mean ETR of the active period
-
-```
-
-5.2 Summer yield/ ETR
-
-```{r}
-# Mean YIED/ETR summer 19-20
-
-(mean_yield_X1_19_20 <- summer_19_20 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X1.Y),
-    max_Y = max(X1.Y),
-    min_Y = min(X1.Y)))
-
-(mean_ETR_X1_19_20 <- summer_19_20 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X1.ETR),
-    max_ETR = max(X1.ETR),
-    min_ETR = min(X1.ETR)))
-
-# Mean YIED/ETR summer 20-21
-
-(mean_yield_X1_20_21 <- summer_20_21 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X1.Y),
-    max_Y = max(X1.Y),
-    min_Y = min(X1.Y)))
-
-(mean_ETR_X1_20_21 <- summer_20_21 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X1.ETR),
-    max_ETR = max(X1.ETR),
-    min_ETR = min(X1.ETR)))
-
-# Mean YIED/ETR summer 21-22
-
-(mean_yield_X1_21_22 <- summer_21_22 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X1.Y),
-    max_Y = max(X1.Y),
-    min_Y = min(X1.Y)))
-
-(mean_ETR_X1_21_22 <- summer_21_22 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X1.ETR),
-    max_ETR = max(X1.ETR),
-    min_ETR = min(X1.ETR)))
-
-# Mean YIED/ETR summer 22-23
-
-(mean_yield_X1_22_23 <- summer_22_23 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X1.Y),
-    max_Y = max(X1.Y),
-    min_Y = min(X1.Y)))
-
-(mean_ETR_X1_22_23 <- summer_22_23 %>% 
-  group_by(X1.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X1.ETR),
-    max_ETR = max(X1.ETR),
-    min_ETR = min(X1.ETR)))
-
-```
-5.3. Monthly
-
-```{r}
-(month_Y_stats_X1 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X1.Y),
-            max_Y = max(X1.Y),  # get the maximum temperature
-            min_Y = min(X1.Y)))
-
-write.xlsx(month_Y_stats_X1, file = "stats/bryum/month_Y_stats_X1.xlsx") # save table
-
-(month_ETR_stats_X1 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X1.ETR),
-            max_ETR = max(X1.ETR),  # get the maximum temperature
-            min_ETR = min(X1.ETR)))
-
-write.xlsx(month_ETR_stats_X1, file = "stats/bryum/month_ETR_stats_X1.xlsx") # save table
-```
-### 9.3. Bryum (X2)
-
-1. Create columns for activity
-
-```{r}
-data_clean <- data_clean %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE))  # If the yield is above 0 the plant is active = TRUE
-
-data_clean_23 <- data_clean_23 %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE)) 
-
-summer_19_20 <- summer_19_20 %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE)) 
-
-summer_20_21 <- summer_20_21 %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE)) 
-
-summer_21_22 <- summer_21_22 %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE)) 
-
-summer_22_23 <- summer_22_23 %>% 
-  mutate(X2.Active = if_else(X2.Y > 0, TRUE, FALSE)) 
-```
-
-2. Active time
-
-2.1. Active total time
-
-```{r}
-# Active total time
-
-(total_activetime_stats_X2 <- bind_rows(  # put both counts into one dataset
-  data_clean %>% count(Condition = X2.Y > 0, name = "Count_data_clean"),  # Count rows with active time (1 row = 1 hour)
-  data_clean_23 %>% count(Condition = X2.Y > 0, name = "Count_data_clean_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>%  # join rows that have the same condition (True or False)
-mutate(Total_time = Count_data_clean + Count_data_clean_23)) # add both columns to get the total active time of the year
-  
-(total_active_hours_X2 <- total_activetime_stats_X2 %>% # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Total_time))
-
-(Percentage_active_days_X2 <- total_active_hours_X2/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
-```
-
-2.2. Active time each summer
-
-```{r}
-# Active time each summer
-
-summer_activetime_stats_X2 <-bind_rows(
-  summer_19_20 %>% count(Condition = X2.Y > 0, name = "Count_19_20"), # Count rows in summer 20_21 with active time (1 row = 1 hour) // no chosen yield  becaue didn't make any ajustments
-  summer_20_21 %>% count(Condition = X2.Y > 0, name = "Count_20_21"), # Chosen yield because made ajustments
-  summer_21_22 %>% count(Condition = X2.Y > 0, name = "Count_21_22"),
-  summer_22_23 %>% count(Condition = X2.Y > 0, name = "Count_22_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)  # join rows that have the same condition (True or False)
-
-(total_active_hours_19_20_X2 <- summer_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20))
-
-(total_active_hours_20_21_X2 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_20_21))
-
-(total_active_hours_21_22_X2 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_21_22))
-
-(total_active_hours_22_23_X2 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_22_23))
-
-(Percentage_active_hours_19_20_X2 <- total_active_hours_19_20_X2 /nrow(summer_19_20) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_X2 <- total_active_hours_20_21_X2 /nrow(summer_20_21) * 100)
-
-(Percentage_active_hours_21_22_X2 <- total_active_hours_21_22_X2 /nrow(summer_21_22) * 100)
-
-(Percentage_active_hours_22_23_X2 <- total_active_hours_22_23_X2 /nrow(summer_22_23) * 100)
-```
-
-2.3. Active time each month
-
-```{r}
-# Active time each month
-
-(month_activetime_stats_X2 <- bind_rows(
-  summer_19_20 %>% filter(Month == 11) %>% count(Condition = X2.Y > 0, name = "Count_19_20_nov"),
-  summer_19_20 %>% filter(Month == 12) %>% count(Condition = X2.Y > 0, name = "Count_19_20_dec"),
-  summer_19_20 %>% filter(Month == 1) %>% count(Condition = X2.Y > 0, name = "Count_19_20_jan"),
-  summer_19_20 %>% filter(Month == 2) %>% count(Condition = X2.Y > 0, name = "Count_19_20_feb"),
-  summer_20_21 %>% filter(Month == 11) %>% count(Condition = X2.Y > 0, name = "Count_20_21_nov"),
-  summer_20_21 %>% filter(Month == 12) %>% count(Condition = X2.Y > 0, name = "Count_20_21_dec"),
-  summer_20_21 %>% filter(Month == 1) %>% count(Condition = X2.Y > 0, name = "Count_20_21_jan"),
-  summer_20_21 %>% filter(Month == 2) %>% count(Condition = X2.Y > 0, name = "Count_20_21_feb"),
-  summer_21_22 %>% filter(Month == 11) %>% count(Condition = X2.Y > 0, name = "Count_21_22_nov"),
-  summer_21_22 %>% filter(Month == 12) %>% count(Condition = X2.Y > 0, name = "Count_21_22_dec"),
-  summer_21_22 %>% filter(Month == 1) %>% count(Condition = X2.Y > 0, name = "Count_21_22_jan"),
-  summer_21_22 %>% filter(Month == 2) %>% count(Condition = X2.Y > 0, name = "Count_21_22_feb"),
-  summer_22_23 %>% filter(Month == 11) %>% count(Condition = X2.Y > 0, name = "Count_22_23_nov"),
-  summer_22_23 %>% filter(Month == 12) %>% count(Condition = X2.Y > 0, name = "Count_22_23_dec"),
-  summer_22_23 %>% filter(Month == 1) %>% count(Condition = X2.Y > 0, name = "Count_22_23_jan"),
-  summer_22_23 %>% filter(Month == 2) %>% count(Condition = X2.Y > 0, name = "Count_22_23_feb")) %>% 
-  group_by(Condition) %>% 
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>% 
-   filter(Condition == TRUE))
-
-
-(total_active_hours_19_20_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_nov))
-
-(total_active_hours_19_20_dec_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_dec))
-
-(total_active_hours_19_20_jan_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_jan))
-
-(total_active_hours_19_20_feb_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20_feb))
-
-(total_active_hours_20_21_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_nov))
-
-(total_active_hours_20_21_dec_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_dec))
-
-(total_active_hours_20_21_jan_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_jan))
-
-(total_active_hours_20_21_feb_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_20_21_feb))
-
-(total_active_hours_21_22_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_nov))
-
-(total_active_hours_21_22_dec_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_21_22_dec))
-
-(total_active_hours_21_22_jan_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_jan))
-
-(total_active_hours_21_22_feb_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_feb))
-
-(total_active_hours_22_23_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_dec_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_jan_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_jan))
-
-(total_active_hours_22_23_feb_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_feb))
-
-(Percentage_active_hours_19_20_nov_X2 <- total_active_hours_19_20_nov_X2 /nrow(summer_19_20 %>% filter(Month == 11)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_dec_X2 <- total_active_hours_19_20_dec_X2 /nrow(summer_19_20 %>% filter(Month == 12)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_jan_X2 <- total_active_hours_19_20_nov_X2 /nrow(summer_19_20 %>% filter(Month == 1)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_feb_X2 <- total_active_hours_19_20_nov_X2 /nrow(summer_19_20 %>% filter(Month == 2)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_nov_X2 <- total_active_hours_20_21_nov_X2 /nrow(summer_20_21 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_20_21_dec_X2 <- total_active_hours_20_21_dec_X2 /nrow(summer_20_21 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_20_21_jan_X2 <- total_active_hours_20_21_jan_X2 /nrow(summer_20_21 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_20_21_feb_X2 <- total_active_hours_20_21_feb_X2 /nrow(summer_20_21 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_21_22_nov_X2 <- total_active_hours_21_22_nov_X2 /nrow(summer_21_22 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_21_22_dec_X2 <- total_active_hours_21_22_dec_X2 /nrow(summer_21_22 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_21_22_jan_X2 <- total_active_hours_21_22_jan_X2 /nrow(summer_21_22 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_21_22_feb_X2 <- total_active_hours_21_22_feb_X2 /nrow(summer_21_22 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_22_23_nov_X2 <- total_active_hours_22_23_nov_X2 /nrow(summer_22_23 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_22_23_dec_X2 <- total_active_hours_22_23_dec_X2 /nrow(summer_22_23 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_22_23_jan_X2 <- total_active_hours_22_23_jan_X2 /nrow(summer_22_23 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_22_23_feb_X2 <- total_active_hours_22_23_feb_X2 /nrow(summer_22_23 %>% filter(Month == 2)) * 100)
-```
-
-**3. Thallus Temperature**
-
-3.1. Total measuring and active time
-
-```{r}
-# Mean temperature during the whole measuring period ------------------
-
-(mean_Temp_X2_data <- bind_rows(
-  data_clean  %>% select(X2.Temp), 
-  data_clean_23  %>% select(X2.Temp)) %>% 
-  summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))  # get the minimum temperature
-
-# Mean temperature whole active period-------------------
-
-(mean_Temp_active_X2_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X2.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X2.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_temp = mean(X2.Temp),
-    max_temp = max(X2.Temp),
-    min_temp = min(X2.Temp)))  # calculate the mean Temp of the active period
-
-(mean_Temp_active_X2 <- mean_Temp_active_X2_data %>%  # extract the mean Temp of the active period
-  filter( X2.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.2. Summer Temperature
-
-```{r}
-# Mean temperature summer 19-20
-
-(mean_Temp_X2_19_20 <- summer_19_20  %>%  # Mean Temp for 19-20
-    select(X2.Temp) %>% 
-  summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X2_19_20 <- summer_19_20 %>%  # Mean Temp for active 19-20
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X2.Temp),
-    max_temp = max(X2.Temp),
-    min_temp = min(X2.Temp)))
-
-(mean_Temp_active_X2_19_20 <- mean_Temp_active_X2_19_20 %>%  # extract the mean Temp of the active period
-  filter( X2.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 20-21
-
-(mean_Temp_X2_20_21 <- summer_20_21  %>%  # Mean Temp for 20-21
-    select(X2.Temp) %>% 
-  summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X2_20_21 <- summer_20_21 %>% # Mean Temp for active 20-21
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X2.Temp),
-    max_temp = max(X2.Temp),
-    min_temp = min(X2.Temp)))
-
-(mean_Temp_active_X2_20_21 <- mean_Temp_active_X2_20_21 %>%  # extract the mean Temp of the active period
-  filter( X2.Active == TRUE ) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 21-22
-
-(mean_Temp_X2_21_22 <- summer_21_22  %>%  # Mean Temp for 21-22
-    select(X2.Temp) %>% 
-  summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X2_21_22 <- summer_21_22 %>% # Mean Temp for active 21-22
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X2.Temp),
-    max_temp = max(X2.Temp),
-    min_temp = min(X2.Temp)))
-
-(mean_Temp_active_X2_21_22 <- mean_Temp_active_X2_21_22 %>%  # extract the mean Temp of the active period
-  filter( X2.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 22-23
-
-(mean_Temp_X2_22_23 <- summer_22_23  %>%  # Mean Temp for 22-23
-    select(X2.Temp) %>% 
-  summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X2_22_23 <- summer_22_23 %>% # Mean Temp for active 22-23
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X2.Temp),
-    max_temp = max(X2.Temp),
-    min_temp = min(X2.Temp)))
-
-(mean_Temp_active_X2_22_23 <- mean_Temp_active_X2_22_23 %>%  # extract the mean Temp of the active period
-  filter( X2.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.3. Monthly temperature
-
-```{r}
-
-(month_temp_stats_X2 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))
-
-(month_active_temp_stats_X2 <- bind_rows(  # Monthly stats for active period
-  summer_19_20 %>% filter(Month == 11, X2.Y > 0),
-  summer_19_20 %>% filter(Month == 12, X2.Y > 0),
-  summer_19_20 %>% filter(Month == 1, X2.Y > 0),
-  summer_19_20 %>% filter(Month == 2, X2.Y > 0),
-  summer_20_21 %>% filter(Month == 11, X2.Y > 0),
-  summer_20_21 %>% filter(Month == 12, X2.Y > 0),
-  summer_20_21 %>% filter(Month == 1, X2.Y > 0),
-  summer_20_21 %>% filter(Month == 2, X2.Y > 0),
-  summer_21_22 %>% filter(Month == 11, X2.Y > 0),
-  summer_21_22 %>% filter(Month == 12, X2.Y > 0),
-  summer_21_22 %>% filter(Month == 1, X2.Y > 0),
-  summer_21_22 %>% filter(Month == 2, X2.Y > 0),
-  summer_22_23 %>% filter(Month == 11, X2.Y > 0),
-  summer_22_23 %>% filter(Month == 12, X2.Y > 0),
-  summer_22_23 %>% filter(Month == 1, X2.Y > 0),
-  summer_22_23 %>% filter(Month == 2, X2.Y > 0)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X2.Temp),
-            max_temp = max(X2.Temp),  # get the maximum temperature
-            min_temp = min(X2.Temp)))
-
-```
-
-**4. PAR**
-
-```{r}
-# Active period----
-
-(mean_PAR_active_X2_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X2.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X2.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_PAR = mean(X2.PAR),
-    max_PAR = max(X2.PAR),
-    min_PAR = min(X2.PAR)))  # calculate the mean PAR of the active period
-
-```
-
-4.2. Summerly PAR
-
-```{r}
-# Mean PAR summer 19-20
-
-(mean_PAR_X2_19_20 <- summer_19_20 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X2.PAR),
-    max_PAR = max(X2.PAR),
-    min_PAR = min(X2.PAR)))
-
-# Mean temperature summer 20-21
-
-(mean_PAR_X2_20_21 <- summer_20_21 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X2.PAR),
-    max_PAR = max(X2.PAR),
-    min_PAR = min(X2.PAR)))
-
-# Mean temperature summer 21-22
-
-(mean_PAR_X2_21_22 <- summer_21_22 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X2.PAR),
-    max_PAR = max(X2.PAR),
-    min_PAR = min(X2.PAR)))
-
-# Mean temperature summer 22-23
-
-(mean_PAR_X2_22_23 <- summer_22_23 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X2.PAR),
-    max_PAR = max(X2.PAR),
-    min_PAR = min(X2.PAR)))
-
-```
-
-4.3. Monthly PAR
-
-```{r}
-(month_PAR_stats_X2 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_PAR = mean(X2.PAR),
-            max_PAR = max(X2.PAR),  # get the maximum temperature
-            min_PAR = min(X2.PAR)))
-```
-
-
-**5. YIELD and ETR**
-
-```{r}
-# Active period----
-
-(mean_yield_active_X2_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X2.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X2.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_Y = mean(X2.Y),
-    max_Y = max(X2.Y),
-    min_Y = min(X2.Y)))  # calculate the mean yield of the active period
-
-(mean_ETR_active_X2_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X2.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X2.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_ETR = mean(X2.ETR),
-    max_ETR = max(X2.ETR),
-    min_ETR = min(X2.ETR)))  # calculate the mean ETR of the active period
-
-```
-
-5.2 Summer yield/ ETR
-
-```{r}
-# Mean YIED/ETR summer 19-20
-
-(mean_yield_X2_19_20 <- summer_19_20 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X2.Y),
-    max_Y = max(X2.Y),
-    min_Y = min(X2.Y)))
-
-(mean_ETR_X2_19_20 <- summer_19_20 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X2.ETR),
-    max_ETR = max(X2.ETR),
-    min_ETR = min(X2.ETR)))
-
-# Mean YIED/ETR summer 20-21
-
-(mean_yield_X2_20_21 <- summer_20_21 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X2.Y),
-    max_Y = max(X2.Y),
-    min_Y = min(X2.Y)))
-
-(mean_ETR_X2_20_21 <- summer_20_21 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X2.ETR),
-    max_ETR = max(X2.ETR),
-    min_ETR = min(X2.ETR)))
-
-# Mean YIED/ETR summer 21-22
-
-(mean_yield_X2_21_22 <- summer_21_22 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X2.Y),
-    max_Y = max(X2.Y),
-    min_Y = min(X2.Y)))
-
-(mean_ETR_X2_21_22 <- summer_21_22 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X2.ETR),
-    max_ETR = max(X2.ETR),
-    min_ETR = min(X2.ETR)))
-
-# Mean YIED/ETR summer 22-23
-
-(mean_yield_X2_22_23 <- summer_22_23 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X2.Y),
-    max_Y = max(X2.Y),
-    min_Y = min(X2.Y)))
-
-(mean_ETR_X2_22_23 <- summer_22_23 %>% 
-  group_by(X2.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X2.ETR),
-    max_ETR = max(X2.ETR),
-    min_ETR = min(X2.ETR)))
-
-```
-
-5.3. Monthly
-
-```{r}
-(month_Y_stats_X2 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X2.Y),
-            max_Y = max(X2.Y),  # get the maximum temperature
-            min_Y = min(X2.Y)))
-
-(month_ETR_stats_X2 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X2.ETR),
-            max_ETR = max(X2.ETR),  # get the maximum temperature
-            min_ETR = min(X2.ETR)))
-```
-
-### 9.4. Bryum (X4)
-
-1. Create columns for activity
-
-```{r}
-data_clean <- data_clean %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE))  # If the yield is above 0 the plant is active = TRUE
-
-data_clean_23 <- data_clean_23 %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
-
-summer_19_20 <- summer_19_20 %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
-
-summer_20_21 <- summer_20_21 %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
-
-summer_21_22 <- summer_21_22 %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
-
-summer_22_23 <- summer_22_23 %>% 
-  mutate(X4.Active = if_else(X4.chosen_yield > 0, TRUE, FALSE)) 
-```
-
-2. Active time
-
-2.1. Active total time
-
-```{r}
-# Active total time
-
-(total_activetime_stats_X4 <- bind_rows(  # put both counts into one dataset
-  data_clean %>% count(Condition = X4.Active == TRUE, name = "Count_data_clean"),  # Count rows with active time (1 row = 1 hour)
-  data_clean_23 %>% count(Condition = X4.Active == TRUE, name = "Count_data_clean_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>%  # join rows that have the same condition (True or False)
-mutate(Total_time = Count_data_clean + Count_data_clean_23)) # add both columns to get the total active time of the year
-  
-(total_active_hours_X4 <- total_activetime_stats_X4 %>% # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Total_time))
-
-(Percentage_active_days_X4 <- total_active_hours_X4/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
-```
-
-2.2. Active time each summer
-
-```{r}
-# Active time each summer
-
-(summer_activetime_stats_X4 <-bind_rows(
-  summer_19_20 %>% count(Condition = X4.Active == TRUE, name = "Count_19_20"), # Count rows in summer 20_21 with active time (1 row = 1 hour) // no chosen yield  becaue didn't make any ajustments
-  summer_20_21 %>% count(Condition = X4.Active == TRUE, name = "Count_20_21"), # Chosen yield because made ajustments
-  summer_21_22 %>% count(Condition = X4.Active == TRUE, name = "Count_21_22"),
-  summer_22_23 %>% count(Condition = X4.Active == TRUE, name = "Count_22_23")) %>% 
-group_by(Condition) %>%  # Group the data by the unique values in column "Condition"
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum))  # join rows that have the same condition (True or False)
-
-(total_active_hours_19_20_X4 <- summer_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20))
-
-(total_active_hours_20_21_X4 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_20_21))
-
-(total_active_hours_21_22_X4 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_21_22))
-
-(total_active_hours_22_23_X4 <- summer_activetime_stats_X2 %>%
-  filter(Condition == TRUE) %>%
-  select(Count_22_23))
-
-(Percentage_active_hours_19_20_X4 <- total_active_hours_19_20_X4 /nrow(summer_19_20) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_X4 <- total_active_hours_20_21_X4 /nrow(summer_20_21) * 100)
-
-(Percentage_active_hours_21_22_X4 <- total_active_hours_21_22_X4 /nrow(summer_21_22) * 100)
-
-(Percentage_active_hours_22_23_X4 <- total_active_hours_22_23_X4 /nrow(summer_22_23) * 100)
-```
-
-2.3. Active time each month
-
-```{r}
-# Active time each month
-
-(month_activetime_stats_X4 <- bind_rows(
-  summer_19_20 %>% filter(Month == 11) %>% count(Condition = X4.Active == TRUE, name = "Count_19_20_nov"),
-  summer_19_20 %>% filter(Month == 12) %>% count(Condition = X4.Active == TRUE, name = "Count_19_20_dec"),
-  summer_19_20 %>% filter(Month == 1) %>% count(Condition = X4.Active == TRUE, name = "Count_19_20_jan"),
-  summer_19_20 %>% filter(Month == 2) %>% count(Condition = X4.Active == TRUE, name = "Count_19_20_feb"),
-  summer_20_21 %>% filter(Month == 11) %>% count(Condition = X4.Active == TRUE, name = "Count_20_21_nov"),
-  summer_20_21 %>% filter(Month == 12) %>% count(Condition = X4.Active == TRUE, name = "Count_20_21_dec"),
-  summer_20_21 %>% filter(Month == 1) %>% count(Condition = X4.Active == TRUE, name = "Count_20_21_jan"),
-  summer_20_21 %>% filter(Month == 2) %>% count(Condition = X4.Active == TRUE, name = "Count_20_21_feb"),
-  summer_21_22 %>% filter(Month == 11) %>% count(Condition = X4.Active == TRUE, name = "Count_21_22_nov"),
-  summer_21_22 %>% filter(Month == 12) %>% count(Condition = X4.Active == TRUE, name = "Count_21_22_dec"),
-  summer_21_22 %>% filter(Month == 1) %>% count(Condition = X4.Active == TRUE, name = "Count_21_22_jan"),
-  summer_21_22 %>% filter(Month == 2) %>% count(Condition = X4.Active == TRUE, name = "Count_21_22_feb"),
-  summer_22_23 %>% filter(Month == 11) %>% count(Condition = X4.Active == TRUE, name = "Count_22_23_nov"),
-  summer_22_23 %>% filter(Month == 12) %>% count(Condition = X4.Active == TRUE, name = "Count_22_23_dec"),
-  summer_22_23 %>% filter(Month == 1) %>% count(Condition = X4.Active == TRUE, name = "Count_22_23_jan"),
-  summer_22_23 %>% filter(Month == 2) %>% count(Condition = X4.Active == TRUE, name = "Count_22_23_feb")) %>% 
-  group_by(Condition) %>% 
-    mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum) %>% 
-   filter(Condition == TRUE))
-
-
-(total_active_hours_19_20_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_19_20_nov))
-
-(total_active_hours_19_20_dec_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_19_20_dec))
-
-(total_active_hours_19_20_jan_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_19_20_jan))
-
-(total_active_hours_19_20_feb_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_19_20_feb))
-
-(total_active_hours_20_21_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_20_21_nov))
-
-(total_active_hours_20_21_dec_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_20_21_dec))
-
-(total_active_hours_20_21_jan_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_20_21_jan))
-
-(total_active_hours_20_21_feb_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_20_21_feb))
-
-(total_active_hours_21_22_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_nov))
-
-(total_active_hours_21_22_dec_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_dec))
-
-(total_active_hours_21_22_jan_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_jan))
-
-(total_active_hours_21_22_feb_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_21_22_feb))
-
-(total_active_hours_22_23_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_dec_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_nov))
-
-(total_active_hours_22_23_jan_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_jan))
-
-(total_active_hours_22_23_feb_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
-  select(Count_22_23_feb))
-
-(Percentage_active_hours_19_20_nov_X4 <- total_active_hours_19_20_nov_X4 /nrow(summer_19_20 %>% filter(Month == 11)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_dec_X4 <- total_active_hours_19_20_dec_X4 /nrow(summer_19_20 %>% filter(Month == 12)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_jan_X4 <- total_active_hours_19_20_nov_X4 /nrow(summer_19_20 %>% filter(Month == 1)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_19_20_feb_X4 <- total_active_hours_19_20_nov_X4 /nrow(summer_19_20 %>% filter(Month == 2)) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_nov_X4 <- total_active_hours_20_21_nov_X4 /nrow(summer_20_21 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_20_21_dec_X4 <- total_active_hours_20_21_dec_X4 /nrow(summer_20_21 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_20_21_jan_X4 <- total_active_hours_20_21_jan_X4 /nrow(summer_20_21 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_20_21_feb_X4 <- total_active_hours_20_21_feb_X4 /nrow(summer_20_21 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_21_22_nov_X4 <- total_active_hours_21_22_nov_X4 /nrow(summer_21_22 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_21_22_dec_X4 <- total_active_hours_21_22_dec_X4 /nrow(summer_21_22 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_21_22_jan_X4 <- total_active_hours_21_22_jan_X4 /nrow(summer_21_22 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_21_22_feb_X4 <- total_active_hours_21_22_feb_X4 /nrow(summer_21_22 %>% filter(Month == 2)) * 100)
-
-(Percentage_active_hours_22_23_nov_X4 <- total_active_hours_22_23_nov_X4 /nrow(summer_22_23 %>% filter(Month == 11)) * 100)
-
-(Percentage_active_hours_22_23_dec_X4 <- total_active_hours_22_23_dec_X4 /nrow(summer_22_23 %>% filter(Month == 12)) * 100)
-
-(Percentage_active_hours_22_23_jan_X4 <- total_active_hours_22_23_jan_X4 /nrow(summer_22_23 %>% filter(Month == 1)) * 100)
-
-(Percentage_active_hours_22_23_feb_X4 <- total_active_hours_22_23_feb_X4 /nrow(summer_22_23 %>% filter(Month == 2)) * 100)
-```
-
-**3. Thallus Temperature**
-
-3.1. Total measuring and active time
-
-```{r}
-# Mean temperature during the whole measuring period ------------------
-
-(mean_Temp_X4_data <- bind_rows(
-  data_clean  %>% select(X4.Temp), 
-  data_clean_23  %>% select(X4.Temp)) %>% 
-  summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))  # get the minimum temperature
-
-# Mean temperature whole active period-------------------
-
-(mean_Temp_active_X4_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X4.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X4.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_temp = mean(X4.Temp),
-    max_temp = max(X4.Temp),
-    min_temp = min(X4.Temp)))  # calculate the mean Temp of the active period
-
-(mean_Temp_active_X4 <- mean_Temp_active_X4_data %>%  # extract the mean Temp of the active period
-  filter( X4.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.2. Summer Temperature
-
-```{r}
-# Mean temperature summer 19-20
-
-(mean_Temp_X4_19_20 <- summer_19_20  %>%  # Mean Temp for 19-20
-    select(X4.Temp) %>% 
-  summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X4_19_20 <- summer_19_20 %>%  # Mean Temp for active 19-20
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X4.Temp),
-    max_temp = max(X4.Temp),
-    min_temp = min(X4.Temp)))
-
-(mean_Temp_active_X4_19_20 <- mean_Temp_active_X4_19_20 %>%  # extract the mean Temp of the active period
-  filter( X4.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 20-21
-
-(mean_Temp_X4_20_21 <- summer_20_21  %>%  # Mean Temp for 20-21
-    select(X4.Temp) %>% 
-  summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X4_20_21 <- summer_20_21 %>% # Mean Temp for active 20-21
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X4.Temp),
-    max_temp = max(X4.Temp),
-    min_temp = min(X4.Temp)))
-
-(mean_Temp_active_X4_20_21 <- mean_Temp_active_X4_20_21 %>%  # extract the mean Temp of the active period
-  filter( X4.Active == TRUE ) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 21-22
-
-(mean_Temp_X4_21_22 <- summer_21_22  %>%  # Mean Temp for 21-22
-    select(X4.Temp) %>% 
-  summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X4_21_22 <- summer_21_22 %>% # Mean Temp for active 21-22
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X4.Temp),
-    max_temp = max(X4.Temp),
-    min_temp = min(X4.Temp)))
-
-(mean_Temp_active_X4_21_22 <- mean_Temp_active_X4_21_22 %>%  # extract the mean Temp of the active period
-  filter( X4.Active == TRUE) %>% 
-  select( mean_temp))
-
-# Mean temperature summer 22-23
-
-(mean_Temp_X4_22_23 <- summer_22_23  %>%  # Mean Temp for 22-23
-    select(X4.Temp) %>% 
-  summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))  # get the minimum temperature
-
-(mean_Temp_active_X4_22_23 <- summer_22_23 %>% # Mean Temp for active 22-23
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_temp = mean(X4.Temp),
-    max_temp = max(X4.Temp),
-    min_temp = min(X4.Temp)))
-
-(mean_Temp_active_X4_22_23 <- mean_Temp_active_X4_22_23 %>%  # extract the mean Temp of the active period
-  filter( X4.Active == TRUE) %>% 
-  select( mean_temp))
-
-
-```
-
-3.3. Monthly temperature
-
-```{r}
-
-(month_temp_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))
-
-(month_active_temp_stats_X4 <- bind_rows(  # Monthly stats for active period
-  summer_19_20 %>% filter(Month == 11, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 12, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 1, X1.Y > 0),
-  summer_19_20 %>% filter(Month == 2, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 11, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 12, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 1, X1.Y > 0),
-  summer_20_21 %>% filter(Month == 2, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 11, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 12, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 1, X1.Y > 0),
-  summer_21_22 %>% filter(Month == 2, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 11, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 12, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 1, X1.Y > 0),
-  summer_22_23 %>% filter(Month == 2, X1.Y > 0)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_temp = mean(X4.Temp),
-            max_temp = max(X4.Temp),  # get the maximum temperature
-            min_temp = min(X4.Temp)))
-
-```
-
-**4. PAR**
-
-```{r}
-# Active period----
-
-(mean_PAR_active_X4_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X4.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X4.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_PAR = mean(X4.PAR),
-    max_PAR = max(X4.PAR),
-    min_PAR = min(X4.PAR)))  # calculate the mean PAR of the active period
-
-```
-
-4.2. Summerly PAR
-
-```{r}
-# Mean PAR summer 19-20
-
-(mean_PAR_X4_19_20 <- summer_19_20 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X4.PAR),
-    max_PAR = max(X4.PAR),
-    min_PAR = min(X4.PAR)))
-
-# Mean temperature summer 20-21
-
-(mean_PAR_X4_20_21 <- summer_20_21 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X4.PAR),
-    max_PAR = max(X4.PAR),
-    min_PAR = min(X4.PAR)))
-
-# Mean temperature summer 21-22
-
-(mean_PAR_X4_21_22 <- summer_21_22 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X4.PAR),
-    max_PAR = max(X4.PAR),
-    min_PAR = min(X4.PAR)))
-
-# Mean temperature summer 22-23
-
-(mean_PAR_X4_22_23 <- summer_22_23 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_PAR = mean(X4.PAR),
-    max_PAR = max(X4.PAR),
-    min_PAR = min(X4.PAR)))
-
-```
-
-4.3. Monthly PAR
-
-```{r}
-(month_PAR_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_PAR = mean(X4.PAR),
-            max_PAR = max(X4.PAR),  # get the maximum temperature
-            min_PAR = min(X4.PAR)))
-```
-
-
-**5. YIELD and ETR**
-
-```{r}
-# Active period----
-
-(mean_yield_active_X4_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X4.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X4.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_Y = mean(X4.Y),
-    max_Y = max(X4.Y),
-    min_Y = min(X4.Y)))  # calculate the mean yield of the active period
-
-(mean_ETR_active_X4_data <- bind_rows(  # Make into a single dataset
-  data_clean %>% 
-    group_by(X4.Active),  # get the rows in data_clean where the lichen is active
-  data_clean_23 %>% 
-    group_by(X2.Active)) %>%  # get the rows in data_clean_23 where the lichen is active
-  summarise( n = n(),
-    mean_ETR = mean(X4.ETR),
-    max_ETR = max(X4.ETR),
-    min_ETR = min(X4.ETR)))  # calculate the mean ETR of the active period
-
-```
-
-5.2 Summer yield/ ETR
-
-```{r}
-# Mean YIED/ETR summer 19-20
-
-(mean_yield_X4_19_20 <- summer_19_20 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X4.Y),
-    max_Y = max(X4.Y),
-    min_Y = min(X4.Y)))
-
-(mean_ETR_X4_19_20 <- summer_19_20 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X4.ETR),
-    max_ETR = max(X4.ETR),
-    min_ETR = min(X4.ETR)))
-
-# Mean YIED/ETR summer 20-21
-
-(mean_yield_X4_20_21 <- summer_20_21 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X4.Y),
-    max_Y = max(X4.Y),
-    min_Y = min(X4.Y)))
-
-(mean_ETR_X4_20_21 <- summer_20_21 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X4.ETR),
-    max_ETR = max(X4.ETR),
-    min_ETR = min(X4.ETR)))
-
-# Mean YIED/ETR summer 21-22
-
-(mean_yield_X4_21_22 <- summer_21_22 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X4.Y),
-    max_Y = max(X4.Y),
-    min_Y = min(X4.Y)))
-
-(mean_ETR_X4_21_22 <- summer_21_22 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X4.ETR),
-    max_ETR = max(X4.ETR),
-    min_ETR = min(X4.ETR)))
-
-# Mean YIED/ETR summer 22-23
-
-(mean_yield_X4_22_23 <- summer_22_23 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_Y = mean(X4.Y),
-    max_Y = max(X4.Y),
-    min_Y = min(X4.Y)))
-
-(mean_ETR_X4_22_23 <- summer_22_23 %>% 
-  group_by(X4.Active) %>% 
-  summarise( n = n(),
-    mean_ETR = mean(X4.ETR),
-    max_ETR = max(X4.ETR),
-    min_ETR = min(X4.ETR)))
-
-```
-
-5.3. Monthly
-
-```{r}
-(month_Y_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X4.Y),
-            max_Y = max(X4.Y),  # get the maximum temperature
-            min_Y = min(X4.Y)))
-
-(month_ETR_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X4.ETR),
-            max_ETR = max(X4.ETR),  # get the maximum temperature
-            min_ETR = min(X4.ETR)))
-```
-
-
-### 9.5. Average Bryum
-
-1. Active time
-
-```{r}
-(list_act_time <- list(total_activetime_stats_X1,total_activetime_stats_X2, total_activetime_stats_X4)) # put all datasets in a list
-(total_activetime_stats_moss <- Reduce(`+`, list_act_time)/length(list_act_time)) # average them 
-
-(total_active_hours_moss <- total_activetime_stats_moss %>% # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Total_time))
-
-(percentage_active_days_moss <- total_active_hours_moss/(nrow(data_clean) + nrow(data_clean_23)) * 100)
-```
-
-1.2 Active time each summer
-
-```{r}
-(list_act_time_summer <- list(summer_activetime_stats_X1,summer_activetime_stats_X2, summer_activetime_stats_X3)) # put all datasets in a list
-(summer_activetime_stats_moss <- Reduce(`+`, list_act_time_summer)/length(list_act_time)) # average them 
-```
-
-1.3 Active time each month
-
-```{r}
-(list_act_time_summer <- list(summer_activetime_stats_X1,summer_activetime_stats_X2, summer_activetime_stats_X3)) # put all datasets in a list
-(summer_activetime_stats_moss <- Reduce(`+`, list_act_time_summer)/length(list_act_time)) # average them 
-
-(total_active_hours_19_20_moss <- summer_activetime_stats_moss %>%  # filter from the dataset the total number of active hours
-  filter(Condition == TRUE) %>%
-  select(Count_19_20))
-
-(total_active_hours_20_21_moss <- summer_activetime_stats_moss %>%
-  filter(Condition == TRUE) %>%
-  select(Count_20_21))
-
-(total_active_hours_21_22_moss <- summer_activetime_stats_moss %>%
-  filter(Condition == TRUE) %>%
-  select(Count_21_22))
-
-(total_active_hours_22_23_moss <- summer_activetime_stats_moss %>%
-  filter(Condition == TRUE) %>%
-  select(Count_22_23))
-
-(Percentage_active_hours_19_20_moss <- total_active_hours_19_20_moss /nrow(summer_19_20) * 100) # put active hours as a percentage
-
-(Percentage_active_hours_20_21_moss <- total_active_hours_20_21_moss /nrow(summer_20_21) * 100)
-
-(Percentage_active_hours_21_22_moss <- total_active_hours_21_22_moss /nrow(summer_21_22) * 100)
-
-(Percentage_active_hours_22_23_moss <- total_active_hours_22_23_moss /nrow(summer_22_23) * 100)
-
-```
-
-**3. Thallus Temperature**
-
-3.1. Total measuring and active time
-
-```{r}
-# Mean temperature during the whole measuring period ------------------
-
-(list_measuring_temp_moss <-list(mean_Temp_X1_data, mean_Temp_X2_data, mean_Temp_X4_data)) # put all datasets in a list
-(mean_Temp_moss_data <- Reduce(`+`, list_measuring_temp_moss)/length(list_measuring_temp_moss)) # average them 
-
-# Mean temperature whole active period-------------------
-
-(list_active_temp_moss <-list(mean_Temp_active_X1_data, mean_Temp_active_X2_data, mean_Temp_active_X4_data)) # put all datasets in a list
-(mean_Temp_active_moss_data <- Reduce(`+`, list_active_temp_moss)/length(list_active_temp_moss)) # average them 
-
-```
-
-3.2. Summer Temperature
-
-```{r}
-# Mean temperature summer 19-20
-
-(list_measuring_temp_moss_19_20 <-list(mean_Temp_X1_19_20, mean_Temp_X2_19_20, mean_Temp_X4_19_20)) # put all measuring datasets in a list
-(mean_Temp_moss_data_19_20 <- Reduce(`+`, list_measuring_temp_moss_19_20)/length(list_measuring_temp_moss_19_20)) # average them 
-
-(list_active_temp_moss_19_20 <-list(mean_Temp_active_X1_19_20, mean_Temp_active_X2_19_20, mean_Temp_active_X4_19_20)) # put all active datasets in a list
-(mean_active_Temp_moss_data_19_20 <- Reduce(`+`, list_active_temp_moss_19_20)/length(list_active_temp_moss_19_20)) # average them 
-
-# Mean temperature summer 20-21
-
-(list_measuring_temp_moss_20_21 <-list(mean_Temp_X1_20_21, mean_Temp_X2_20_21, mean_Temp_X4_20_21)) # put all measuring datasets in a list
-(mean_Temp_moss_data_20_21 <- Reduce(`+`, list_measuring_temp_moss_20_21)/length(list_measuring_temp_moss_20_21)) # average them 
-
-(list_active_temp_moss_20_21 <-list(mean_Temp_active_X1_20_21, mean_Temp_active_X2_20_21, mean_Temp_active_X4_20_21)) # put all active datasets in a list
-(mean_Temp_moss_data_20_21 <- Reduce(`+`, list_active_temp_moss_20_21)/length(list_active_temp_moss_20_21)) # average them 
-
-# Mean temperature summer 21-22
-
-(list_measuring_temp_moss_21_22 <-list(mean_Temp_X1_21_22, mean_Temp_X2_21_22, mean_Temp_X4_21_22)) # put all measuring datasets in a list
-(mean_Temp_moss_data_21_22 <- Reduce(`+`, list_measuring_temp_moss_21_22)/length(list_measuring_temp_moss_21_22)) # average them 
-
-(list_active_temp_moss_21_22 <-list(mean_Temp_active_X1_21_22, mean_Temp_active_X2_21_22, mean_Temp_active_X4_21_22)) # put all active datasets in a list
-(mean_Temp_moss_data_21_22 <- Reduce(`+`, list_active_temp_moss_21_22)/length(list_active_temp_moss_21_22)) # average them 
-
-# Mean temperature summer 22-23
-
-(list_measuring_temp_moss_22_23 <-list(mean_Temp_X1_22_23, mean_Temp_X2_22_23, mean_Temp_X4_22_23)) # put all measuring datasets in a list
-(mean_Temp_moss_data_22_23 <- Reduce(`+`, list_measuring_temp_moss_22_23)/length(list_measuring_temp_moss_22_23)) # average them 
-
-(list_active_temp_moss_22_23 <-list(mean_Temp_active_X1_22_23, mean_Temp_active_X2_22_23, mean_Temp_active_X4_22_23)) # put all active datasets in a list
-(mean_Temp_moss_data_22_23 <- Reduce(`+`, list_active_temp_moss_22_23)/length(list_active_temp_moss_22_23)) # average them 
-
-```
-
-3.3. Month Temperature
-
-```{r}
-(list_measuring_month_temp_moss <-list(month_temp_stats_X1, month_temp_stats_X2, month_temp_stats_X4)) # put all datasets in a list
-(mean_measuring_Temp_moss_data <- Reduce(`+`, list_measuring_month_temp_moss)/length(list_measuring_month_temp_moss)) # average them 
-
-```
-
-**4.PAR**
-
-```{r}
-(list_measuring_PAR_moss <-list(mean_PAR_active_X1_data, mean_PAR_active_X2_data, mean_PAR_active_X4_data)) # put all datasets in a list
-(mean_measuring_PAR_moss <- Reduce(`+`, list_measuring_PAR_moss)/length(list_measuring_PAR_moss)) # average them 
-
-```
-
-4.2. Summerly PAR
-
-```{r}
-(list_measuring_PAR_moss_19_20 <-list(mean_PAR_X1_19_20, mean_PAR_X2_19_20, mean_PAR_X4_19_20)) # put all datasets in a list
-(mean_measuring_PAR_moss_19_20 <- Reduce(`+`, list_measuring_PAR_moss_19_20)/length(list_measuring_PAR_moss_19_20)) # average them 
-
-(list_measuring_PAR_moss_20_21 <-list(mean_PAR_X1_20_21, mean_PAR_X2_20_21, mean_PAR_X4_20_21)) # put all datasets in a list
-(mean_measuring_PAR_moss_20_21 <- Reduce(`+`, list_measuring_PAR_moss_20_21)/length(list_measuring_PAR_moss_20_21)) # average them 
-
-(list_measuring_PAR_moss_21_22 <-list(mean_PAR_X1_21_22, mean_PAR_X2_21_22, mean_PAR_X4_21_22)) # put all datasets in a list
-(mean_measuring_PAR_moss_21_22 <- Reduce(`+`, list_measuring_PAR_moss_21_22)/length(list_measuring_PAR_moss_21_22)) # average them 
-
-(list_measuring_PAR_moss_22_23 <-list(mean_PAR_X1_22_23, mean_PAR_X2_22_23, mean_PAR_X4_22_23)) # put all datasets in a list
-(mean_measuring_PAR_moss_22_23 <- Reduce(`+`, list_measuring_PAR_moss_22_23)/length(list_measuring_PAR_moss_22_23)) # average them 
-```
-
-4.3. Monthly PAR
-
-```{r}
-(list_measuring_monthly_PAR_moss <-list(month_PAR_stats_X1, month_PAR_stats_X2, month_PAR_stats_X4)) # put all datasets in a list
-(mean_measuring_monthly_PAR_moss <- Reduce(`+`, list_measuring_monthly_PAR_moss)/length(list_measuring_monthly_PAR_moss)) # average them 
-
-```
-
-**5. YIELD and ETR**
-
-```{r}
-# Active period----
-
-(list_measuring_active_yield_moss <-list(mean_yield_active_X1_data, mean_yield_active_X2_data, mean_yield_active_X4_data)) # put all datasets in a list
-(mean_measuring_active_yield_moss <- Reduce(`+`, list_measuring_active_yield_moss)/length(list_measuring_active_yield_moss)) # average them 
-
-(list_measuring_active_ETR_moss <-list(mean_ETR_active_X1_data, mean_ETR_active_X2_data, mean_ETR_active_X4_data)) # put all datasets in a list
-(mean_measuring_active_ETR_moss <- Reduce(`+`, list_measuring_active_yield_moss)/length(list_measuring_active_yield_moss)) # average them 
-
-```
-
-5.2 Summer yield/ ETR
-
-```{r}
-# Mean YIED/ETR summer 19-20
-
-(list_measuring_active_yield_moss_19_20 <-list(mean_yield_X4_19_20, mean_yield_X4_19_20, mean_yield_X4_19_20)) # put all datasets in a list
-(mean_measuring_active_yield_moss_19_20 <- Reduce(`+`, list_measuring_active_yield_moss_19_20)/length(list_measuring_active_yield_moss_19_20)) # average them 
-
-(list_measuring_active_ETR_moss_19_20 <-list(mean_ETR_X4_19_20, mean_ETR_X4_19_20, mean_ETR_X4_19_20)) # put all datasets in a list
-(mean_measuring_active_ETR_moss_19_20 <- Reduce(`+`, list_measuring_active_ETR_moss_19_20)/length(list_measuring_active_ETR_moss_19_20)) # average them 
-
-# Mean YIED/ETR summer 20-21
-
-(list_measuring_active_yield_moss_20_21 <-list(mean_yield_X1_20_21, mean_yield_X2_20_21, mean_yield_X4_20_21)) # put all datasets in a list
-(mean_measuring_active_yield_moss_20_21 <- Reduce(`+`, list_measuring_active_yield_moss_20_21)/length(list_measuring_active_yield_moss_20_21)) # average them 
-
-(list_measuring_active_ETR_moss_20_21 <-list(mean_ETR_X4_20_21, mean_ETR_X4_20_21, mean_ETR_X4_20_21)) # put all datasets in a list
-(mean_measuring_active_ETR_moss_20_21 <- Reduce(`+`, list_measuring_active_ETR_moss_20_21)/length(list_measuring_active_ETR_moss_20_21)) # average them 
-
-# Mean YIED/ETR summer 21-22
-
-(list_measuring_active_yield_moss_21_22 <-list(mean_yield_X1_21_22, mean_yield_X2_21_22, mean_yield_X4_21_22)) # put all datasets in a list
-(mean_measuring_active_yield_moss_21_22 <- Reduce(`+`, list_measuring_active_yield_moss_21_22)/length(list_measuring_active_yield_moss_21_22)) # average them 
-
-(list_measuring_active_ETR_moss_21_22 <-list(mean_ETR_X4_21_22, mean_ETR_X4_21_22, mean_ETR_X4_21_22)) # put all datasets in a list
-(mean_measuring_active_ETR_moss_21_22 <- Reduce(`+`, list_measuring_active_ETR_moss_21_22)/length(list_measuring_active_ETR_moss_21_22)) # average them 
-
-# Mean YIED/ETR summer 22-23
-
-(list_measuring_active_yield_moss_22_23 <-list(mean_yield_X1_22_23, mean_yield_X2_22_23, mean_yield_X4_22_23)) # put all datasets in a list
-(mean_measuring_active_yield_moss_22_23 <- Reduce(`+`, list_measuring_active_yield_moss_22_23)/length(list_measuring_active_yield_moss_22_23)) # average them 
-
-(list_measuring_active_ETR_moss_22_23 <-list(mean_ETR_X4_22_23, mean_ETR_X4_22_23, mean_ETR_X4_22_23)) # put all datasets in a list
-(mean_measuring_active_ETR_moss_22_23 <- Reduce(`+`, list_measuring_active_ETR_moss_22_23)/length(list_measuring_active_ETR_moss_22_23)) # average them 
-
-```
-
-5.3. Monthly
-
-```{r}
-# Yield
-(list_measuring_active_yield_moss_monthly <-list(month_Y_stats_X1, month_Y_stats_X2, month_Y_stats_X4)) # put all datasets in a list
-(mean_measuring_active_yield_moss_monthly <- Reduce(`+`, list_measuring_active_yield_moss_monthly)/length(list_measuring_active_yield_moss_monthly)) # average them 
-
-# ETR
-
-(list_measuring_active_ETR_moss_monthly <-list(month_ETR_stats_X1, month_ETR_stats_X2, month_ETR_stats_X4)) # put all datasets in a list
-(mean_measuring_active_ETR_moss_monthly <- Reduce(`+`, list_measuring_active_ETR_moss_monthly)/length(list_measuring_active_ETR_moss_monthly)) # average them
-
-```
-
-
 ### 9.6. Meteorological
 
 1. Import and take a look at data
@@ -5593,6 +2947,287 @@ ggsave(filename = "graphs_env_conditions/temp_year_round_19_22.png", temp_year_r
 ```
 
 
-## 12. Plot data for the heatwave March 2022
+## 12. Plot data for the heatwave March 2022/ check unusual in march-october 2023
 
+March-October 2023
+1. Austroplaca is inactive
+
+2. Sample X1 (Moss)
+
+```{r}
+(temp_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date, X1.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+    ggplot(aes(Date_Combined, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X1") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Ft_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.F)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Ft \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 5)))  # Remove axis label and text for the graph
+
+(Fm_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%   # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 10)))  # Remove axis label and text for the graph
+
+(Diff_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.diff)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X1 ") +  # a.u. means arbitrary unit
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))
+
+
+
+(combined_plot_march_22_23_X1 <- (Ft_plot_march_22_23_X1/Fm_plot_march_22_23_X1/Diff_plot_march_22_23_X1/Yield_plot_march_22_23_X1/temp_plot_march_22_23_X1/PAR_plot_march_22_23_X1) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_year_round/march_october/combined_plot_march_22_23_X1.png", combined_plot_march_22_23_X1, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+
+```
+
+3. Sample X2 (Moss)
+
+```{r}
+(temp_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date, X2.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X2 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+    ggplot(aes(Date_Combined, X2.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X2.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X2.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X2") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Ft_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X2.F)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Ft \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 5)))  # Remove axis label and text for the graph
+
+(Fm_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%   # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X2.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X2 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 10)))  # Remove axis label and text for the graph
+
+(Diff_plot_march_22_23_X2 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X2.diff)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X2 ") +  # a.u. means arbitrary unit
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))
+
+
+
+(combined_plot_march_22_23_X2 <- (Ft_plot_march_22_23_X2/Fm_plot_march_22_23_X2/Diff_plot_march_22_23_X2/Yield_plot_march_22_23_X2/temp_plot_march_22_23_X2/PAR_plot_march_22_23_X2) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_year_round/march_october/combined_plot_march_22_23_X2.png", combined_plot_march_22_23_X2, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+```
+
+4. Sample X4 (Moss)
+
+```{r}
+
+(temp_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date, X4.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X4 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+    ggplot(aes(Date_Combined, X4.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X4.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X4.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X4") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(Ft_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X4.F)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Ft \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 5)))  # Remove axis label and text for the graph
+
+(Fm_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%   # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X4.Fm)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Fm \nMoss X4 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 100, by = 10)))  # Remove axis label and text for the graph
+
+(Diff_plot_march_22_23_X4 <- data_clean %>% 
+   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X4.diff)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+    geom_hline(yintercept = 5, color = "red", linetype = "dashed") + # Added a line at 5. A suitable difference between Fm and Ft for it to be reliable is 5 (Allan)
+   labs(x = "\nDate (day)", y = "Difference\nflourescence (a.u.) \nMoss X4 ") +  # a.u. means arbitrary unit
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major.y = element_line(color = "gray")) +
+    scale_y_continuous(breaks = seq(0, 10, by = 1)))
+
+
+
+(combined_plot_march_22_23_X4 <- (Ft_plot_march_22_23_X4/Fm_plot_march_22_23_X4/Diff_plot_march_22_23_X4/Yield_plot_march_22_23_X4/temp_plot_march_22_23_X4/PAR_plot_march_22_23_X4) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_year_round/march_october/combined_plot_march_22_23_X4.png", combined_plot_march_22_23_X4, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+```
 
