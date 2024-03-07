@@ -2504,7 +2504,7 @@ Sample X4 (moss)
    theme_graphs_env_cond())
 
 (Yield_plot_21_22_X4 <- summer_21_22 %>% 
-   ggplot(aes(Date_Combined, X4.Y)) +
+   ggplot(aes(Date_Combined, X4.chosen_yield)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "Yield \n Moss X4 ") +
@@ -2513,7 +2513,7 @@ Sample X4 (moss)
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
 (ETR_plot_21_22_X4 <- summer_21_22 %>% 
-   ggplot(aes(Date_Combined, X4.ETR)) +
+   ggplot(aes(Date_Combined, X4.chosen_ETR)) +
    geom_point()+  # Add points for the data
    geom_line()+  # Add a line that joins the points
    labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X4") +
