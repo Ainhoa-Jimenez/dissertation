@@ -2868,10 +2868,14 @@ write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save 
 
 ## 11. Plot data for all the measuring period
 
-### 11.1. Graph for PAR year round (This need to be changed to include 2022-2023)
+11.1. Graph for PAR year round (This need to be changed to include 2022-2023)
 
 ```{r}
-(PAR_year_round_19_22 <- data_clean %>%
+(PAR_year_round_19_23 <- rbind(
+  data_clean %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR),
+  data_clean_23 %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR)) %>%
   mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
   ggplot(aes(Date, mean_PAR)) +  # plot it
   geom_line() +
@@ -2883,21 +2887,9 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_rou
 
 ```
 
-### 11.2. Graph for yield year round
+11.2. Graph for yield year round
 
 ```{r}
-
-# (yield_year_round_19_22 <- data_clean %>%  # not in use
-#  ggplot() +
-# geom_point(aes(Date, X1.Y, color = "Bryum argemteum"), alpha = 0.4) +
-#  geom_point(aes(Date, X2.Y, color = "Bryum argemteum"), alpha = 0.4) + 
-#  geom_point(aes(Date, X3.Y, color = "Austroplaca soropelta"), alpha = 0.7) +
-#  geom_point(aes(Date, X4.Y, color = "Bryum argemteum"), alpha = 0.4) +
-#  theme_graphs_env_cond() +
-#  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
-#  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
-#  labs(color = "Species") + # This adds a legend for the colors
-#   ylab("Yield"))  # This sets the y-axis label to "Yield"
 
 (yield_year_round_19_22 <- rbind(data_clean)%>%
   ggplot() +
@@ -2911,7 +2903,7 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_rou
   labs(color = "Species") + # This adds a legend for the colors
    ylab("Yield"))  # This sets the y-axis label to "Yield"
 
-(yield_year_round_19_22 <- rbind(data_clean_23)%>%
+(yield_year_round_22_23 <- rbind(data_clean_23)%>%
   ggplot() +
   geom_line(aes(Date, X1.Y, color = "Bryum argemteum"), alpha = 0.4) +
   geom_line(aes(Date, X2.Y, color = "Bryum argemteum"), alpha = 0.4) + 
@@ -2923,31 +2915,37 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_22.png", PAR_year_rou
   labs(color = "Species") + # This adds a legend for the colors
    ylab("Yield"))  # This sets the y-axis label to "Yield"
 
-ggsave(filename = "graphs_year_round/yield_year_round_19_22.png", yield_year_round_19_22, width = 54,height = 18, units = "cm",device = "png")  # Save graph
+
 ```
 
-### 11.3. Graph for T year round
+11.3. Graph for T year round
 ```{r}
-(temp_year_round_19_22 <- data_clean %>%
+(temp_year_round_19_23 <- rbind(
+  data_clean %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp),
+  data_clean_23 %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp)) %>%
   mutate(mean_Temp = rowMeans(select(., c("X1.Temp", "X2.Temp", "X3.Temp", "X4.Temp")), na.rm = TRUE)) %>%  # calcualte mean PAR across all samples
   ggplot(aes(Date, mean_Temp)) +
   geom_line() +
+  geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
-  ylab("Temperature ºC"))
+  ylab("Thallus \nTemperature ºC"))
 
 ggsave(filename = "graphs_env_conditions/temp_year_round_19_22.png", temp_year_round_19_22, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 
-(air_temp_year_round_19_22 <- data_met %>%
+(air_temp_year_round_19_23 <- data_met %>%
   ggplot(aes(DateTime, Tmean)) +
   geom_line() +
+  geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
-  ylab("Temperature ºC"))
+  ylab("Air \nTemperature ºC"))
 ```
 
 
-## 12. Plot data for the heatwave March 2022/ check unusual in march-october 2023
+### 11.4. Plot data for the heatwave March 2022/ check unusual in march-october 2023
 
 March-October 2023
 1. Austroplaca is inactive
@@ -3229,5 +3227,55 @@ ggsave(filename = "graphs_year_round/march_october/combined_plot_march_22_23_X2.
 (combined_plot_march_22_23_X4 <- (Ft_plot_march_22_23_X4/Fm_plot_march_22_23_X4/Diff_plot_march_22_23_X4/Yield_plot_march_22_23_X4/temp_plot_march_22_23_X4/PAR_plot_march_22_23_X4) & plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_year_round/march_october/combined_plot_march_22_23_X4.png", combined_plot_march_22_23_X4, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+```
+
+There is false activity in X4. Remove it.
+
+```{r}
+data_clean <- data_clean %>% 
+  mutate(X4.chosen_yield = case_when( # summer_21_22 X4 yield
+    Day_cum <= 44606 ~ X4.Y,  # Days before the 14th of Feb stay with machine yield
+    Day_cum > 44606 & Day_cum <= 44620 ~ 0,  # Days between the 14th of Feb and 28th of Feb change to calc_yield
+    Day_cum >= 44620 &  Day_cum <= 44620 ~ X4.Y,  # Days after the 28th of Feb stay with machine yield
+    Day_cum > 44620 ~ 0),  
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR)  # summer_21_2 X4 ETR
+```
+
+### 
+11.5. Replot graph
+
+```{r}
+(yield_year_round_19_23 <- rbind(
+  data_clean %>% 
+    select(Date, X1.Y, X2.Y, X3.chosen_yield, X4.chosen_yield),
+  data_clean_23 %>% 
+    select(Date, X1.Y, X2.Y, X3.chosen_yield, X4.chosen_yield))%>%
+  ggplot() +
+  geom_line(aes(Date, X1.Y, color = "Bryum argemteum"), alpha = 0.4) +
+  geom_line(aes(Date, X2.Y, color = "Bryum argemteum"), alpha = 0.4) + 
+  geom_line(aes(Date, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.7) +
+  geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum"), alpha = 0.4) +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+  labs(color = "Species") + # This adds a legend for the colors
+   ylab("Yield"))  # This sets the y-axis label to "Yield"
+
+ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_round_19_23, width = 54,height = 18, units = "cm",device = "png")  # Save graph
+
+```
+
+11.6. Combined plot year round:
+
+```{r}
+(combined_plot_19_23 <- (yield_year_round_19_23/temp_year_round_19_23/air_temp_year_round_19_23/PAR_year_round_19_23) & plot_layout(ncol = 1))
+(combined_plot_19_23 <- (
+  (yield_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())) /
+  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())) /
+  (air_temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())) /
+  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))))
+  & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_23, width = 54,height = 18, units = "cm",device = "png")  # Save graph
 ```
 

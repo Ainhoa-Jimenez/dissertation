@@ -244,6 +244,15 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
             max_temp = max(X3.Temp),  # get the maximum temperature
             min_temp = min(X3.Temp)))  # get the minimum temperature
 
+mean_Temp_X3 <- mean_Temp_X3_data %>% 
+  select( mean_temp)
+
+max_Temp_X3 <- mean_Temp_X3_data %>% 
+  select( max_temp)
+
+min_Temp_X3 <- mean_Temp_X3_data %>% 
+  select( min_temp)
+
 # Mean temperature whole active period -------------------
 
 (mean_Temp_active_X3_data <- bind_rows(  # Make into a single dataset
@@ -260,7 +269,13 @@ data_clean_23$X3.Temp <- replace(data_clean_23$X3.Temp, is.na(data_clean_23$X3.T
   filter( X3.Active == TRUE) %>% 
   select( mean_temp))
 
+(max_Temp_active_X3 <- mean_Temp_active_X3_data %>%  # extract the mean Temp of the active period
+  filter( X3.Active == TRUE) %>% 
+  select( max_temp))
 
+(min_Temp_active_X3 <- mean_Temp_active_X3_data %>%  # extract the mean Temp of the active period
+  filter( X3.Active == TRUE) %>% 
+  select( min_temp))
 ```
 
 #### 3.2. Summer Temperature
@@ -483,7 +498,17 @@ write.xlsx(month_active_temp_stats_X3, file = "stats/austroplaca/month_active_te
     max_PAR = max(X3.PAR),
     min_PAR = min(X3.PAR)))  # calculate the mean PAR of the active period
 
+mean_PAR_active_X3 <- mean_PAR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(mean_PAR)
 
+max_PAR_active_X3 <- mean_PAR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(max_PAR)
+
+min_PAR_active_X3 <- mean_PAR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(min_PAR)
 ```
 
 #### 4.2. Monthly PAR
@@ -620,6 +645,18 @@ write.xlsx(month_PAR_stats_X3, file = "stats/austroplaca/month_PAR_stats_X3.xlsx
     max_Y = max(X3.chosen_yield),
     min_Y = min(X3.chosen_yield)))  # calculate the mean yield of the active period
 
+mean_Y_active_X3 <- mean_yield_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(mean_Y)
+
+max_Y_active_X3 <- mean_yield_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(max_Y)
+
+min_Y_active_X3 <- mean_yield_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(min_Y)
+
 (mean_ETR_active_X3_data <- bind_rows(  # Make into a single dataset
   data_clean %>% 
     group_by(X3.Active),  # get the rows in data_clean where the lichen is active
@@ -630,6 +667,17 @@ write.xlsx(month_PAR_stats_X3, file = "stats/austroplaca/month_PAR_stats_X3.xlsx
     max_ETR = max(X3.chosen_ETR),
     min_ETR = min(X3.chosen_ETR)))  # calculate the mean ETR of the active period
 
+mean_ETR_active_X3 <- mean_ETR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(mean_ETR)
+
+max_ETR_active_X3 <- mean_ETR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(max_ETR)
+
+min_ETR_active_X3 <- mean_ETR_active_X3_data %>% 
+  filter(X3.Active == TRUE) %>% 
+  select(min_ETR)
 ```
 
 #### 5.2 Summerly yield/ ETR
@@ -864,7 +912,7 @@ mutate(Total_time = Count_data_clean + Count_data_clean_23) # add both columns t
   filter(Condition == TRUE) %>%
   select(Total_time))
 
-(Percentage_active_days_X1 <- total_active_hours_X1/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
+(Percentage_active_hours_X1 <- total_active_hours_X1/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
 ```
 
 #### 2.2. Active time each summer
@@ -1051,6 +1099,15 @@ month_activetime_stats_X1 <- bind_rows(
             max_temp = max(X1.Temp),  # get the maximum temperature
             min_temp = min(X1.Temp)))  # get the minimum temperature
 
+mean_Temp_X1 <- mean_Temp_X1_data %>% 
+  select( mean_temp)
+
+max_Temp_X1 <- mean_Temp_X1_data %>% 
+  select( max_temp)
+
+min_Temp_X1 <- mean_Temp_X1_data %>% 
+  select( min_temp)
+
 # Mean temperature whole active period-------------------
 
 (mean_Temp_active_X1_data <- bind_rows(  # Make into a single dataset
@@ -1067,7 +1124,13 @@ month_activetime_stats_X1 <- bind_rows(
   filter( X1.Active == TRUE) %>% 
   select( mean_temp))
 
+(max_Temp_active_X1 <- mean_Temp_active_X1_data %>%  # extract the mean Temp of the active period
+  filter( X1.Active == TRUE) %>% 
+  select( max_temp))
 
+(min_Temp_active_X1 <- mean_Temp_active_X1_data %>%  # extract the mean Temp of the active period
+  filter( X1.Active == TRUE) %>% 
+  select( min_temp))
 ```
 
 #### 3.2. Summer Temperature
@@ -1289,6 +1352,17 @@ write.xlsx(month_active_temp_stats_X1, file = "stats/bryum/month_active_temp_sta
     max_PAR = max(X1.PAR),
     min_PAR = min(X1.PAR)))  # calculate the mean PAR of the active period
 
+mean_PAR_active_X1 <- mean_PAR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(mean_PAR)
+
+max_PAR_active_X1 <- mean_PAR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(max_PAR)
+
+min_PAR_active_X1 <- mean_PAR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(min_PAR)
 ```
 
 #### 4.2. Summerly PAR
@@ -1424,6 +1498,18 @@ write.xlsx(month_PAR_stats_X1, file = "stats/bryum/month_PAR_stats_X1.xlsx") # s
     max_Y = max(X1.Y),
     min_Y = min(X1.Y)))  # calculate the mean yield of the active period
 
+mean_Y_active_X1 <- mean_yield_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(mean_Y)
+
+max_Y_active_X1 <- mean_yield_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(max_Y)
+
+min_Y_active_X1 <- mean_yield_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(min_Y)
+
 (mean_ETR_active_X1_data <- bind_rows(  # Make into a single dataset
   data_clean %>% 
     group_by(X1.Active),  # get the rows in data_clean where the lichen is active
@@ -1434,6 +1520,17 @@ write.xlsx(month_PAR_stats_X1, file = "stats/bryum/month_PAR_stats_X1.xlsx") # s
     max_ETR = max(X1.ETR),
     min_ETR = min(X1.ETR)))  # calculate the mean ETR of the active period
 
+mean_ETR_active_X1 <- mean_ETR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(mean_ETR)
+
+max_ETR_active_X1 <- mean_ETR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(max_ETR)
+
+min_ETR_active_X1 <- mean_ETR_active_X1_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(min_ETR)
 ```
 
 #### 5.2 Summer yield/ ETR
@@ -1667,7 +1764,7 @@ mutate(Total_time = Count_data_clean + Count_data_clean_23)) # add both columns 
   filter(Condition == TRUE) %>%
   select(Total_time))
 
-(Percentage_active_days_X2 <- total_active_hours_X2/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
+(Percentage_active_hours_X2 <- total_active_hours_X2/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
 ```
 
 #### 2.2. Active time each summer
@@ -1842,6 +1939,15 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
             max_temp = max(X2.Temp),  # get the maximum temperature
             min_temp = min(X2.Temp)))  # get the minimum temperature
 
+mean_Temp_X2 <- mean_Temp_X2_data %>% 
+  select( mean_temp)
+
+max_Temp_X2 <- mean_Temp_X2_data %>% 
+  select( max_temp)
+
+min_Temp_X2 <- mean_Temp_X2_data %>% 
+  select( min_temp)
+
 # Mean temperature whole active period-------------------
 
 (mean_Temp_active_X2_data <- bind_rows(  # Make into a single dataset
@@ -1858,7 +1964,13 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
   filter( X2.Active == TRUE) %>% 
   select( mean_temp))
 
+(max_Temp_active_X2 <- mean_Temp_active_X2_data %>%  # extract the mean Temp of the active period
+  filter( X2.Active == TRUE) %>% 
+  select( max_temp))
 
+(min_Temp_active_X2 <- mean_Temp_active_X2_data %>%  # extract the mean Temp of the active period
+  filter( X2.Active == TRUE) %>% 
+  select( min_temp))
 ```
 
 #### 3.2. Summer Temperature
@@ -2077,6 +2189,17 @@ write.xlsx(month_active_temp_stats_X2, file = "stats/bryum/month_active_temp_sta
     max_PAR = max(X2.PAR),
     min_PAR = min(X2.PAR)))  # calculate the mean PAR of the active period
 
+mean_PAR_active_X2 <- mean_PAR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(mean_PAR)
+
+max_PAR_active_X2 <- mean_PAR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(max_PAR)
+
+min_PAR_active_X2 <- mean_PAR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(min_PAR)
 ```
 
 #### 4.2. Summerly PAR
@@ -2212,6 +2335,18 @@ write.xlsx(month_PAR_stats_X2, file = "stats/bryum/month_PAR_stats_X2.xlsx") # s
     max_Y = max(X2.Y),
     min_Y = min(X2.Y)))  # calculate the mean yield of the active period
 
+mean_Y_active_X2 <- mean_yield_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(mean_Y)
+
+max_Y_active_X2 <- mean_yield_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(max_Y)
+
+min_Y_active_X2 <- mean_yield_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(min_Y)
+
 (mean_ETR_active_X2_data <- bind_rows(  # Make into a single dataset
   data_clean %>% 
     group_by(X2.Active),  # get the rows in data_clean where the lichen is active
@@ -2222,6 +2357,17 @@ write.xlsx(month_PAR_stats_X2, file = "stats/bryum/month_PAR_stats_X2.xlsx") # s
     max_ETR = max(X2.ETR),
     min_ETR = min(X2.ETR)))  # calculate the mean ETR of the active period
 
+mean_ETR_active_X2 <- mean_ETR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(mean_ETR)
+
+max_ETR_active_X2 <- mean_ETR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(max_ETR)
+
+min_ETR_active_X2 <- mean_ETR_active_X2_data %>% 
+  filter(X2.Active == TRUE) %>% 
+  select(min_ETR)
 ```
 
 #### 5.2 Summer yield/ ETR
@@ -2458,7 +2604,7 @@ mutate(Total_time = Count_data_clean + Count_data_clean_23)) # add both columns 
   filter(Condition == TRUE) %>%
   select(Total_time))
 
-(Percentage_active_days_X4 <- total_active_hours_X4/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
+(Percentage_active_hours_X4 <- total_active_hours_X4/(nrow(data_clean) + nrow(data_clean_23)) * 100) # calculate the percentage 
 ```
 
 #### 2.2. Active time each summer
@@ -2623,6 +2769,15 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
             max_temp = max(X4.Temp),  # get the maximum temperature
             min_temp = min(X4.Temp)))  # get the minimum temperature
 
+mean_Temp_X4 <- mean_Temp_X4_data %>% 
+  select( mean_temp)
+
+max_Temp_X4 <- mean_Temp_X4_data %>% 
+  select( max_temp)
+
+min_Temp_X4 <- mean_Temp_X4_data %>% 
+  select( min_temp)
+
 # Mean temperature whole active period-------------------
 
 (mean_Temp_active_X4_data <- bind_rows(  # Make into a single dataset
@@ -2639,7 +2794,13 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
   filter( X4.Active == TRUE) %>% 
   select( mean_temp))
 
+(max_Temp_active_X4 <- mean_Temp_active_X4_data %>%  # extract the mean Temp of the active period
+  filter( X4.Active == TRUE) %>% 
+  select( max_temp))
 
+(min_Temp_active_X4 <- mean_Temp_active_X4_data %>%  # extract the mean Temp of the active period
+  filter( X4.Active == TRUE) %>% 
+  select( min_temp))
 ```
 
 #### 3.2. Summer Temperature
@@ -2858,6 +3019,17 @@ write.xlsx(month_active_temp_stats_X4, file = "stats/bryum/month_active_temp_sta
     max_PAR = max(X4.PAR),
     min_PAR = min(X4.PAR)))  # calculate the mean PAR of the active period
 
+mean_PAR_active_X4 <- mean_PAR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(mean_PAR)
+
+max_PAR_active_X4 <- mean_PAR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(max_PAR)
+
+min_PAR_active_X4 <- mean_PAR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(min_PAR)
 ```
 
 #### 4.2. Summerly PAR
@@ -2993,6 +3165,18 @@ write.xlsx(month_PAR_stats_X4, file = "stats/bryum/month_PAR_stats_X4.xlsx") # s
     max_Y = max(X4.Y),
     min_Y = min(X4.Y)))  # calculate the mean yield of the active period
 
+mean_Y_active_X4 <- mean_yield_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(mean_Y)
+
+max_Y_active_X4 <- mean_yield_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(max_Y)
+
+min_Y_active_X4 <- mean_yield_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(min_Y)
+
 (mean_ETR_active_X4_data <- bind_rows(  # Make into a single dataset
   data_clean %>% 
     group_by(X4.Active),  # get the rows in data_clean where the lichen is active
@@ -3003,6 +3187,17 @@ write.xlsx(month_PAR_stats_X4, file = "stats/bryum/month_PAR_stats_X4.xlsx") # s
     max_ETR = max(X4.ETR),
     min_ETR = min(X4.ETR)))  # calculate the mean ETR of the active period
 
+mean_ETR_active_X4 <- mean_ETR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(mean_ETR)
+
+max_ETR_active_X4 <- mean_ETR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(max_ETR)
+
+min_ETR_active_X4 <- mean_ETR_active_X4_data %>% 
+  filter(X4.Active == TRUE) %>% 
+  select(min_ETR)
 ```
 
 #### 5.2 Summer yield/ ETR
@@ -3201,24 +3396,17 @@ write.xlsx(month_ETR_stats_X4, file = "stats/bryum/month_ETR_stats_X4.xlsx") # s
 ### 1. Active time
 
 ```{r}
-(list_act_time <- list(total_activetime_stats_X1,total_activetime_stats_X2, total_activetime_stats_X4)) # put all datasets in a list
+(list_act_time <- list(total_activetime_stats_X2,total_activetime_stats_X2, total_activetime_stats_X4)) # put all datasets in a list
 (total_activetime_stats_moss <- Reduce(`+`, list_act_time)/length(list_act_time)) # average them 
 
 (total_active_hours_moss <- total_activetime_stats_moss %>% # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
   select(Total_time))
 
-(percentage_active_days_moss <- total_active_hours_moss/(nrow(data_clean) + nrow(data_clean_23)) * 100)
+(Percentage_active_hours_moss <- total_active_hours_moss/(nrow(data_clean) + nrow(data_clean_23)) * 100)
 ```
 
 #### 1.2 Active time each summer
-
-```{r}
-(list_act_time_summer <- list(summer_activetime_stats_X1,summer_activetime_stats_X2, summer_activetime_stats_X3)) # put all datasets in a list
-(summer_activetime_stats_moss <- Reduce(`+`, list_act_time_summer)/length(list_act_time)) # average them 
-```
-
-#### 1.3 Active time each month
 
 ```{r}
 (list_act_time_summer <- list(summer_activetime_stats_X1,summer_activetime_stats_X2, summer_activetime_stats_X3)) # put all datasets in a list
@@ -3247,7 +3435,14 @@ write.xlsx(month_ETR_stats_X4, file = "stats/bryum/month_ETR_stats_X4.xlsx") # s
 (Percentage_active_hours_21_22_moss <- total_active_hours_21_22_moss /nrow(summer_21_22) * 100)
 
 (Percentage_active_hours_22_23_moss <- total_active_hours_22_23_moss /nrow(summer_22_23) * 100)
+```
 
+#### 1.3 Active time each month
+
+```{r}
+(list_act_time_month <- list(month_activetime_stats_X1, month_activetime_stats_X2, month_activetime_stats_X4)) # put all datasets in a list
+# (summer_activetime_stats_moss <- Reduce(`+`, list_act_time_month)/length(list_act_time_month)) # average them 
+# Can't do it because they are not active the same amount of time
 ```
 
 ### 3. Thallus Temperature
@@ -3260,11 +3455,31 @@ write.xlsx(month_ETR_stats_X4, file = "stats/bryum/month_ETR_stats_X4.xlsx") # s
 (list_measuring_temp_moss <-list(mean_Temp_X1_data, mean_Temp_X2_data, mean_Temp_X4_data)) # put all datasets in a list
 (mean_Temp_moss_data <- Reduce(`+`, list_measuring_temp_moss)/length(list_measuring_temp_moss)) # average them 
 
+mean_Temp_moss <- mean_Temp_moss_data %>% 
+  select( mean_temp)
+
+max_Temp_moss <- mean_Temp_moss_data %>% 
+  select( max_temp)
+
+min_Temp_moss <- mean_Temp_moss_data %>% 
+  select( min_temp)
+          
 # Mean temperature whole active period-------------------
 
 (list_active_temp_moss <-list(mean_Temp_active_X1_data, mean_Temp_active_X2_data, mean_Temp_active_X4_data)) # put all datasets in a list
 (mean_Temp_active_moss_data <- Reduce(`+`, list_active_temp_moss)/length(list_active_temp_moss)) # average them 
 
+mean_Temp_active_moss <- mean_Temp_active_moss_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select( mean_temp)
+
+max_Temp_active_moss <- mean_Temp_active_moss_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select( max_temp)
+
+min_Temp_active_moss <- mean_Temp_active_moss_data %>% 
+  filter(X1.Active == TRUE) %>% 
+  select( min_temp)
 ```
 
 #### 3.2. Summer Temperature
@@ -3405,6 +3620,17 @@ write.xlsx(mean_measuring_Temp_moss_month_data, file = "stats/bryum/mean_measuri
 (list_measuring_PAR_moss <-list(mean_PAR_active_X1_data, mean_PAR_active_X2_data, mean_PAR_active_X4_data)) # put all datasets in a list
 (mean_measuring_PAR_moss <- Reduce(`+`, list_measuring_PAR_moss)/length(list_measuring_PAR_moss)) # average them 
 
+mean_PAR_active_moss <- mean_measuring_PAR_moss %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(mean_PAR)
+
+max_PAR_active_moss <- mean_measuring_PAR_moss %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(max_PAR)
+
+min_PAR_active_moss <- mean_measuring_PAR_moss %>% 
+  filter(X1.Active == TRUE) %>% 
+  select(min_PAR)
 ```
 
 #### 4.2. Summerly PAR
@@ -3488,9 +3714,32 @@ write.xlsx(mean_measuring_monthly_PAR_moss, file = "stats/bryum/mean_measuring_m
 (list_measuring_active_yield_moss <-list(mean_yield_active_X1_data, mean_yield_active_X2_data, mean_yield_active_X4_data)) # put all datasets in a list
 (mean_measuring_active_yield_moss <- Reduce(`+`, list_measuring_active_yield_moss)/length(list_measuring_active_yield_moss)) # average them 
 
-(list_measuring_active_ETR_moss <-list(mean_ETR_active_X1_data, mean_ETR_active_X2_data, mean_ETR_active_X4_data)) # put all datasets in a list
-(mean_measuring_active_ETR_moss <- Reduce(`+`, list_measuring_active_yield_moss)/length(list_measuring_active_yield_moss)) # average them 
+mean_Y_active_moss <- mean_measuring_active_yield_moss %>% 
+  filter(X1.Active == TRUE) %>% 
+  select( mean_Y )
 
+max_Y_active_moss <- mean_measuring_active_yield_moss %>% 
+  filter(X1.Active == TRUE) %>% 
+  select( max_Y )
+
+min_Y_active_moss <- mean_measuring_active_yield_moss %>% 
+    filter(X1.Active == TRUE) %>% 
+  select( min_Y )
+
+(list_measuring_active_ETR_moss <-list(mean_ETR_active_X1_data, mean_ETR_active_X2_data, mean_ETR_active_X4_data)) # put all datasets in a list
+(mean_measuring_active_ETR_moss <- Reduce(`+`, list_measuring_active_ETR_moss)/length(list_measuring_active_ETR_moss)) # average them 
+
+mean_ETR_active_moss <- mean_measuring_active_ETR_moss %>% 
+    filter(X1.Active == TRUE) %>% 
+  select( mean_ETR )
+
+max_ETR_active_moss <- mean_measuring_active_ETR_moss %>% 
+    filter(X1.Active == TRUE) %>% 
+  select( max_ETR )
+
+min_ETR_active_Temp_moss <- mean_measuring_active_ETR_moss %>% 
+    filter(X1.Active == TRUE) %>% 
+  select( min_ETR )
 ```
 
 #### 5.2 Summer yield/ ETR
@@ -3775,6 +4024,69 @@ write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save 
 ```
 
 # 10. Create a table for the results
+## 10.1 Create table for general values to compare
+
+```{r}
+
+# create table for general values to compare
+
+(table_general <- data.frame(
+  Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active",
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR",
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  Austroplaca_X3 = c(
+    pull(total_active_hours_X3), pull(Percentage_active_hours_X3), 
+    pull(mean_Temp_X3), pull(min_Temp_X3), pull(max_Temp_X3),
+    pull(mean_Temp_active_X3), pull(min_Temp_active_X3),
+    pull(max_Temp_active_X3), pull(mean_PAR_active_X3),
+    pull(max_PAR_active_X3), pull(max_Y_active_X3),
+    pull(mean_Y_active_X3), pull(mean_ETR_active_X3),
+    pull(max_ETR_active_X3), 0, 0, 0, 0
+  ),
+  Bryum_X1 = c(
+    pull(total_active_hours_X1), pull(Percentage_active_hours_X1), 
+    pull(mean_Temp_X1), pull(min_Temp_X1), pull(max_Temp_X1),
+    pull(mean_Temp_active_X1), pull(min_Temp_active_X1),
+    pull(max_Temp_active_X1), pull(mean_PAR_active_X1),
+    pull(max_PAR_active_X1), pull(max_Y_active_X1),
+    pull(mean_Y_active_X1), pull(mean_ETR_active_X1),
+    pull(max_ETR_active_X1), 0, 0, 0, 0
+  ),
+  Bryum_X2 = c(
+    pull(total_active_hours_19_20_X2), pull(Percentage_active_hours_19_20_X2),
+    pull(mean_Temp_X2_19_20), pull(min_Temp_X2_19_20), pull(max_Temp_X2_19_20),
+    pull(mean_Temp_active_X2_19_20), pull(min_Temp_active_X2_19_20),
+    pull(max_Temp_active_X2_19_20), pull(mean_PAR_active_X2_19_20),
+    pull(max_PAR_active_X2_19_20), pull(max_Y_active_X2_19_20),
+    pull(mean_Y_active_X2_19_20), pull(mean_ETR_active_X2_19_20),
+    pull(max_ETR_active_X2_19_20), 0, 0, 0, 0
+  ),
+ Bryum_X4 = c(
+    pull(total_active_hours_X4), pull(Percentage_active_hours_X4),
+    pull(mean_Temp_X4), pull(min_Temp_X4), pull(max_Temp_X4),
+    pull(mean_Temp_active_X4), pull(min_Temp_active_X4),
+    pull(max_Temp_active_X4), pull(mean_PAR_active_X4),
+    pull(max_PAR_active_X4), pull(max_Y_active_X4),
+    pull(mean_Y_active_X4), pull(mean_ETR_active_X4),
+    pull(max_ETR_active_X4), 0, 0, 0, 0
+  ),
+  Bryum_average = c(
+    pull(total_active_hours_moss), pull(Percentage_active_hours_moss),
+    pull(mean_Temp_X4), pull(min_Temp_moss), pull(max_Temp_moss),
+    pull(mean_Temp_active_moss), pull(min_Temp_active_moss),
+    pull(max_Temp_active_moss), pull(mean_PAR_active_moss),
+    pull(max_PAR_active_moss), pull(max_Y_active_moss),
+    pull(mean_Y_active_moss), pull(mean_ETR_active_moss),
+    pull(max_ETR_active_moss), 0, 0, 0, 0
+  )))
+ 
+write.xlsx(table_2019_2020, file = "stats/general/table_general.xlsx") # save table
+```
+ 
+## 10.2. Create a table with all the values of each summer to compare
 
 ```{r}
 # create a table with all the values of each summer to compare
@@ -3805,13 +4117,13 @@ table_2019_2020 <- data.frame(
     pull(max_ETR_active_X1_19_20), 0, 0, 0, 0
   ),
   Bryum_X2 = c(
-    pull(total_active_hours_19_20_X2), pull(Percentage_active_hours_19_20_X2), 
-    pull(mean_Temp_X2_19_20), pull(min_Temp_X2_19_20), pull(max_Temp_X2_19_20), 
-    pull(mean_Temp_active_X2_19_20), pull(min_Temp_active_X2_19_20), 
-    pull(max_Temp_active_X2_19_20), pull(mean_PAR_active_X2_19_20), 
-    pull(max_PAR_active_X2_19_20), pull(max_Y_active_X2_19_20), 
-    pull(mean_Y_active_X2_19_20), pull(mean_ETR_active_X2_19_20), 
-    pull(max_ETR_active_X2_19_20), 0, 0, 0, 0
+     pull(total_active_hours_X2), pull(Percentage_active_hours_X2), # pull removes thee value from the tibble
+    pull(mean_Temp_X2), pull(min_Temp_X2), pull(max_Temp_X2), 
+    pull(mean_Temp_active_X2), pull(min_Temp_active_X2), 
+    pull(max_Temp_active_X2), pull(mean_PAR_active_X2), 
+    pull(max_PAR_active_X2), pull(max_Y_active_X2), 
+    pull(mean_Y_active_X2), pull(mean_ETR_active_X2), 
+    pull(max_ETR_active_X2), 0, 0, 0, 0
   ),
   Bryum_X4 = c(
     pull(total_active_hours_19_20_X4), pull(Percentage_active_hours_19_20_X4), 
@@ -3832,7 +4144,7 @@ table_2019_2020 <- data.frame(
     pull(max_ETR_active_moss_19_20), 0, 0, 0, 0
   ))
 
-  write.xlsx(table_2019_2020, file = "stats/summers/table_2019_2020.xlsx") # save table
+write.xlsx(table_2019_2020, file = "stats/summers/table_2019_2020.xlsx") # save table
   
   
  table_2020_2021 <- data.frame(
@@ -3977,4 +4289,217 @@ table_2022_2023 <- data.frame(
  
 ```
 
+## 10.3 Create a table per species
+
+```{r}
+# Austroplaca
+
+table_austroplaca <- data.frame(
+  Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active", 
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR", 
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  year_19_20 = c(
+    pull(total_active_hours_19_20_X3), pull(Percentage_active_hours_19_20_X3), # pull removes thee value from the tibble
+    pull(mean_Temp_X3_19_20), pull(min_Temp_X3_19_20), pull(max_Temp_X3_19_20), 
+    pull(mean_Temp_active_X3_19_20), pull(min_Temp_active_X3_19_20), 
+    pull(max_Temp_active_X3_19_20), pull(mean_PAR_active_X3_19_20), 
+    pull(max_PAR_active_X3_19_20), pull(max_Y_active_X3_19_20), 
+    pull(mean_Y_active_X3_19_20), pull(mean_ETR_active_X3_19_20), 
+    pull(max_ETR_active_X3_19_20), 0, 0, 0, 0
+  ),
+  year_20_21 = c(
+    pull(total_active_hours_20_21_X3), pull(Percentage_active_hours_20_21_X3), pull(mean_Temp_X3_20_21), 
+    pull(min_Temp_X3_20_21), pull(max_Temp_X3_20_21), pull(mean_Temp_active_X3_20_21), 
+    pull(min_Temp_active_X3_20_21), pull(max_Temp_active_X3_20_21), pull(mean_PAR_active_X3_20_21), 
+    pull(max_PAR_active_X3_20_21), pull(max_Y_active_X3_20_21), pull(mean_Y_active_X3_20_21),
+    pull(mean_ETR_active_X3_20_21), pull(max_ETR_active_X3_20_21), 0, 0, 0, 0
+  ),
+  year_21_22 = c(
+    pull(total_active_hours_21_22_X3), pull(Percentage_active_hours_21_22_X3), pull(mean_Temp_X3_21_22), 
+    pull(min_Temp_X3_21_22), pull(max_Temp_X3_21_22), pull(mean_Temp_active_X3_21_22), 
+    pull(min_Temp_active_X3_21_22), pull(max_Temp_active_X3_21_22), pull(mean_PAR_active_X3_21_22), 
+    pull(max_PAR_active_X3_21_22), pull(max_Y_active_X3_21_22), pull(mean_Y_active_X3_21_22),
+    pull(mean_ETR_active_X3_21_22), pull(max_ETR_active_X3_21_22), 0, 0, 0, 0
+  ),
+  year_22_23 = c(
+    pull(total_active_hours_22_23_X3), pull(Percentage_active_hours_22_23_X3), pull(mean_Temp_X3_22_23), 
+    pull(min_Temp_X3_22_23), pull(max_Temp_X3_22_23), pull(mean_Temp_active_X3_22_23), 
+    pull(min_Temp_active_X3_22_23), pull(max_Temp_active_X3_22_23), pull(mean_PAR_active_X3_22_23), 
+    pull(max_PAR_active_X3_22_23), pull(max_Y_active_X3_22_23), pull(mean_Y_active_X3_22_23),
+    pull(mean_ETR_active_X3_22_23), pull(max_ETR_active_X3_22_23), 0, 0, 0, 0
+  ))
+
+ write.xlsx(table_austroplaca, file = "stats/austroplaca/table_austroplaca.xlsx") # save table 
+
+ # Bryum X1
+ 
+ table_bryum_x1 <- data.frame(
+   Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active", 
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR", 
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  year_19_20 = c(
+    pull(total_active_hours_19_20_X1), pull(Percentage_active_hours_19_20_X1), 
+    pull(mean_Temp_X1_19_20), pull(min_Temp_X1_19_20), pull(max_Temp_X1_19_20), 
+    pull(mean_Temp_active_X1_19_20), pull(min_Temp_active_X1_19_20), 
+    pull(max_Temp_active_X1_19_20), pull(mean_PAR_active_X1_19_20), 
+    pull(max_PAR_active_X1_19_20), pull(max_Y_active_X1_19_20), 
+    pull(mean_Y_active_X1_19_20), pull(mean_ETR_active_X1_19_20), 
+    pull(max_ETR_active_X1_19_20), 0, 0, 0, 0
+  ),
+  year_20_21 = c(
+    pull(total_active_hours_20_21_X1), pull(Percentage_active_hours_20_21_X1), pull(mean_Temp_X1_20_21), 
+    pull(min_Temp_X1_20_21), pull(max_Temp_X1_20_21), pull(mean_Temp_active_X1_20_21), 
+    pull(min_Temp_active_X1_20_21), pull(max_Temp_active_X1_20_21), pull(mean_PAR_active_X1_20_21), 
+    pull(max_PAR_active_X1_20_21), pull(max_Y_active_X1_20_21), pull(mean_Y_active_X1_20_21),
+    pull(mean_ETR_active_X1_20_21), pull(max_ETR_active_X1_20_21), 0, 0, 0, 0
+  ),
+  year_21_22 = c(
+    pull(total_active_hours_21_22_X1), pull(Percentage_active_hours_21_22_X1), pull(mean_Temp_X1_21_22), 
+    pull(min_Temp_X1_21_22), pull(max_Temp_X1_21_22), pull(mean_Temp_active_X1_21_22), 
+    pull(min_Temp_active_X1_21_22), pull(max_Temp_active_X1_21_22), pull(mean_PAR_active_X1_21_22), 
+    pull(max_PAR_active_X1_21_22), pull(max_Y_active_X1_21_22), pull(mean_Y_active_X1_21_22),
+    pull(mean_ETR_active_X1_21_22), pull(max_ETR_active_X1_21_22), 0, 0, 0, 0
+  ),
+  year_22_23 = c(
+    pull(total_active_hours_22_23_X1), pull(Percentage_active_hours_22_23_X1), pull(mean_Temp_X1_22_23), 
+    pull(min_Temp_X1_22_23), pull(max_Temp_X1_22_23), pull(mean_Temp_active_X1_22_23), 
+    pull(min_Temp_active_X1_22_23), pull(max_Temp_active_X1_22_23), pull(mean_PAR_active_X1_22_23), 
+    pull(max_PAR_active_X1_22_23), pull(max_Y_active_X1_22_23), pull(mean_Y_active_X1_22_23),
+    pull(mean_ETR_active_X1_22_23), pull(max_ETR_active_X1_22_23), 0, 0, 0, 0
+  ))
+ 
+  write.xlsx(table_bryum_x1, file = "stats/bryum/table_bryum_x1.xlsx") # save table 
+  
+ # Bryum X2
+ 
+ table_bryum_X2 <- data.frame(
+   Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active", 
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR", 
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  year_19_20 = c(
+    pull(total_active_hours_19_20_X2), pull(Percentage_active_hours_19_20_X2), 
+    pull(mean_Temp_X2_19_20), pull(min_Temp_X2_19_20), pull(max_Temp_X2_19_20), 
+    pull(mean_Temp_active_X2_19_20), pull(min_Temp_active_X2_19_20), 
+    pull(max_Temp_active_X2_19_20), pull(mean_PAR_active_X2_19_20), 
+    pull(max_PAR_active_X2_19_20), pull(max_Y_active_X2_19_20), 
+    pull(mean_Y_active_X2_19_20), pull(mean_ETR_active_X2_19_20), 
+    pull(max_ETR_active_X2_19_20), 0, 0, 0, 0
+  ),
+  year_20_21 = c(
+    pull(total_active_hours_20_21_X2), pull(Percentage_active_hours_20_21_X2), pull(mean_Temp_X2_20_21), 
+    pull(min_Temp_X2_20_21), pull(max_Temp_X2_20_21), pull(mean_Temp_active_X2_20_21), 
+    pull(min_Temp_active_X2_20_21), pull(max_Temp_active_X2_20_21), pull(mean_PAR_active_X2_20_21), 
+    pull(max_PAR_active_X2_20_21), pull(max_Y_active_X2_20_21), pull(mean_Y_active_X2_20_21),
+    pull(mean_ETR_active_X2_20_21), pull(max_ETR_active_X2_20_21), 0, 0, 0, 0
+  ),
+  year_21_22 = c(
+    pull(total_active_hours_21_22_X2), pull(Percentage_active_hours_21_22_X2), pull(mean_Temp_X2_21_22), 
+    pull(min_Temp_X2_21_22), pull(max_Temp_X2_21_22), pull(mean_Temp_active_X2_21_22), 
+    pull(min_Temp_active_X2_21_22), pull(max_Temp_active_X2_21_22), pull(mean_PAR_active_X2_21_22), 
+    pull(max_PAR_active_X2_21_22), pull(max_Y_active_X2_21_22), pull(mean_Y_active_X2_21_22),
+    pull(mean_ETR_active_X2_21_22), pull(max_ETR_active_X2_21_22), 0, 0, 0, 0
+  ),
+  year_22_23 = c(
+    pull(total_active_hours_22_23_X2), pull(Percentage_active_hours_22_23_X2), pull(mean_Temp_X2_22_23), 
+    pull(min_Temp_X2_22_23), pull(max_Temp_X2_22_23), pull(mean_Temp_active_X2_22_23), 
+    pull(min_Temp_active_X2_22_23), pull(max_Temp_active_X2_22_23), pull(mean_PAR_active_X2_22_23), 
+    pull(max_PAR_active_X2_22_23), pull(max_Y_active_X2_22_23), pull(mean_Y_active_X2_22_23),
+    pull(mean_ETR_active_X2_22_23), pull(max_ETR_active_X2_22_23), 0, 0, 0, 0
+  ))
+ 
+  write.xlsx(table_bryum_X2, file = "stats/bryum/table_bryum_X2.xlsx") # save table  
+  
+# Bryum X4
+ 
+ table_bryum_X4 <- data.frame(
+   Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active", 
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR", 
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  year_19_20 = c(
+    pull(total_active_hours_19_20_X4), pull(Percentage_active_hours_19_20_X4), 
+    pull(mean_Temp_X4_19_20), pull(min_Temp_X4_19_20), pull(max_Temp_X4_19_20), 
+    pull(mean_Temp_active_X4_19_20), pull(min_Temp_active_X4_19_20), 
+    pull(max_Temp_active_X4_19_20), pull(mean_PAR_active_X4_19_20), 
+    pull(max_PAR_active_X4_19_20), pull(max_Y_active_X4_19_20), 
+    pull(mean_Y_active_X4_19_20), pull(mean_ETR_active_X4_19_20), 
+    pull(max_ETR_active_X4_19_20), 0, 0, 0, 0
+  ),
+  year_20_21 = c(
+    pull(total_active_hours_20_21_X4), pull(Percentage_active_hours_20_21_X4), pull(mean_Temp_X4_20_21), 
+    pull(min_Temp_X4_20_21), pull(max_Temp_X4_20_21), pull(mean_Temp_active_X4_20_21), 
+    pull(min_Temp_active_X4_20_21), pull(max_Temp_active_X4_20_21), pull(mean_PAR_active_X4_20_21), 
+    pull(max_PAR_active_X4_20_21), pull(max_Y_active_X4_20_21), pull(mean_Y_active_X4_20_21),
+    pull(mean_ETR_active_X4_20_21), pull(max_ETR_active_X4_20_21), 0, 0, 0, 0
+  ),
+  year_21_22 = c(
+    pull(total_active_hours_21_22_X4), pull(Percentage_active_hours_21_22_X4), pull(mean_Temp_X4_21_22), 
+    pull(min_Temp_X4_21_22), pull(max_Temp_X4_21_22), pull(mean_Temp_active_X4_21_22), 
+    pull(min_Temp_active_X4_21_22), pull(max_Temp_active_X4_21_22), pull(mean_PAR_active_X4_21_22), 
+    pull(max_PAR_active_X4_21_22), pull(max_Y_active_X4_21_22), pull(mean_Y_active_X4_21_22),
+    pull(mean_ETR_active_X4_21_22), pull(max_ETR_active_X4_21_22), 0, 0, 0, 0
+  ),
+  year_22_23 = c(
+    pull(total_active_hours_22_23_X4), pull(Percentage_active_hours_22_23_X4), pull(mean_Temp_X4_22_23), 
+    pull(min_Temp_X4_22_23), pull(max_Temp_X4_22_23), pull(mean_Temp_active_X4_22_23), 
+    pull(min_Temp_active_X4_22_23), pull(max_Temp_active_X4_22_23), pull(mean_PAR_active_X4_22_23), 
+    pull(max_PAR_active_X4_22_23), pull(max_Y_active_X4_22_23), pull(mean_Y_active_X4_22_23),
+    pull(mean_ETR_active_X4_22_23), pull(max_ETR_active_X4_22_23), 0, 0, 0, 0
+  ))
+ 
+  write.xlsx(table_bryum_X4, file = "stats/bryum/table_bryum_X4.xlsx") # save table 
+  
+# Bryum Average
+ 
+ table_bryum_average <- data.frame(
+   Category = c(
+    "Total active hours", "% active hours", "Average Thallus temp", "Min Thallus temp",
+    "Max Thallus temp", "Average Thallus temp active", "Min Thallus temp active", 
+    "Max Thallus temp active", "PAR", "Max Par", "MAX Yield", "Yield", "ETR", 
+    "Max ETR", "mean air T", "min air T", "max air T", "RH (%)"
+  ),
+  year_19_20 = c(
+    pull(total_active_hours_19_20_moss), pull(Percentage_active_hours_19_20_moss), 
+    pull(mean_Temp_X4_19_20), pull(min_Temp_moss_19_20), pull(max_Temp_moss_19_20), 
+    pull(mean_Temp_active_moss_19_20), pull(min_Temp_active_moss_19_20), 
+    pull(max_Temp_active_moss_19_20), pull(mean_PAR_active_moss_19_20), 
+    pull(max_PAR_active_moss_19_20), pull(max_Y_active_moss_19_20), 
+    pull(mean_Y_active_moss_19_20), pull(mean_ETR_active_moss_19_20), 
+    pull(max_ETR_active_moss_19_20), 0, 0, 0, 0
+  ),
+  year_20_21 = c(
+    pull(total_active_hours_20_21_moss), pull(Percentage_active_hours_20_21_moss), pull(mean_Temp_X4_20_21), 
+    pull(min_Temp_moss_20_21), pull(max_Temp_moss_20_21), pull(mean_Temp_active_moss_20_21), 
+    pull(min_Temp_active_moss_20_21), pull(max_Temp_active_moss_20_21), pull(mean_PAR_active_moss_20_21), 
+    pull(max_PAR_active_moss_20_21), pull(max_Y_active_moss_20_21), pull(mean_Y_active_moss_20_21),
+    pull(mean_ETR_active_moss_20_21), pull(max_ETR_active_moss_20_21), 0, 0, 0, 0
+  ),
+  year_21_22 = c(
+    pull(total_active_hours_21_22_moss), pull(Percentage_active_hours_21_22_moss), pull(mean_Temp_X4_21_22), 
+    pull(min_Temp_moss_21_22), pull(max_Temp_moss_21_22), pull(mean_Temp_active_moss_21_22), 
+    pull(min_Temp_active_moss_21_22), pull(max_Temp_active_moss_21_22), pull(mean_PAR_active_moss_21_22), 
+    pull(max_PAR_active_moss_21_22), pull(max_Y_active_moss_21_22), pull(mean_Y_active_moss_21_22),
+    pull(mean_ETR_active_moss_21_22), pull(max_ETR_active_moss_21_22), 0, 0, 0, 0
+  ),
+  year_22_23 = c(
+    pull(total_active_hours_22_23_moss), pull(Percentage_active_hours_22_23_moss), pull(mean_Temp_X4_22_23), 
+    pull(min_Temp_moss_22_23), pull(max_Temp_moss_22_23), pull(mean_Temp_active_moss_22_23), 
+    pull(min_Temp_active_moss_22_23), pull(max_Temp_active_moss_22_23), pull(mean_PAR_active_moss_22_23), 
+    pull(max_PAR_active_moss_22_23), pull(max_Y_active_moss_22_23), pull(mean_Y_active_moss_22_23),
+    pull(mean_ETR_active_moss_22_23), pull(max_ETR_active_moss_22_23), 0, 0, 0, 0
+  ))
+ 
+  write.xlsx(table_bryum_average, file = "stats/bryum/table_bryum_average.xlsx") # save table 
+```
 
