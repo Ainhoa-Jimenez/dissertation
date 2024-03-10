@@ -95,7 +95,7 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
 ```{r}
 # Active time each month
 
-month_activetime_stats_X3 <- bind_rows(
+(month_activetime_stats_X3 <- bind_rows(
   summer_19_20 %>% filter(Month == 11) %>% count(Condition = X3.Y > 0, name = "Count_19_20_nov"),
   summer_19_20 %>% filter(Month == 12) %>% count(Condition = X3.Y > 0, name = "Count_19_20_dec"),
   summer_19_20 %>% filter(Month == 1) %>% count(Condition = X3.Y > 0, name = "Count_19_20_jan"),
@@ -114,7 +114,10 @@ month_activetime_stats_X3 <- bind_rows(
   summer_22_23 %>% filter(Month == 2) %>% count(Condition = X3.chosen_yield > 0, name = "Count_22_23_feb")) %>% 
   group_by(Condition) %>% 
     mutate_all(~ifelse(is.na(.), 0, .)) %>% 
- summarise_all(sum)
+ summarise_all(sum))
+
+write.xlsx(month_activetime_stats_X3, file = "stats/austroplaca/month_activetime_stats_X3.xlsx") # save table
+
 
 (total_active_hours_19_20_nov_X3 <- month_activetime_stats_X3 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
@@ -819,52 +822,65 @@ min_ETR_active_X3 <- mean_ETR_active_X3_data %>%
 #### 5.3. Monthly yield
 
 ```{r}
-(month_Y_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
+(month_Y_stats_X3_2 <- bind_rows(  # Monthly stats fro total measuring period
   summer_20_21 %>% filter(Month == 11),
   summer_20_21 %>% filter(Month == 12),
   summer_20_21 %>% filter(Month == 1),
   summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
   summer_22_23 %>% filter(Month == 11),
   summer_22_23 %>% filter(Month == 12),
   summer_22_23 %>% filter(Month == 1),
   summer_22_23 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X3.Y),
+ summarise(mean_Y= mean(X3.chosen_yield),
+            max_Y = max(X3.chosen_yield),  # get the maximum temperature
+            min_Y = min(X3.chosen_yield)))
+
+(month_Y_stats_X3_1 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2)) %>% 
+  group_by(Year, Month) %>% 
+summarise(mean_Y= mean(X3.Y),
             max_Y = max(X3.Y),  # get the maximum temperature
             min_Y = min(X3.Y)))
+month_Y_stats_X3 <- bind_rows(month_Y_stats_X3_1, month_Y_stats_X3_2)
 
 write.xlsx(month_Y_stats_X3, file = "stats/austroplaca/month_Y_stats_X3.xlsx") # save table
 
-
-(month_ETR_stats_X3 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
+(month_ETR_stats_X3_2 <- bind_rows(  # Monthly stats fro total measuring period
   summer_20_21 %>% filter(Month == 11),
   summer_20_21 %>% filter(Month == 12),
   summer_20_21 %>% filter(Month == 1),
   summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
   summer_22_23 %>% filter(Month == 11),
   summer_22_23 %>% filter(Month == 12),
   summer_22_23 %>% filter(Month == 1),
   summer_22_23 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X3.ETR),
+ summarise(mean_ETR= mean(X3.chosen_ETR),
+            max_ETR = max(X3.chosen_ETR),  # get the maximum temperature
+            min_ETR = min(X3.chosen_ETR)))
+
+(month_ETR_stats_X3_1 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2)) %>% 
+  group_by(Year, Month) %>% 
+summarise(mean_ETR= mean(X3.ETR),
             max_ETR = max(X3.ETR),  # get the maximum temperature
             min_ETR = min(X3.ETR)))
+month_ETR_stats_X3 <- bind_rows(month_ETR_stats_X3_1, month_ETR_stats_X3_2)
 
 write.xlsx(month_ETR_stats_X3, file = "stats/austroplaca/month_ETR_stats_X3.xlsx") # save table
 ```
@@ -983,6 +999,8 @@ month_activetime_stats_X1 <- bind_rows(
   group_by(Condition) %>% 
     mutate_all(~ifelse(is.na(.), 0, .)) %>% 
  summarise_all(sum)
+
+write.xlsx(month_activetime_stats_X1, file = "stats/bryum/month_activetime_stats_X1.xlsx") # save table
 
 # filter from the dataset the total number of active hours
 
@@ -1833,6 +1851,8 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
  summarise_all(sum) %>% 
    filter(Condition == TRUE))
 
+write.xlsx(month_activetime_stats_X2, file = "stats/bryum/month_activetime_stats_X2.xlsx") # save table
+
 
 (total_active_hours_19_20_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
@@ -2673,6 +2693,7 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
  summarise_all(sum) %>% 
    filter(Condition == TRUE))
 
+write.xlsx(month_activetime_stats_X4, file = "stats/bryum/month_activetime_stats_X4.xlsx") # save table
 
 (total_active_hours_19_20_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
   select(Count_19_20_nov))
@@ -3340,7 +3361,7 @@ min_ETR_active_X4 <- mean_ETR_active_X4_data %>%
 #### 5.3. Monthly
 
 ```{r}
-(month_Y_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
+(month_Y_stats_X4_1 <- bind_rows(  # Monthly stats fro total measuring period
   summer_19_20 %>% filter(Month == 11),
   summer_19_20 %>% filter(Month == 12),
   summer_19_20 %>% filter(Month == 1),
@@ -3348,31 +3369,13 @@ min_ETR_active_X4 <- mean_ETR_active_X4_data %>%
   summer_20_21 %>% filter(Month == 11),
   summer_20_21 %>% filter(Month == 12),
   summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
-  summer_21_22 %>% filter(Month == 11),
-  summer_21_22 %>% filter(Month == 12),
-  summer_21_22 %>% filter(Month == 1),
-  summer_21_22 %>% filter(Month == 2),
-  summer_22_23 %>% filter(Month == 11),
-  summer_22_23 %>% filter(Month == 12),
-  summer_22_23 %>% filter(Month == 1),
-  summer_22_23 %>% filter(Month == 2)) %>% 
+  summer_20_21 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
  summarise(mean_Y= mean(X4.Y),
             max_Y = max(X4.Y),  # get the maximum temperature
             min_Y = min(X4.Y)))
 
-write.xlsx(month_Y_stats_X4, file = "stats/bryum/month_Y_stats_X4.xlsx") # save table
-
-(month_ETR_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
-  summer_19_20 %>% filter(Month == 11),
-  summer_19_20 %>% filter(Month == 12),
-  summer_19_20 %>% filter(Month == 1),
-  summer_19_20 %>% filter(Month == 2),
-  summer_20_21 %>% filter(Month == 11),
-  summer_20_21 %>% filter(Month == 12),
-  summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2),
+(month_Y_stats_X4_2 <- bind_rows(
   summer_21_22 %>% filter(Month == 11),
   summer_21_22 %>% filter(Month == 12),
   summer_21_22 %>% filter(Month == 1),
@@ -3382,9 +3385,43 @@ write.xlsx(month_Y_stats_X4, file = "stats/bryum/month_Y_stats_X4.xlsx") # save 
   summer_22_23 %>% filter(Month == 1),
   summer_22_23 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
+ summarise(mean_Y= mean(X4.chosen_yield),
+            max_Y = max(X4.chosen_yield),  # get the maximum temperature
+            min_Y = min(X4.chosen_yield)))
+
+month_Y_stats_X4 <- bind_rows(month_Y_stats_X4_1, month_Y_stats_X4_2)
+
+write.xlsx(month_Y_stats_X4, file = "stats/bryum/month_Y_stats_X4.xlsx") # save table
+
+(month_ETR_stats_X4_1 <- bind_rows(  # Monthly stats fro total measuring period
+  summer_19_20 %>% filter(Month == 11),
+  summer_19_20 %>% filter(Month == 12),
+  summer_19_20 %>% filter(Month == 1),
+  summer_19_20 %>% filter(Month == 2),
+  summer_20_21 %>% filter(Month == 11),
+  summer_20_21 %>% filter(Month == 12),
+  summer_20_21 %>% filter(Month == 1),
+  summer_20_21 %>% filter(Month == 2)) %>% 
+   group_by(Year, Month) %>% 
  summarise(mean_ETR= mean(X4.ETR),
             max_ETR = max(X4.ETR),  # get the maximum temperature
             min_ETR = min(X4.ETR)))
+
+(month_ETR_stats_X4_2 <- bind_rows(  # Monthly stats fro total measuring period
+summer_21_22 %>% filter(Month == 11),
+  summer_21_22 %>% filter(Month == 12),
+  summer_21_22 %>% filter(Month == 1),
+  summer_21_22 %>% filter(Month == 2),
+  summer_22_23 %>% filter(Month == 11),
+  summer_22_23 %>% filter(Month == 12),
+  summer_22_23 %>% filter(Month == 1),
+  summer_22_23 %>% filter(Month == 2)) %>% 
+   group_by(Year, Month) %>% 
+ summarise(mean_ETR= mean(X4.chosen_ETR),
+            max_ETR = max(X4.chosen_ETR),  # get the maximum temperature
+            min_ETR = min(X4.chosen_ETR)))
+
+month_ETR_stats_X4 <- bind_rows(month_ETR_stats_X4_1, month_ETR_stats_X4_2)
 
 write.xlsx(month_ETR_stats_X4, file = "stats/bryum/month_ETR_stats_X4.xlsx") # save table
 
@@ -4056,14 +4093,14 @@ write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save 
     pull(max_ETR_active_X1), 0, 0, 0, 0
   ),
   Bryum_X2 = c(
-    pull(total_active_hours_19_20_X2), pull(Percentage_active_hours_19_20_X2),
-    pull(mean_Temp_X2_19_20), pull(min_Temp_X2_19_20), pull(max_Temp_X2_19_20),
-    pull(mean_Temp_active_X2_19_20), pull(min_Temp_active_X2_19_20),
-    pull(max_Temp_active_X2_19_20), pull(mean_PAR_active_X2_19_20),
-    pull(max_PAR_active_X2_19_20), pull(max_Y_active_X2_19_20),
-    pull(mean_Y_active_X2_19_20), pull(mean_ETR_active_X2_19_20),
-    pull(max_ETR_active_X2_19_20), 0, 0, 0, 0
-  ),
+    pull(total_active_hours_X2), pull(Percentage_active_hours_X2), 
+    pull(mean_Temp_X2), pull(min_Temp_X2), pull(max_Temp_X2),
+    pull(mean_Temp_active_X2), pull(min_Temp_active_X2),
+    pull(max_Temp_active_X2), pull(mean_PAR_active_X2),
+    pull(max_PAR_active_X2), pull(max_Y_active_X2),
+    pull(mean_Y_active_X2), pull(mean_ETR_active_X2),
+    pull(max_ETR_active_X2), 0, 0, 0, 0
+    ),
  Bryum_X4 = c(
     pull(total_active_hours_X4), pull(Percentage_active_hours_X4),
     pull(mean_Temp_X4), pull(min_Temp_X4), pull(max_Temp_X4),
@@ -4083,7 +4120,7 @@ write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save 
     pull(max_ETR_active_moss), 0, 0, 0, 0
   )))
  
-write.xlsx(table_2019_2020, file = "stats/general/table_general.xlsx") # save table
+write.xlsx(table_general, file = "stats/general/table_general.xlsx") # save table
 ```
  
 ## 10.2. Create a table with all the values of each summer to compare
@@ -4117,13 +4154,13 @@ table_2019_2020 <- data.frame(
     pull(max_ETR_active_X1_19_20), 0, 0, 0, 0
   ),
   Bryum_X2 = c(
-     pull(total_active_hours_X2), pull(Percentage_active_hours_X2), # pull removes thee value from the tibble
-    pull(mean_Temp_X2), pull(min_Temp_X2), pull(max_Temp_X2), 
-    pull(mean_Temp_active_X2), pull(min_Temp_active_X2), 
-    pull(max_Temp_active_X2), pull(mean_PAR_active_X2), 
-    pull(max_PAR_active_X2), pull(max_Y_active_X2), 
-    pull(mean_Y_active_X2), pull(mean_ETR_active_X2), 
-    pull(max_ETR_active_X2), 0, 0, 0, 0
+    pull(total_active_hours_19_20_X2), pull(Percentage_active_hours_19_20_X2), 
+    pull(mean_Temp_X2_19_20), pull(min_Temp_X2_19_20), pull(max_Temp_X2_19_20), 
+    pull(mean_Temp_active_X2_19_20), pull(min_Temp_active_X2_19_20), 
+    pull(max_Temp_active_X2_19_20), pull(mean_PAR_active_X2_19_20), 
+    pull(max_PAR_active_X2_19_20), pull(max_Y_active_X2_19_20), 
+    pull(mean_Y_active_X2_19_20), pull(mean_ETR_active_X2_19_20), 
+    pull(max_ETR_active_X2_19_20), 0, 0, 0, 0
   ),
   Bryum_X4 = c(
     pull(total_active_hours_19_20_X4), pull(Percentage_active_hours_19_20_X4), 
