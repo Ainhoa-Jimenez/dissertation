@@ -3311,10 +3311,10 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_rou
 
 ```{r}
 (combined_plot_19_23 <- ( (yield_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/ # use ggarrange to move legend 
-  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/
+  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), legend.position = "none"))/
   (air_temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/
   ( RH_year_round_19_23 +theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/
-  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1, guides = "collect")) & theme(legend.position = 'bottom'))
+  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1)))
 
 #(combined_plot_19_23 <- ggarrange( (yield_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())), # use ggarrange to move legend 
 #  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), legend.position = "none")),
@@ -3365,7 +3365,7 @@ data_yield_rh <- full_join(data_clean %>%  # we want to plant info from differen
     filter(Date_no_time > as.Date("16/01/2019", format = "%d/%m/%Y"),
            Date_no_time < as.Date("31/10/2022", format = "%d/%m/%Y")))
 
-(graph_rh_y_all_period <- data_yield_rh %>%  #
+(graph_rh_y_all_period_X3 <- data_yield_rh %>%  #
   ggplot() + 
   geom_point(aes( Rhmean, X3.chosen_yield, color = "Austroplaca soropelta", fill = "Austroplaca soropelta", alpha = 0.1)) +
     # geom_polygon(aes(Rhmean, X3.chosen_yield, alpha = 0.1)) +
@@ -3376,7 +3376,7 @@ data_yield_rh <- full_join(data_clean %>%  # we want to plant info from differen
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
   
-(graph_rh_y_all_period_X3 <- data_yield_rh %>% 
+#(graph_rh_y_all_period_X3 <- data_yield_rh %>% 
   ggplot() + 
   # geom_point(aes( Rhmean, X3.chosen_yield, color = "Austroplaca soropelta", fill = "Austroplaca soropelta", alpha = 0.1)) +
  geom_polygon(aes(Rhmean, X3.chosen_yield, alpha = 0.1)) +
@@ -3398,7 +3398,7 @@ ggsave(filename = "graphs_characterise/austroplaca/graph_rh_y_all_period_X3.png"
   ggplot(aes(av_moss_temp, av_moss_yield, color = "Bryum argemteum")) +
   geom_point() +
   theme_graphs_env_cond()+
-  labs(x = "\nTemperature ºC", y = "Yield Lichen X3 ") +
+  labs(x = "\nTemperature ºC", y = "Yield Average moss ") +
    scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
@@ -3409,7 +3409,7 @@ ggsave(filename = "graphs_characterise/bryum/graph_temp_y_all_period_X1.png", gr
   ggplot(aes(av_moss_temp, av_moss_yield, color = "Bryum argemteum")) +
   geom_point() +
   theme_graphs_env_cond()+
-  labs(x = "\nTemperature ºC", y = "Yield Lichen X3 ") +
+  labs(x = "\nTemperature ºC", y = "Yield average moss ") +
      scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
   theme(axis.text.x = element_text(angle = 0)))
 
@@ -3424,7 +3424,7 @@ ggsave(filename = "graphs_characterise/bryum/graph_temp_y_22_23_X1.png", graph_t
   geom_point(aes( Rhmean, X1.Y, color = "Bryum argemteum", fill = "Austroplaca soropelta", alpha = 0.1)) +
     # geom_polygon(aes(Rhmean, X3.chosen_yield, alpha = 0.1)) +
   theme_graphs_env_cond()+
-  labs(x = "\nRH %", y = "Yield Lichen X3 ") +
+  labs(x = "\nRH %", y = "Yield average moss ") +
     scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
     scale_fill_manual(values = "transparent") +
   theme(axis.text.x = element_text(angle = 0),
@@ -4861,4 +4861,56 @@ Snowfall end of the year
 
 no activity sin jan and no snow until teh end of feb
 
+
+
+## 14. Graphs results
+
+```{r}
+(temp_plot_19_20_results <- summer_19_20 %>% 
+   ggplot() +
+   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta")) +  # add a line that joins the points
+   geom_line(aes(Date, X1.Temp, color = "Bryum argemteum")) +  # add a line that joins the points           
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \n(ºC) X3 ") +
+   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+   theme_graphs_env_cond()+
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))
+
+(PAR_plot_19_20_results <- summer_19_20 %>% 
+   ggplot() +
+   geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) +  # add a line that joins the points
+   geom_line(aes(Date, X1.PAR, color = "Bryum argemteum")) +  # add a line that joins the points
+   labs(x = "\nDate 2019-2020 (day)", y = "PAR X3\n(µmol m-2 s^-1)") +
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+    scale_x_datetime(date_breaks = "1 week", date_labels = "%d %m %Y") +
+   theme_graphs_env_cond())
+
+(Yield_plot_19_20_results<- summer_19_20 %>% 
+   ggplot() +
+   geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta"))+  # Add a line that joins the points
+   geom_line(aes(Date, X1.Y, color = "Bryum argemteum"))+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_19_20_results <- summer_19_20 %>% 
+   ggplot() +
+   geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta"))+  # Add a line that joins the points
+   geom_line(aes(Date, X1.ETR, color = "Bryum argemteum"))+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+
+(combined_plot_19_20_results <- (ETR_plot_19_20_results/Yield_plot_19_20_results/temp_plot_19_20_results/(PAR_plot_19_20_results + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1))) 
+
+ggsave(filename = "graphs_characterise/combined_plot_19_20_results.png", combined_plot_19_20_results, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+
+```
+```
 
