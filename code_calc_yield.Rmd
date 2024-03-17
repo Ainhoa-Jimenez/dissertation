@@ -35,6 +35,7 @@ library(patchwork)  # combine plots
 library(hms)  # use function as.Time()
 library(openxlsx) # write.xlsx 
 library(ggpubr)  # combine plots
+library(viridis)  # colorblid friendly palette
 ```
 2.2. Creates functions
 
@@ -4870,53 +4871,7 @@ no activity sin jan and no snow until teh end of feb
 
 ## 14. Graphs results
 
-```{r}
-(temp_plot_19_20_results <- summer_19_20 %>% 
-   ggplot() +
-   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta")) +  # add a line that joins the points
-   geom_line(aes(Date, X1.Temp, color = "Bryum argemteum")) +  # add a line that joins the points           
-   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature \n(ºC) X3 ") +
-   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
-   theme_graphs_env_cond()+
-   theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))
 
-(PAR_plot_19_20_results <- summer_19_20 %>% 
-   ggplot() +
-   geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) +  # add a line that joins the points
-   geom_line(aes(Date, X1.PAR, color = "Bryum argemteum")) +  # add a line that joins the points
-   labs(x = "\nDate 2019-2020 (day)", y = "PAR X3\n(µmol m-2 s^-1)") +
-  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
-    scale_x_datetime(date_breaks = "1 week", date_labels = "%d %m %Y") +
-   theme_graphs_env_cond())
-
-(Yield_plot_19_20_results<- summer_19_20 %>% 
-   ggplot() +
-   geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta"))+  # Add a line that joins the points
-   geom_line(aes(Date, X1.Y, color = "Bryum argemteum"))+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
-    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
-
-(ETR_plot_19_20_results <- summer_19_20 %>% 
-   ggplot() +
-   geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta"))+  # Add a line that joins the points
-   geom_line(aes(Date, X1.ETR, color = "Bryum argemteum"))+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
-    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
-   theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
-
-
-(combined_plot_19_20_results <- (ETR_plot_19_20_results/Yield_plot_19_20_results/temp_plot_19_20_results/(PAR_plot_19_20_results + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1))) 
-
-ggsave(filename = "graphs_characterise/combined_plot_19_20_results.png", combined_plot_19_20_results, width = 54,height = 18, units = "cm", device = "png")  # Save graph
-
-```
 
 ```{r}
 (temp_plot_21_22_results <- summer_21_22 %>% 
@@ -4956,6 +4911,7 @@ ggsave(filename = "graphs_characterise/combined_plot_19_20_results.png", combine
    labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
     scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
    theme_graphs_env_cond() +
+      ylim(0, 0.8) +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
@@ -4975,3 +4931,286 @@ ggsave(filename = "graphs_characterise/combined_plot_19_20_results.png", combine
 ggsave(filename = "graphs_characterise/combined_plot_21_22_results.png", combined_plot_21_22_results, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 
 ```
+Snowmelt- 11th dec
+
+```{r}
+(temp_plot_21_22_undersnow_11_dec <- summer_21_22 %>% 
+   filter (Day_cum > 44537 & Day_cum < 44544) %>%  # filter the 13th 14th of feb
+   ggplot() + 
+   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta"))+  # add a line that joins the points
+    geom_line(aes(Date, X1.Temp, color = "Bryum argemteum X1"))+  # add a line that joins the points
+    geom_line(aes(Date, X2.Temp, color = "Bryum argemteum X2"))+  # add a line that joins the points
+    geom_line(aes(Date, X4.Temp, color = "Bryum argemteum X4"))+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4")) +
+   labs(x = "\nDate (day)", y = "Thallus \nTemperature \n(ºC) X3 ") +
+   theme_graphs_env_cond()+
+   ylim(-10, 10) +
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+         legend.position = "none"))
+
+(PAR_plot_21_22_undersnow_11_dec <- summer_21_22 %>%
+  filter (Day_cum > 44537 & Day_cum < 44544) %>% # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.PAR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.PAR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.PAR, color = "Bryum argemteum X4", alpha = 0.5)) + # add a line that joins the points
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+  ylim(0, 1500) +
+  labs(x = "\nDate 2021-2022 (day-month-year)", y = "PAR X3\n(µmol m-2 s^-1)") +
+  theme_graphs_env_cond() +
+    theme(legend.position = "bottom"))
+
+(Yield_plot_21_22_undersnow_11_dec <- summer_21_22 %>% 
+  filter (Day_cum > 44537 & Day_cum < 44544) %>%  # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.Y, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.Y, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+    ylim(0, 0.8) +
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(ETR_plot_21_22_undersnow_11_dec <- summer_21_22 %>% 
+  filter (Day_cum > 44537 & Day_cum < 44544) %>%  # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.ETR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.ETR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_ETR, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+   ylim(0, 150) +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(combined_plot_21_22_undersnow_11_dec <- (ETR_plot_21_22_undersnow_11_dec
+                                         /Yield_plot_21_22_undersnow_11_dec
+                                         /temp_plot_21_22_undersnow_11_dec
+                                         /PAR_plot_21_22_undersnow_11_dec) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_11_dec.png", combined_plot_21_22_undersnow_11_dec, width = 40,height = 20, units = "cm",device = "png")  # Save graph
+```
+ Snowfall 31st December
+
+```{r}
+(temp_plot_21_22_undersnow_31_dec <- summer_21_22 %>% 
+   filter (Day_cum > 44559 & Day_cum < 44563) %>%  # filter the 13th 14th of feb
+   ggplot() + 
+   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta"))+  # add a line that joins the points
+    geom_line(aes(Date, X1.Temp, color = "Bryum argemteum X1"))+  # add a line that joins the points
+    geom_line(aes(Date, X2.Temp, color = "Bryum argemteum X2"))+  # add a line that joins the points
+    geom_line(aes(Date, X4.Temp, color = "Bryum argemteum X4"))+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4")) +
+   labs(x = "\nDate (day)", y = "Thallus \nTemperature \n(ºC) X3 ") +
+   theme_graphs_env_cond()+
+   ylim(-10, 10) +
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()) +
+   theme(legend.position = "none"))
+
+(PAR_plot_21_22_undersnow_31_dec <- summer_21_22 %>%
+  filter (Day_cum > 44559 & Day_cum < 44563) %>% # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.PAR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.PAR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.PAR, color = "Bryum argemteum X4", alpha = 0.5)) + # add a line that joins the points
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+  ylim(0, 1500) +
+  labs(x = "\nDate 2021-2022 (day-month-year)", y = "PAR X3\n(µmol m-2 s^-1)") +
+  theme_graphs_env_cond() +
+    theme(legend.position = "bottom"))
+
+(Yield_plot_21_22_undersnow_31_dec <- summer_21_22 %>% 
+  filter (Day_cum > 44559 & Day_cum < 44563) %>%  # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.Y, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.Y, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+    ylim(0, 0.8) +
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(ETR_plot_21_22_undersnow_31_dec <- summer_21_22 %>% 
+  filter (Day_cum > 44559 & Day_cum < 44563) %>%  # filter the 13th 14th of feb
+  ggplot() +
+  geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.ETR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.ETR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_ETR, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+   ylim(0, 150) +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(combined_plot_21_22_undersnow_31_dec <- (ETR_plot_21_22_undersnow_31_dec
+                                         /Yield_plot_21_22_undersnow_31_dec
+                                         /temp_plot_21_22_undersnow_31_dec
+                                         /PAR_plot_21_22_undersnow_31_dec) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_31_dec.png", combined_plot_21_22_undersnow_31_dec, width = 40,height = 20, units = "cm",device = "png")  # Save graph
+
+```
+
+Snowfall end of the year
+
+No activity under snow
+
+
+```{r}
+(temp_plot_21_22_undersnow_16_feb <- summer_21_22 %>% 
+   filter (Day_cum > 44605 & Day_cum < 44612) %>%  # filter the 15th 21nd of feb
+   ggplot() + 
+   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta"))+  # add a line that joins the points
+    geom_line(aes(Date, X1.Temp, color = "Bryum argemteum X1"))+  # add a line that joins the points
+    geom_line(aes(Date, X2.Temp, color = "Bryum argemteum X2"))+  # add a line that joins the points
+    geom_line(aes(Date, X4.Temp, color = "Bryum argemteum X4"))+  # add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4")) +
+   labs(x = "\nDate (day)", y = "Thallus \nTemperature \n(ºC) X3 ") +
+   theme_graphs_env_cond()+
+   ylim(-10, 10) +
+   theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))
+
+(PAR_plot_21_22_undersnow_16_feb <- summer_21_22 %>%
+  filter (Day_cum > 44605 & Day_cum < 44612) %>% # filter the 15th 21nd of feb
+  ggplot() +
+  geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.PAR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.PAR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.PAR, color = "Bryum argemteum X4", alpha = 0.5)) + # add a line that joins the points
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+  ylim(0, 1500) +
+  labs(x = "\nDate 2021-2022 (day)", y = "PAR X3\n(µmol m-2 s^-1)") +
+  theme_graphs_env_cond() +
+    theme(
+    legend.text = element_text(size = 14),  # Adjust the font size of legend text
+    legend.title = element_text(size = 16)  # Adjust the font size of legend title
+  )+
+    theme(legend.position = "bottom"))
+
+(Yield_plot_21_22_undersnow_16_feb <- summer_21_22 %>% 
+  filter (Day_cum > 44605 & Day_cum < 44612) %>%  # filter the 15th 21nd of feb
+  ggplot() +
+  geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.Y, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.Y, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+    ylim(0, 0.8) +
+   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(ETR_plot_21_22_undersnow_16_feb <- summer_21_22 %>% 
+  filter (Day_cum > 44605 & Day_cum < 44612) %>%  # filter the 15th 21nd of feb
+  ggplot() +
+  geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta")) + # add a line that joins the points
+  geom_line(aes(Date, X1.ETR, color = "Bryum argemteum X1")) + # add a line that joins the points
+  geom_line(aes(Date, X2.ETR, color = "Bryum argemteum X2", alpha = 0.5)) + # add a line that joins the points
+  geom_line(aes(Date, X4.chosen_ETR, color = "Bryum argemteum X4", alpha = 0.5)) +
+  scale_color_manual(values = c(
+    "Austroplaca soropelta" = "#ff914d",
+    "Bryum argemteum X1" = "green1",
+    "Bryum argemteum X2" = "#35B779FF",
+    "Bryum argemteum X4" = "olivedrab4"
+  )) +
+   ylim(0, 150) +
+   labs(x = "\nDate (day-month-year)", y = "ETR\nμmol e- m−2s−1 \nLichen X3 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none"))  # Remove axis label and text for the graph)
+
+(combined_plot_21_22_undersnow_16_feb <- (ETR_plot_21_22_undersnow_16_feb
+                                         /Yield_plot_21_22_undersnow_16_feb
+                                         /temp_plot_21_22_undersnow_16_feb
+                                         /PAR_plot_21_22_undersnow_16_feb) & plot_layout(ncol = 1))
+
+
+ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_16_feb.png", combined_plot_21_22_undersnow_16_feb, width = 40,height = 20, units = "cm",device = "png")  # Save graph
+
+```
+
+
+```{r}
+unique(data_met %>% filter(Tmean >0) %>% 
+  select(Month))
+
+```
+
