@@ -349,3 +349,111 @@ corr_low_kendall_X4
 
 ```
 
+5.2 With active temperature different samples
+```{r}
+# Get unique samples in the dataset
+unique_samples <- unique(data_corr_temp$sample)
+
+# Create an empty list to store correlation results
+correlation_results_act <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Spearman correlation test for the current sample
+  corr_result_act <- cor.test(x = subset_data$av_temp_act, y = subset_data$act_hours, method = 'spearman')
+  
+  # Store correlation result
+  correlation_results_act[[sample]] <- corr_result_act
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results[[sample]])
+  cat("\n")
+}
+```
+          Kendall
+```{r}
+
+# Create an empty list to store correlation results
+correlation_results_act_kendall <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Kendall correlation test for the current sample
+  corr_result_act_kendall <- cor.test(x = subset_data$av_temp_act, y = subset_data$act_hours, method = 'kendall')
+  
+  # Store correlation result
+  correlation_results_act_kendall[[sample]] <- corr_result_act_kendall
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results_act_kendall[[sample]])
+  cat("\n")
+}
+```
+
+5.2.2 With normal temperature different samples
+
+```{r}
+# Get unique samples in the dataset
+unique_samples <- unique(data_corr_temp$sample)
+
+# Create an empty list to store correlation results
+correlation_results <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Spearman correlation test for the current sample
+  corr_result <- cor.test(x = subset_data$av_temp, y = subset_data$act_hours, method = 'spearman')
+  
+  # Store correlation result
+  correlation_results[[sample]] <- corr_result
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results[[sample]])
+  cat("\n")
+}
+```
+
+          Kendall
+```{r}
+
+# Create an empty list to store correlation results
+correlation_results_kendall <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Kendall correlation test for the current sample
+  corr_result_kendall <- cor.test(x = subset_data$av_temp, y = subset_data$act_hours, method = 'kendall')
+  
+  # Store correlation result
+  correlation_results_kendall[[sample]] <- corr_result_kendall
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results_act_kendall[[sample]])
+  cat("\n")
+}
+```
+

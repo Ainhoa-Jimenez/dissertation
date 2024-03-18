@@ -2978,7 +2978,7 @@ March-October 2023
 
 ```{r}
 (temp_plot_march_22_23_X1 <- data_clean %>% 
-   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
    mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
    ggplot(aes(Date, X1.Temp)) +
    geom_point()+  # Add points for the data
@@ -2990,7 +2990,7 @@ March-October 2023
         axis.title.x = element_blank()))  # Remove axis label and text for the graph
 
 (PAR_plot_march_22_23_X1 <- data_clean %>% 
-   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
    mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
     ggplot(aes(Date_Combined, X1.PAR)) +
    geom_point()+  # Add points for the data
@@ -2999,7 +2999,7 @@ March-October 2023
    theme_graphs_env_cond())
 
 (Yield_plot_march_22_23_X1 <- data_clean %>% 
-   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
    mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
    ggplot(aes(Date_Combined, X1.Y)) +
    geom_point()+  # Add points for the data
@@ -3010,7 +3010,7 @@ March-October 2023
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
 (ETR_plot_march_22_23_X1 <- data_clean %>% 
-   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
    mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
    ggplot(aes(Date_Combined, X1.ETR)) +
    geom_point()+  # Add points for the data
@@ -3021,7 +3021,7 @@ March-October 2023
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
 (Ft_plot_march_22_23_X1 <- data_clean %>% 
-   filter(Day_cum > 44620) %>% # Filter days from 28th Feb 2022
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
    mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
    ggplot(aes(Date_Combined, X1.F)) +
    geom_point()+  # Add points for the data
@@ -3323,7 +3323,7 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_rou
 #  ( RH_year_round_19_23 +theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())),
 #  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))), ncol = 1, heights = c(1,1,1,1,1), common.legend = TRUE, legend = "bottom"))
 
-ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_23, width = 58,height = 18, units = "cm",device = "png")  # Save graph
+ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_23, width = 58,height = 30, units = "cm",device = "png")  # Save graph
 ```
 
 
@@ -3333,25 +3333,24 @@ ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_
 
 12.1.1 Temp-yield
 ```{r}
-(graph_temp_y_all_period_X3 <- data_clean %>% 
+(graph_temp_y_all_period_X3 <-  rbind(
+  data_clean %>% 
+    select(X3.Temp, X3.chosen_yield),
+  data_clean_23 %>% 
+    select(X3.Temp, X3.chosen_yield))%>%
   ggplot() +
   geom_point(aes(X3.Temp, X3.chosen_yield, color = "Austroplaca soropelta")) +
   theme_graphs_env_cond()+
   labs(x = "\nTemperature ºC", y = "Yield Lichen X3 ") +
    scale_color_manual(values = c( "Austroplaca soropelta" = "#ff914d")) +
+   ylim(0.1, 0.83) +
+   xlim(-20, 20)+
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
 
 ggsave(filename = "graphs_characterise/austroplaca/graph_temp_y_all_period_X3.png", graph_temp_y_all_period_X3, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 
-(graph_temp_y_22_23_X3 <- summer_22_23 %>% 
-  ggplot(aes(X3.Temp, X3.chosen_yield)) +
-  geom_point() +
-  theme_graphs_env_cond()+
-  labs(x = "\nTemperature ºC", y = "Yield Lichen X3 ") +
-  theme(axis.text.x = element_text(angle = 0)))
 
-ggsave(filename = "graphs_characterise/austroplaca/graph_temp_y_22_23_X3.png", graph_temp_y_22_23_X3, width = 58,height = 58, units = "cm",device = "png")  # Save graph
 ```
 
 12.1.2 Rh-yield
@@ -3374,47 +3373,52 @@ data_yield_rh <- full_join(data_clean %>%  # we want to plant info from differen
   labs(x = "\nRH %", y = "Yield Lichen X3 ") +
    scale_color_manual(values = c( "Austroplaca soropelta" = "#ff914d")) +
     scale_fill_manual(values = "transparent") +
+          ylim(0.1, 0.83) +
+   xlim(0, 100)+
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
   
-#(graph_rh_y_all_period_X3 <- data_yield_rh %>% 
-  ggplot() + 
-  # geom_point(aes( Rhmean, X3.chosen_yield, color = "Austroplaca soropelta", fill = "Austroplaca soropelta", alpha = 0.1)) +
- geom_polygon(aes(Rhmean, X3.chosen_yield, alpha = 0.1)) +
-  theme_graphs_env_cond()+
-  labs(x = "\nRH %", y = "Yield Lichen X3 ") +
-   scale_color_manual(values = c( "Austroplaca soropelta" = "#ff914d")) +
-    scale_fill_manual(values = "transparent") +
-  theme(axis.text.x = element_text(angle = 0),
-        legend.position = "none"))
 
 ggsave(filename = "graphs_characterise/austroplaca/graph_rh_y_all_period_X3.png", graph_rh_y_all_period_X3, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 ```
+12.1.3 PAR- yield
+```{r}
+
+(graph_temp_y_all_period_X3 <- data_clean %>% 
+  ggplot() +
+  geom_point(aes(X3.PAR, X3.chosen_yield, color = "Austroplaca soropelta")) +
+  theme_graphs_env_cond()+
+  labs(x = "PAR \n(µmol m-2 s^-1)", y = "Yield Lichen X3 ") +
+   scale_color_manual(values = c( "Austroplaca soropelta" = "#ff914d")) +
+  theme(axis.text.x = element_text(angle = 0),
+        legend.position = "none"))
+
+ggsave(filename = "graphs_characterise/austroplaca/graph_temp_y_all_period_X3.png", graph_temp_y_all_period_X3, width = 20,height = 20, units = "cm",device = "png")  # Save graph
+```
+
 
 12.2. Sample X1 (moss)
 
 ```{r}
-(graph_temp_y_all_period_X1 <- data_clean %>% 
+(graph_temp_y_all_period_moss <- rbind(
+  data_clean %>% 
+    select(av_moss_yield, av_moss_temp),
+  data_clean_23 %>% 
+    select(av_moss_yield, av_moss_temp))%>%
    filter(av_moss_yield > 0) %>% 
   ggplot(aes(av_moss_temp, av_moss_yield, color = "Bryum argemteum")) +
   geom_point() +
+      ylim(0.1, 0.83) +
+   xlim(-20, 20)+
   theme_graphs_env_cond()+
   labs(x = "\nTemperature ºC", y = "Yield Average moss ") +
    scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
 
-ggsave(filename = "graphs_characterise/bryum/graph_temp_y_all_period_X1.png", graph_temp_y_all_period_X1, width = 20,height = 20, units = "cm",device = "png")  # Save graph
+ggsave(filename = "graphs_characterise/bryum/graph_temp_y_all_period_moss.png", graph_temp_y_all_period_moss, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 
-(graph_temp_y_22_23_X1 <- summer_22_23 %>% 
-  ggplot(aes(av_moss_temp, av_moss_yield, color = "Bryum argemteum")) +
-  geom_point() +
-  theme_graphs_env_cond()+
-  labs(x = "\nTemperature ºC", y = "Yield average moss ") +
-     scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
-  theme(axis.text.x = element_text(angle = 0)))
 
-ggsave(filename = "graphs_characterise/bryum/graph_temp_y_22_23_X1.png", graph_temp_y_22_23_X1, width = 58,height = 58, units = "cm",device = "png")  # Save graph
 ```
 
 12.2.2. Rh-yield
@@ -3428,12 +3432,29 @@ ggsave(filename = "graphs_characterise/bryum/graph_temp_y_22_23_X1.png", graph_t
   labs(x = "\nRH %", y = "Yield average moss ") +
     scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
     scale_fill_manual(values = "transparent") +
+      ylim(0.1, 0.83) +
+   xlim(0, 100)+
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none"))
 
 ggsave(filename = "graphs_characterise/bryum/graph_rh_y_all_period_moss.png", graph_rh_y_all_period_moss, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 ```
 
+12.3. Combined graph
+
+```{r}
+graph_temp_y_all_period_X3 <- graph_temp_y_all_period_X3 + theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+graph_rh_y_all_period_X3 <- graph_rh_y_all_period_X3 + theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(),  axis.title.y = element_blank())
+graph_temp_y_all_period_moss <- graph_temp_y_all_period_moss
+graph_rh_y_all_period_moss <- graph_rh_y_all_period_moss + theme(axis.title.y = element_blank())
+
+
+(combined_temp_yield_rh <- (graph_temp_y_all_period_X3 /graph_rh_y_all_period_X3/graph_temp_y_all_period_moss/graph_rh_y_all_period_moss
+                            ) + plot_layout(ncol = 2, nrow = 2))
+
+ggsave(filename = "graphs_env_conditions/combined_temp_yield_rh.png", combined_temp_yield_rh, width = 20,height = 15, units = "cm",device = "png")  # Save graph
+
+```
 
 
 
@@ -4879,12 +4900,16 @@ no activity sin jan and no snow until teh end of feb
   geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta")) +  # add a line that joins the points
   geom_line(aes(Date, av_moss_temp, color = "Bryum argemteum")) +  # add a line that joins the points           
   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   
   geom_segment(aes(x = as.POSIXct("2021-12-09 00:53:00"), y = 15, xend = as.POSIXct("2021-12-11 00:53:00"), yend = 2),
                arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "#FFCC00") + # add arrow for snowmelting event
+   
   geom_segment(aes(x = as.POSIXct("2021-12-29 00:53:00"), y = 15, xend = as.POSIXct("2021-12-31 00:53:00"), yend = 2),
                arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "brown") + # add arrow for short snowfall event
+   
   geom_segment(aes(x = as.POSIXct("2022-02-18 00:53:00"), y = 15, xend = as.POSIXct("2022-02-16 00:53:00"), yend = 2),
                arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "darkblue") + # add arrow for final snowfall event
+   
   labs(x = "\nDate (day)", y = "Temperature \n(ºC) X3 ") +
   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
   theme_graphs_env_cond() +
@@ -4895,10 +4920,18 @@ no activity sin jan and no snow until teh end of feb
    ggplot() +
    geom_line(aes(Date, X3.PAR, color = "Austroplaca soropelta")) +  # add a line that joins the points
    geom_line(aes(Date, av_moss_PAR, color = "Bryum argemteum")) +  # add a line that joins the points
+    
    geom_segment(aes(x = as.POSIXct("2021-12-09 00:53:00"), y = 700, xend = as.POSIXct("2021-12-11 00:53:00"), yend = 100),
                 arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "#FFCC00") + # add arrow for snowmelting event
-   geom_segment(aes(x = as.POSIXct("2021-12-29 00:53:00"), y = 700, xend = as.POSIXct("2021-12-31 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "brown") + # add arrow for snowmelting event
-   geom_segment(aes(x = as.POSIXct("2022-02-18 00:53:00"), y = 700, xend = as.POSIXct("2022-02-16 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "darkblue") + # add arrow for short snowfall event
+    
+   geom_segment(aes(x = as.POSIXct("2021-12-29 00:53:00"), y = 700,
+                    xend = as.POSIXct("2021-12-31 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), 
+                size = 1, color = "brown") + # add arrow for snowmelting event
+    
+   geom_segment(aes(x = as.POSIXct("2022-02-18 00:53:00"), y = 700,
+                    xend = as.POSIXct("2022-02-16 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), 
+                size = 1, color = "darkblue") + # add arrow for short snowfall event
+    
     labs(x = "\nDate 2021-2022 (day-month-year)", y = "PAR X3\n(µmol m-2 s^-1)") +
    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
      scale_x_datetime(date_breaks = "1 week", date_labels = "%d %m %Y") +
@@ -4926,7 +4959,12 @@ no activity sin jan and no snow until teh end of feb
         axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
 
-(combined_plot_21_22_results <- (ETR_plot_21_22_results/Yield_plot_21_22_results/temp_plot_21_22_results/(PAR_plot_21_22_results + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1))) 
+(combined_plot_21_22_results <- (ETR_plot_21_22_results/
+                                Yield_plot_21_22_results/
+                                temp_plot_21_22_results/
+                                (PAR_plot_21_22_results + 
+                                theme(axis.text.x = element_text(angle = 45, hjust = 1))) 
+                                & plot_layout(ncol = 1))) 
 
 ggsave(filename = "graphs_characterise/combined_plot_21_22_results.png", combined_plot_21_22_results, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 
@@ -5005,7 +5043,7 @@ Snowmelt- 11th dec
     "Bryum argemteum X2" = "#35B779FF",
     "Bryum argemteum X4" = "olivedrab4"
   )) +
-   ylim(0, 150) +
+   ylim(0, 300) +
    labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -5093,7 +5131,7 @@ ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_11_dec.png", 
     "Bryum argemteum X2" = "#35B779FF",
     "Bryum argemteum X4" = "olivedrab4"
   )) +
-   ylim(0, 150) +
+   ylim(0, 300) +
    labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -5103,7 +5141,8 @@ ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_11_dec.png", 
 (combined_plot_21_22_undersnow_31_dec <- (ETR_plot_21_22_undersnow_31_dec
                                          /Yield_plot_21_22_undersnow_31_dec
                                          /temp_plot_21_22_undersnow_31_dec
-                                         /PAR_plot_21_22_undersnow_31_dec) & plot_layout(ncol = 1))
+                                         /PAR_plot_21_22_undersnow_31_dec) &
+                                         plot_layout(ncol = 1))
 
 ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_31_dec.png", combined_plot_21_22_undersnow_31_dec, width = 40,height = 20, units = "cm",device = "png")  # Save graph
 
@@ -5190,7 +5229,7 @@ No activity under snow
     "Bryum argemteum X2" = "#35B779FF",
     "Bryum argemteum X4" = "olivedrab4"
   )) +
-   ylim(0, 150) +
+   ylim(0, 300) +
    labs(x = "\nDate (day-month-year)", y = "ETR\nμmol e- m−2s−1 \nLichen X3 ") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
@@ -5200,17 +5239,110 @@ No activity under snow
 (combined_plot_21_22_undersnow_16_feb <- (ETR_plot_21_22_undersnow_16_feb
                                          /Yield_plot_21_22_undersnow_16_feb
                                          /temp_plot_21_22_undersnow_16_feb
-                                         /PAR_plot_21_22_undersnow_16_feb) & plot_layout(ncol = 1))
+                                         /PAR_plot_21_22_undersnow_16_feb) 
+                                         & plot_layout(ncol = 1))
 
 
 ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_16_feb.png", combined_plot_21_22_undersnow_16_feb, width = 40,height = 20, units = "cm",device = "png")  # Save graph
 
 ```
+### 14.3.Graph of daily pattern of PAR
+
+```{r}
+# Close up with time
+
+(PAR_closeup_22_23 <- summer_22_23 %>% 
+   mutate(Av_par =rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples) %>% 
+    filter(Day_cum > 44905 & Day_cum < 44909) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(DateTime, Av_par)) +
+   geom_line()+  # Add a line that joins the points
+   geom_vline(xintercept = as.numeric(seq(ymd_hms("2022-12-10 00:00:00"), ymd_hms("2023-12-31 00:00:00"), by = "1 day")), color = "black") +
+   labs(x = "\nDate (day)", y = "Average PAR\n(µmol m-2 s^-1)\n ") +
+   theme_graphs_env_cond() +
+   theme(axis.text = element_text(size = 15),  # Adjust the size as needed
+          axis.title = element_text(size = 18)) +
+      scale_x_datetime(breaks = "2 hour", labels = waiver()) +  # make the scale every hour
+   theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+
+ggsave(filename = "graphs_year_round/PAR_closeup_22_23.png", PAR_closeup_22_23, width = 40,height = 15, units = "cm",device = "png")  # Save graph
+
+(PAR_closeup_19_20 <- summer_19_20 %>% 
+   mutate(Av_par =rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples) %>% 
+    filter(No. > 7860 & No. < 7940) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(Date, Av_par)) +
+   geom_line()+  # Add a line that joins the points
+   geom_vline(xintercept = as.numeric(seq(ymd_hms("2019-12-10 00:00:00"), ymd_hms("2019-12-31 00:00:00"), by = "1 day")), color = "black") +
+   labs(x = "\nDate (day)", y = "Average PAR\n(µmol m-2 s^-1) ") +
+   theme_graphs_env_cond() +
+      scale_x_datetime(breaks = "1 hour", labels = waiver()) +  # make the scale every hour
+   theme(axis.text.x = element_text(angle = 45, hjust = 1)))
+```
+
+### 14.4 Plot heatwave march
+
+```{r}
+(temp_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date, X1.Temp)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+   labs(x = "\nDate (day)", y = "Temperature \nMoss X1 (°C)") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph
+
+(PAR_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+    ggplot(aes(Date_Combined, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # add a line that joins the points
+   labs(x = "\nDate 2022-2023 (day)", y = "PAR \n(µmol m-2 s^-1)") +
+   theme_graphs_env_cond())
+
+(Yield_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "Yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+
+(ETR_plot_march_22_23_X1 <- data_clean %>% 
+   filter(Day_cum > 44620 & Day_cum < 44650) %>% # Filter days from 28th Feb 2022
+   mutate(Date_Combined = reorder(Date_Combined, Day_cum)) %>%  # reorder the factors of Date_Combined according to the values of Day_cum. Do it for each subset individually because factors repeat for each year
+   ggplot(aes(Date_Combined, X1.ETR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nMoss X1") +
+   theme_graphs_env_cond() +
+    theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
 
 
+```
+
+
+## 15. Further code results
+
+1. Test minths in which air T > 0
 ```{r}
 unique(data_met %>% filter(Tmean >0) %>% 
   select(Month))
+
+```
+
+2. Check when was the min temp for summer 22-23 recorded
+
+```{r}
+data_met %>% 
+  filter(Tmin == -28.9,
+         Month %in% c(11,12,1,2))
 
 ```
 
