@@ -1000,8 +1000,6 @@ month_activetime_stats_X1 <- bind_rows(
     mutate_all(~ifelse(is.na(.), 0, .)) %>% 
  summarise_all(sum)
 
-write.xlsx(month_activetime_stats_X1, file = "stats/bryum/month_activetime_stats_X1.xlsx") # save table
-
 # filter from the dataset the total number of active hours
 
 (total_active_hours_19_20_nov_X1 <- month_activetime_stats_X1 %>%  # filter from the dataset the total number of active hours
@@ -1851,8 +1849,6 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
  summarise_all(sum) %>% 
    filter(Condition == TRUE))
 
-write.xlsx(month_activetime_stats_X2, file = "stats/bryum/month_activetime_stats_X2.xlsx") # save table
-
 
 (total_active_hours_19_20_nov_X2 <- month_activetime_stats_X2 %>%  # filter from the dataset the total number of active hours
   filter(Condition == TRUE) %>%
@@ -2693,7 +2689,6 @@ group_by(Condition) %>%  # Group the data by the unique values in column "Condit
  summarise_all(sum) %>% 
    filter(Condition == TRUE))
 
-write.xlsx(month_activetime_stats_X4, file = "stats/bryum/month_activetime_stats_X4.xlsx") # save table
 
 (total_active_hours_19_20_nov_X4 <- month_activetime_stats_X4 %>%  # filter from the dataset the total number of active hours
   select(Count_19_20_nov))
@@ -3361,7 +3356,7 @@ min_ETR_active_X4 <- mean_ETR_active_X4_data %>%
 #### 5.3. Monthly
 
 ```{r}
-(month_Y_stats_X4_1 <- bind_rows(  # Monthly stats fro total measuring period
+(month_Y_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
   summer_19_20 %>% filter(Month == 11),
   summer_19_20 %>% filter(Month == 12),
   summer_19_20 %>% filter(Month == 1),
@@ -3369,13 +3364,7 @@ min_ETR_active_X4 <- mean_ETR_active_X4_data %>%
   summer_20_21 %>% filter(Month == 11),
   summer_20_21 %>% filter(Month == 12),
   summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X4.Y),
-            max_Y = max(X4.Y),  # get the maximum temperature
-            min_Y = min(X4.Y)))
-
-(month_Y_stats_X4_2 <- bind_rows(
+  summer_20_21 %>% filter(Month == 2),
   summer_21_22 %>% filter(Month == 11),
   summer_21_22 %>% filter(Month == 12),
   summer_21_22 %>% filter(Month == 1),
@@ -3385,15 +3374,13 @@ min_ETR_active_X4 <- mean_ETR_active_X4_data %>%
   summer_22_23 %>% filter(Month == 1),
   summer_22_23 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
- summarise(mean_Y= mean(X4.chosen_yield),
-            max_Y = max(X4.chosen_yield),  # get the maximum temperature
-            min_Y = min(X4.chosen_yield)))
-
-month_Y_stats_X4 <- bind_rows(month_Y_stats_X4_1, month_Y_stats_X4_2)
+ summarise(mean_Y= mean(X4.Y),
+            max_Y = max(X4.Y),  # get the maximum temperature
+            min_Y = min(X4.Y)))
 
 write.xlsx(month_Y_stats_X4, file = "stats/bryum/month_Y_stats_X4.xlsx") # save table
 
-(month_ETR_stats_X4_1 <- bind_rows(  # Monthly stats fro total measuring period
+(month_ETR_stats_X4 <- bind_rows(  # Monthly stats fro total measuring period
   summer_19_20 %>% filter(Month == 11),
   summer_19_20 %>% filter(Month == 12),
   summer_19_20 %>% filter(Month == 1),
@@ -3401,14 +3388,8 @@ write.xlsx(month_Y_stats_X4, file = "stats/bryum/month_Y_stats_X4.xlsx") # save 
   summer_20_21 %>% filter(Month == 11),
   summer_20_21 %>% filter(Month == 12),
   summer_20_21 %>% filter(Month == 1),
-  summer_20_21 %>% filter(Month == 2)) %>% 
-   group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X4.ETR),
-            max_ETR = max(X4.ETR),  # get the maximum temperature
-            min_ETR = min(X4.ETR)))
-
-(month_ETR_stats_X4_2 <- bind_rows(  # Monthly stats fro total measuring period
-summer_21_22 %>% filter(Month == 11),
+  summer_20_21 %>% filter(Month == 2),
+  summer_21_22 %>% filter(Month == 11),
   summer_21_22 %>% filter(Month == 12),
   summer_21_22 %>% filter(Month == 1),
   summer_21_22 %>% filter(Month == 2),
@@ -3417,11 +3398,9 @@ summer_21_22 %>% filter(Month == 11),
   summer_22_23 %>% filter(Month == 1),
   summer_22_23 %>% filter(Month == 2)) %>% 
    group_by(Year, Month) %>% 
- summarise(mean_ETR= mean(X4.chosen_ETR),
-            max_ETR = max(X4.chosen_ETR),  # get the maximum temperature
-            min_ETR = min(X4.chosen_ETR)))
-
-month_ETR_stats_X4 <- bind_rows(month_ETR_stats_X4_1, month_ETR_stats_X4_2)
+ summarise(mean_ETR= mean(X4.ETR),
+            max_ETR = max(X4.ETR),  # get the maximum temperature
+            min_ETR = min(X4.ETR)))
 
 write.xlsx(month_ETR_stats_X4, file = "stats/bryum/month_ETR_stats_X4.xlsx") # save table
 
