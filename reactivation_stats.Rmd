@@ -462,20 +462,33 @@ for(sample in unique_samples) {
 # 5.3 Decreasing trend active hours
 
 ```{r}
-data_reactivation <- data_reactivation %>% 
+data_reactivation_summary <- data_reactivation %>% 
   mutate(year = as.factor(year),
-         sample = as.factor(sample))
+         sample = as.factor(sample),
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argemteum")) %>% 
+  group_by(species, year) %>% 
+  summarise(mean_act_hours = mean(act_hours))
 
 kruskal.test(act_hours ~ year, data = data_reactivation)
 # teh results are significantly different. Now less check
 
 dunnTest(act_hours ~ year, data = data_reactivation)
 
-data_reactivation %>%
-  ggplot(aes(x = year, y = act_hours, color = sample, group = sample)) +
+data_reactivation_summary %>%
+  ggplot(aes(x = year, y = mean_act_hours, color = species, group = species)) +
   geom_point() +
   geom_line() +
-  theme_classic()
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+ theme_graphs_env_cond()+
+  labs(x = "\nSummer", y = "Nº of Active Hours\n") +
+  theme_graphs_env_cond() +
+  theme(
+    axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=1, face = "bold"),
+    axis.text.y = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    legend.text = element_text(face = "bold"),
+    legend.title = element_text(face = "bold")
+  )
 ```
 
 
