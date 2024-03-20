@@ -1,0 +1,124 @@
+---
+title: "graphs_fast_talk"
+author: "Ainhoa"
+date: "2024-03-19"
+output: html_document
+---
+
+**WARNING: FIRST. RUN  Code_calc_yield.Rmd OTHERWISE IT WON'T. WORK**
+
+# Activity graph
+
+```{r}
+
+(yield_year_round_19_23 <- rbind(
+  data_clean %>% 
+    select(Date, X1.Y, X2.Y, X3.chosen_yield, X4.chosen_yield),
+  data_clean_23 %>% 
+    select(Date, X1.Y, X2.Y, X3.chosen_yield, X4.chosen_yield))%>%
+  ggplot() +
+  geom_line(aes(Date, X1.Y, color = "Bryum argemteum"), alpha = 0.4) +
+  geom_line(aes(Date, X2.Y, color = "Bryum argemteum"), alpha = 0.4) + 
+  geom_line(aes(Date, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.7) +
+  geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum"), alpha = 0.3) +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+  labs(color = "Species") + # This adds a legend for the colors
+   ylab("Yield \n") + # This sets the y-axis label to "Yield
+   theme(
+    legend.text = element_text(size = 14),  # Adjust the font size of legend text
+    legend.title = element_text(size = 16)  # Adjust the font size of legend title
+  ))  
+
+
+(temp_year_round_19_23 <- full_join(rbind(
+  data_clean %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp),
+  data_clean_23 %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp)
+),
+data_met %>% 
+  select(Date.UTC, Tmean) %>% 
+  mutate(Date = as.Date(Date.UTC, format="%d/%m/%Y")))%>%
+  ggplot() +
+  geom_line(aes(Date, X1.Temp, color = "Bryum argemteum"), alpha = 0.4) +
+  geom_line(aes(Date, X2.Temp, color = "Bryum argemteum"), alpha = 0.4) + 
+  geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta"), alpha = 0.7) +
+  geom_line(aes(Date, X4.Temp, color = "Bryum argemteum"), alpha = 0.4) +
+  geom_line(aes(Date, Tmean, color = "Air Temperature"), alpha = 0.4) +
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d", "Air Temperature" = "black")) +
+  geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+  theme_graphs_env_cond() +
+  ylim(-40, 10)+
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  ylab("Thallus \nTemperature ºC"))
+
+(PAR_year_round_19_23 <- rbind(
+  data_clean %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR),
+  data_clean_23 %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR)) %>%
+  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
+  ggplot(aes(Date, mean_PAR)) +  # plot it
+  geom_line() +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  ylab("PAR\n(µmol m-2 s^-1)"))
+
+
+(combined_plot_19_23_fast_talk <- (
+  (yield_year_round_19_23 + 
+    theme(axis.text = element_text(size = 16, face = "bold"), 
+          axis.title = element_text(size = 18, face = "bold"),
+          axis.text.x = element_blank(), 
+          axis.ticks.x = element_blank(), 
+          axis.title.x = element_blank(),
+          legend.position = "none")) / 
+  (temp_year_round_19_23 + 
+    theme(axis.text = element_text(size = 16, face = "bold"), 
+          axis.title = element_text(size = 18, face = "bold"),
+          axis.text.x = element_blank(), 
+          axis.ticks.x = element_blank(), 
+          axis.title.x = element_blank(),
+          legend.text = element_text(size = 20))) / 
+  (PAR_year_round_19_23 + 
+    theme(axis.text = element_text(size = 16, face = "bold"), 
+          axis.title = element_text(size = 18, face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1)))) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_talk/combined_plot_19_23_fast_talk.png", combined_plot_19_23_fast_talk, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+
+```
+
+# Yield 2019 2023 Austroplaca
+
+```{r}
+(Yield_plot_19_20_X3_talk <- summer_19_20 %>% 
+   ggplot() +
+   geom_line(aes(Date, X4.Y, color = "Bryum argemteum"), alpha = 1)+
+   geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta"), alpha = 1 )+  # Add a line that joins the points
+   labs(x = "\nDate (2019-2020)", y = "Yield \nLichen X3 ") +
+   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+   ylim(0, 0.8)+
+   theme_graphs_env_cond()+
+   theme(legend.position = "none")+
+       theme(axis.text = element_text(size = 16, face = "bold"), 
+          axis.title = element_text(size = 18, face = "bold")))
+
+(Yield_plot_22_23_X3_talk <- summer_22_23 %>% 
+   ggplot() +
+   geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum"), alpha = 0.5)+
+   geom_line(aes(Date, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.5)+  # Add a line that joins the points
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+   labs(x = "\nDate (2022-2023)", y = "Yield \n Lichen X3 ") +
+   theme_graphs_env_cond()+
+     theme(legend.position = "bottom")+
+      theme(axis.text = element_text(size = 16, face = "bold"), 
+          axis.title = element_text(size = 18, face = "bold")))
+
+(combine_plot_yield_aus <- (Yield_plot_19_20_X3_talk/Yield_plot_22_23_X3_talk) & plot_layout(ncol = 1))
+
+ggsave(filename = "graphs_talk/combine_plot_yield_aus.png", combine_plot_yield_aus, width = 40,height = 20, units = "cm", device = "png")  # Save graph
+```
+

@@ -27,6 +27,7 @@ library(patchwork)  # combine plots
 library(hms)  # use function as.Time()
 library(openxlsx) # write.xlsx 
 library(ggpubr)  # combine plots
+library(FSA) # dunn test
 ```
 2.2. Creates functions
 
@@ -59,7 +60,7 @@ data_reactivation_wide <- pivot_wider(data_reactivation,
                                       values_from = c("act_hours", "event_high", "events_low"))
 ```
 
-4. Plot each relation to see if tehre is a pattern
+# 4. Plot each relation to see if tehre is a pattern
 
 4.1. Events low. Separating by sapmles
 ```{r}
@@ -197,7 +198,7 @@ corr_low_kendall_X4
 ```
 
 
-# Thallus temperature vs yield
+# 5.1 Thallus temperature vs yield grpahs
 (run code_calc_yield.Rmd first)
 
 ```{r}
@@ -271,7 +272,7 @@ ggsave(filename = "graphs_correlation/graph_correlation_temp_act.png", graph_cor
   theme(axis.text.x = element_text(angle = 0)))
 ```
 
-## 5. Correlation
+# 5.2 Correlation Temp vs yield
 
 5.1. With active temperature and normal temperature all samples
 
@@ -456,4 +457,25 @@ for(sample in unique_samples) {
   cat("\n")
 }
 ```
+
+
+# 5.3 Decreasing trend active hours
+
+```{r}
+data_reactivation <- data_reactivation %>% 
+  mutate(year = as.factor(year),
+         sample = as.factor(sample))
+
+kruskal.test(act_hours ~ year, data = data_reactivation)
+# teh results are significantly different. Now less check
+
+dunnTest(act_hours ~ year, data = data_reactivation)
+
+data_reactivation %>%
+  ggplot(aes(x = year, y = act_hours, color = sample, group = sample)) +
+  geom_point() +
+  geom_line() +
+  theme_classic()
+```
+
 
