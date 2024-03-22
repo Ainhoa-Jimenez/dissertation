@@ -108,8 +108,8 @@ ggsave(filename = "graphs_talk/combined_plot_19_23_fast_talk.png", combined_plot
 
 (Yield_plot_22_23_X3_talk <- summer_22_23 %>% 
    ggplot() +
-   geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum"), alpha = 0.5)+
-   geom_line(aes(Date, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.5)+  # Add a line that joins the points
+   geom_line(aes(Date, X4.chosen_yield, color = "Bryum argemteum"), alpha = 1)+
+   geom_line(aes(Date, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 1)+  # Add a line that joins the points
   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
    labs(x = "\nDate (2022-2023)", y = "Yield \n Lichen X3 ") +
    theme_graphs_env_cond()+

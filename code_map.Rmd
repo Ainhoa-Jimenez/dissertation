@@ -12,16 +12,20 @@ library(tidyverse) # mostly for data wrangling
                      #      "https://mikkovihtakari.github.io/drat"))
 library(ggOceanMapsData)
 library(ggOceanMaps)
+library(ggspatial)
+
 ```
 
 MAp whole Antarctica
 ```{r}
-(Map_antarctica <- basemap(limits = -60, glaciers = TRUE, bathymetry = T)+
+(Map_antarctica <- basemap(limits = -60, glaciers = TRUE, bathymetry = T, grid.col = NA)+
   geom_polygon(fill = "white", color = "black") +
 theme(legend.position = "none",
         legend.title = element_text(color = "green"),
         panel.grid.major = element_blank(),  # Remove major grid lines
-        panel.grid.minor = element_blank()))  # Set ocean color to blue
+        panel.grid.minor = element_blank())+
+  ggspatial::annotation_scale(location = "br") + 
+  ggspatial::annotation_north_arrow(location = "tr", which_north = "true"))  # Set ocean color to blue
 
 ggsave(filename = "graphs_figures/Map_antarctica.png", Map_antarctica, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 
@@ -34,17 +38,23 @@ ggsave(filename = "graphs_figures/Map_antarctica.png", Map_antarctica, width = 2
   geom_polygon(fill = "white", color = "black") +
 theme(legend.position = "none",
         panel.grid.major = element_blank(),  # Remove major grid lines
-        panel.grid.minor = element_blank()))  # Set ocean color to blue'
+        panel.grid.minor = element_blank())+
+    ggspatial::annotation_scale(location = "br") + 
+  ggspatial::annotation_north_arrow(location = "tr", which_north = "true"))  # Set ocean color to blue)  # Set ocean color to blue'
 
 ggsave(filename = "graphs_figures/Map_antarctica_close_up.png", Map_antarctica_close_up, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 
 
-(Map_antarctica_ross_island<- basemap(limits = c(164,167, -76, -78), glaciers = TRUE, bathymetry = T)+  # close up to ross island
+(Map_antarctica_ross_island<- basemap(limits = c(166,169.5, -76.5, -78), glaciers = TRUE, bathymetry = T)+  # close up to ross island
   geom_polygon(fill = "white", color = "black") +
 theme(legend.position = "none",
         legend.title = element_text(color = "green"),
         panel.grid.major = element_blank(),  # Remove major grid lines
-        panel.grid.minor = element_blank()))  # Set ocean color to blue
+        panel.grid.minor = element_blank(),
+      axis.text = element_text(size = 14),
+      axis.title = element_blank())+
+      ggspatial::annotation_scale(location = "br") + 
+  ggspatial::annotation_north_arrow(location = "tr", which_north = "true"))  # Set ocean color to blue)  # Set ocean color to blue
 
 ggsave(filename = "graphs_figures/Map_antarctica_ross_island.png", Map_antarctica_ross_island, width = 20,height = 20, units = "cm",device = "png")  # Save graph
 ```
