@@ -141,7 +141,7 @@ corr_high_kendall_together <- cor.test(x = data_reactivation$event_high, y = dat
 corr_high_kendall_together
 #---
 corr_low_together <- cor.test(x = data_reactivation$events_low, y = data_reactivation$act_hours, method = 'spearman')
-corr_high_together
+corr_low_together
 
 corr_low_kendall_together <- cor.test(x = data_reactivation$events_low, y = data_reactivation$act_hours, method = 'kendall')
 corr_low_kendall_together
@@ -474,21 +474,24 @@ kruskal.test(act_hours ~ year, data = data_reactivation)
 
 dunnTest(act_hours ~ year, data = data_reactivation)
 
-data_reactivation_summary %>%
+(graph_decline <- data_reactivation_summary %>%
   ggplot(aes(x = year, y = mean_act_hours, color = species, group = species)) +
   geom_point() +
-  geom_line() +
+  geom_line(size = 1.5) +
   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
  theme_graphs_env_cond()+
   labs(x = "\nSummer", y = "Nº of Active Hours\n") +
   theme_graphs_env_cond() +
   theme(
     axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=1, face = "bold"),
-    axis.text.y = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    legend.text = element_text(face = "bold"),
-    legend.title = element_text(face = "bold")
-  )
+    axis.text.y = element_text(face = "bold", size = 16),
+    axis.title = element_text(face = "bold", size = 18),
+    legend.text = element_text(face = "bold", size = 18),
+    legend.title = element_text(face = "bold", size = 18)
+  ))
+
+ggsave(filename = "graphs_correlation/graph_decline.png", graph_decline, width = 35, height = 20, units = "cm", device = "png")  # Save graph
+
 ```
 
 
