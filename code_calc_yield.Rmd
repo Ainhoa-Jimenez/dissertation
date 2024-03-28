@@ -1354,6 +1354,7 @@ ggsave(filename = "graphs_yield/closeup_yield_22_23_X1.png", closeup_yield_22_23
     theme(panel.grid.major.y = element_line(color = "gray")) +
       scale_x_datetime(breaks = "1 day", labels = waiver()))
 
+
 (Diff_closeupn_22_23_X1 <- summer_22_23 %>% 
     filter(Day_cum < 44905) %>% # filter days before the 10th of December (when the difference isn't clear)
    ggplot(aes(DateTime, X1.diff)) +
@@ -5195,6 +5196,32 @@ No activity under snow
 
 ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_16_feb.png", combined_plot_21_22_undersnow_16_feb, width = 40,height = 20, units = "cm",device = "png")  # Save graph
 
+```
+
+Graph daily PAR - **NOT use it** just to test theory
+```{r}
+(PAR_closeupn_22_23_X1 <- summer_22_23 %>% 
+    filter(Day_cum < 44925 & Day_cum > 44921) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(DateTime, X1.PAR)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "PAR \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(panel.grid.major.y = element_line(color = "gray"),
+          axis.text.x = element_blank()) +
+      scale_x_datetime(breaks = "1 hour", labels = waiver()))
+
+(Yield_closeupn_22_23_X1 <- summer_22_23 %>% 
+    filter(Day_cum < 44925 & Day_cum > 44921) %>% # filter days before the 10th of December (when the difference isn't clear)
+   ggplot(aes(DateTime, X1.Y)) +
+   geom_point()+  # Add points for the data
+   geom_line()+  # Add a line that joins the points
+   labs(x = "\nDate (day)", y = "yield \nMoss X1 ") +
+   theme_graphs_env_cond() +
+    theme(panel.grid.major.y = element_line(color = "gray")) +
+      scale_x_datetime(breaks = "1 hour", labels = waiver()))
+
+(combined_closeup_22_23_X1 <-(PAR_closeupn_22_23_X1/Yield_closeupn_22_23_X1) & plot_layout(ncol = 1))
 ```
 
 

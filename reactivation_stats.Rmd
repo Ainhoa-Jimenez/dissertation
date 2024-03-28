@@ -272,7 +272,7 @@ ggsave(filename = "graphs_correlation/graph_correlation_temp_act.png", graph_cor
   theme(axis.text.x = element_text(angle = 0)))
 ```
 
-# 5.2 Correlation Temp vs yield
+# 5.2 Correlation Temp vs nº hours
 
 5.1. With active temperature and normal temperature all samples
 
@@ -492,6 +492,15 @@ dunnTest(act_hours ~ year, data = data_reactivation)
 
 ggsave(filename = "graphs_correlation/graph_decline.png", graph_decline, width = 35, height = 20, units = "cm", device = "png")  # Save graph
 
+```
+##6. Correlation Yeild and TT
+
+```{r}
+corr_yield_together <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$av_yield, method = 'spearman')
+corr_yield_together
+
+corr_yield_together_kendall <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$av_yield, method = 'kendall')
+corr_yield_together_kendall
 ```
 
 
