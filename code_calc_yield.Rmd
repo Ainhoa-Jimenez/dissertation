@@ -44,10 +44,11 @@ library(viridis)  # colorblid friendly palette
 ```{r, echo= TRUE, results="hide"}
 theme_graphs_env_cond <- function(){
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90))+
-   theme(axis.text = element_text(size = 14),  # Adjust the size as needed
-          axis.title = element_text(size = 16),
-        legend.text = element_text(size=16))
+  theme(axis.text.x = element_text(face = "bold",size = 12, angle = 90))+
+   theme(axis.text = element_text(face = "bold", size = 12),  # Adjust the size as needed
+          axis.title = element_text(face = "bold", size = 14),
+        legend.text = element_text(face = "bold", size= 14)) 
+  
   }
 ```
 
@@ -2890,6 +2891,21 @@ write.xlsx(mean_air_rh_month, file = "stats/met/mean_air_rh_month.xlsx") # save 
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
   ylab("PAR\n(µmol m-2 s^-1)"))
 
+
+# Graph for the composed graph
+(PAR_year_round_19_23_graph <- rbind(
+  data_clean %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR),
+  data_clean_23 %>% 
+    select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR)) %>%
+  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
+  ggplot(aes(Date, mean_PAR)) +  # plot it
+  geom_line() +
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "2 month", date_labels = "%m %Y") +
+  ylab("PAR\n(µmol \nm-2 s^-1)"))
+
+
 ggsave(filename = "graphs_env_conditions/PAR_year_round_19_23.png", PAR_year_round_19_23, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 
 ```
@@ -2960,6 +2976,28 @@ ggsave(filename = "graphs_env_conditions/PAR_year_round_19_23.png", PAR_year_rou
 
 ggsave(filename = "graphs_env_conditions/temp_year_round_19_23.png", temp_year_round_19_23, width = 54,height = 18, units = "cm", device = "png")  # Save graph
 
+
+# Graph for the composed graph
+(temp_year_round_19_23_graph <- rbind(
+  data_clean %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp),
+  data_clean_23 %>% 
+    select(Date, X1.Temp, X2.Temp, X3.Temp, X4.Temp)
+) %>%
+  ggplot() +
+  geom_line(aes(Date, X1.Temp, color = "Bryum argemteum"), alpha = 0.4) +
+  geom_line(aes(Date, X2.Temp, color = "Bryum argemteum"), alpha = 0.4) + 
+  geom_line(aes(Date, X3.Temp, color = "Austroplaca soropelta"), alpha = 0.7) +
+  geom_line(aes(Date, X4.Temp, color = "Bryum argemteum"), alpha = 0.4) +
+  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+  geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+  theme_graphs_env_cond() +
+  ylim(c(-50, 15)) +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  theme(legend.position = "none")+
+  ylab("TT (ºC)"))
+
+
 (air_temp_year_round_19_23 <- data_met %>%
   ggplot(aes(DateTime, Tmean)) +
   geom_line() +
@@ -2967,6 +3005,17 @@ ggsave(filename = "graphs_env_conditions/temp_year_round_19_23.png", temp_year_r
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
   ylab("Air \nTemperature ºC"))
+
+# Graph for the composed graph
+(air_temp_year_round_19_23_graph <- data_met %>%
+  ggplot(aes(DateTime, Tmean)) +
+  geom_line() +
+  geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
+  theme_graphs_env_cond() +
+  ylim(c(-50, 15)) +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m %Y") +
+  ylab("Air T (ºC)"))
+
 ```
 
 
@@ -3286,11 +3335,12 @@ data_clean <- data_clean %>%
   labs(color = "Species") + # This adds a legend for the colors
    ylab("Yield \n") + # This sets the y-axis label to "Yield
    theme(
-    legend.text = element_text(size = 14),  # Adjust the font size of legend text
-    legend.title = element_text(size = 16)  # Adjust the font size of legend title
+     legend.position = "bottom",
+    legend.text = element_text(size = 12, face = "bold"),  # Adjust the font size of legend text
+    legend.title = element_text(size = 14, face = "bold")  # Adjust the font size of legend title
   ))  
 
-ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_round_19_23, width = 54,height = 18, units = "cm",device = "png")  # Save graph
+ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_round_19_23, width = 16,height = 8, units = "cm",device = "png")  # Save graph
 
 ```
 11.5. Rh plot
@@ -3304,6 +3354,7 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_rou
   geom_line() +
   theme_graphs_env_cond() +
   scale_x_date(date_breaks = "1 month", date_labels = "%m %Y") +
+  scale_y_continuous(breaks = seq(30, 100, by = 15), limits = c(30, 100)) +
   ylab("RH %\n"))
 
 
@@ -3312,11 +3363,38 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_rou
 11.6. Combined plot year round:
 
 ```{r}
-(combined_plot_19_23 <- ( (yield_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/ # use ggarrange to move legend 
-  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), legend.position = "none"))/
-  (air_temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/
-  ( RH_year_round_19_23 +theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()))/
-  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1)))
+(combined_plot_19_23 <- ( 
+  (yield_year_round_19_23 + 
+     theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(), 
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank(),
+            legend.position = "none"))/ # use ggarrange to move legend 
+  (temp_year_round_19_23_graph + 
+     theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(), 
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank(), 
+           legend.position = "none"))/
+  (air_temp_year_round_19_23_graph + 
+     theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank()))/
+  ( RH_year_round_19_23 +
+      theme(axis.text.x = element_blank(), 
+            axis.ticks.x = element_blank(),
+            axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+            axis.title.x = element_blank()))/
+  (PAR_year_round_19_23_graph + 
+     theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "bold", size = 10),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10))) 
+  & plot_layout(ncol = 1)))
 
 #(combined_plot_19_23 <- ggarrange( (yield_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())), # use ggarrange to move legend 
 #  (temp_year_round_19_23 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), legend.position = "none")),
@@ -3324,7 +3402,7 @@ ggsave(filename = "graphs_year_round/yield_year_round_19_23.png", yield_year_rou
 #  ( RH_year_round_19_23 +theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())),
 #  (PAR_year_round_19_23 + theme(axis.text.x = element_text(angle = 45, hjust = 1))), ncol = 1, heights = c(1,1,1,1,1), common.legend = TRUE, legend = "bottom"))
 
-ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_23, width = 58,height = 18, units = "cm",device = "png")  # Save graph
+ggsave(filename = "graphs_year_round/combined_plot_19_23.png", combined_plot_19_23, width = 16,height = 12, units = "cm",device = "png")  # Save graph
 ```
 
 
@@ -4876,11 +4954,15 @@ no activity sin jan and no snow until teh end of feb
                arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "brown") + # add arrow for short snowfall event
   geom_segment(aes(x = as.POSIXct("2022-02-18 00:53:00"), y = 15, xend = as.POSIXct("2022-02-16 00:53:00"), yend = 2),
                arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "darkblue") + # add arrow for final snowfall event
-  labs(x = "\nDate (day)", y = "Temperature \n(ºC) X3 ") +
+  labs(x = "\nDate (day)", y = "TT (ºC) ") +
   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
   theme_graphs_env_cond() +
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))
+  theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank(),
+        legend.position = "none"))
 
 (PAR_plot_21_22_results <- summer_21_22 %>% 
    ggplot() +
@@ -4890,36 +4972,48 @@ no activity sin jan and no snow until teh end of feb
                 arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "#FFCC00") + # add arrow for snowmelting event
    geom_segment(aes(x = as.POSIXct("2021-12-29 00:53:00"), y = 700, xend = as.POSIXct("2021-12-31 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "brown") + # add arrow for snowmelting event
    geom_segment(aes(x = as.POSIXct("2022-02-18 00:53:00"), y = 700, xend = as.POSIXct("2022-02-16 00:53:00"), yend = 100), arrow = arrow(length = unit(0.5, "cm")), size = 1, color = "darkblue") + # add arrow for short snowfall event
-    labs(x = "\nDate 2021-2022 (day-month-year)", y = "PAR X3\n(µmol m-2 s^-1)") +
+    labs(x = "\nDate 2021-2022 (day-month-year)", y = "PAR\n(µmol \nm-2 s^-1)") +
    scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
      scale_x_datetime(date_breaks = "1 week", date_labels = "%d %m %Y") +
-    theme_graphs_env_cond())
+    theme_graphs_env_cond()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "bold", size = 10),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+          legend.position = "none"))
 
 (Yield_plot_21_22_results<- summer_21_22 %>% 
    ggplot() +
    geom_line(aes(Date, X3.Y, color = "Austroplaca soropelta"))+  # Add a line that joins the points
    geom_line(aes(Date, av_moss_yield, color = "Bryum argemteum"))+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "Yield ") +
     scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
    theme_graphs_env_cond() +
       ylim(0, 0.8) +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+    theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank(),
+          legend.position = "none"))  # Remove axis label and text for the graph)
 
 (ETR_plot_21_22_results <- summer_21_22 %>% 
    ggplot() +
    geom_line(aes(Date, X3.ETR, color = "Austroplaca soropelta"))+  # Add a line that joins the points
    geom_line(aes(Date, av_moss_ETR, color = "Bryum argemteum"))+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- \nm−2s−1) ") +
     scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
    theme_graphs_env_cond() +
-    theme(axis.text.x = element_blank(),
-        axis.title.x = element_blank()))  # Remove axis label and text for the graph)
+    theme(axis.text.x = element_blank(), 
+           axis.ticks.x = element_blank(),
+           axis.title = element_text(face = "bold", size = 12),
+           axis.text.y = element_text(face = "bold", size = 10),
+           axis.title.x = element_blank(),
+          legend.position = "none"))  # Remove axis label and text for the graph)
 
 
 (combined_plot_21_22_results <- (ETR_plot_21_22_results/Yield_plot_21_22_results/temp_plot_21_22_results/(PAR_plot_21_22_results + theme(axis.text.x = element_text(angle = 45, hjust = 1))) & plot_layout(ncol = 1))) 
 
-ggsave(filename = "graphs_characterise/combined_plot_21_22_results.png", combined_plot_21_22_results, width = 54,height = 18, units = "cm", device = "png")  # Save graph
+ggsave(filename = "graphs_characterise/combined_plot_21_22_results.png", combined_plot_21_22_results, width = 16,height = 10, units = "cm", device = "png")  # Save graph
 
 ```
 Snowmelt- 11th dec
@@ -5197,6 +5291,31 @@ No activity under snow
 ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_16_feb.png", combined_plot_21_22_undersnow_16_feb, width = 40,height = 20, units = "cm",device = "png")  # Save graph
 
 ```
+Graph closeup daily PAR
+
+```{r}
+(PAR_closup_22_23 <- rbind(
+  #data_clean %>% 
+   # select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR, Day_cum),
+  data_clean_23 %>% 
+    select(DateTime, X1.PAR, X2.PAR, X3.PAR, X4.PAR, Day_cum, Date)) %>%
+  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
+   filter(Day_cum > 44906 & Day_cum < 44910) %>% 
+  ggplot() +  # plot it
+  geom_line(aes(DateTime, mean_PAR)) +
+  geom_vline(aes(xintercept = as.numeric(Date)))+ # Add vertical lines at midnight
+  theme_graphs_env_cond() +
+  scale_x_datetime(date_breaks = "3 hours") +
+  ylab("Average PAR\n(µmol m-2 s^-1)\n") +
+  xlab("Date") +
+  theme(axis.text.x = element_text(face = "bold",size = 11, angle = 45, vjust = 1, hjust = 1))+
+   theme(axis.text = element_text(face = "bold", size = 12),  # Adjust the size as needed
+          axis.title = element_text(face = "bold", size = 14),
+        legend.text = element_text(face = "bold", size= 14)))
+
+ggsave(filename = "graphs_env_conditions/PAR_closup_22_23.png", PAR_closup_22_23, width = 16,height = 8, units = "cm",device = "png")  # Save graph
+
+```
 
 Graph daily PAR - **NOT use it** just to test theory
 ```{r}
@@ -5229,5 +5348,26 @@ Graph daily PAR - **NOT use it** just to test theory
 unique(data_met %>% filter(Tmean >0) %>% 
   select(Month))
 
+data_clean_23 %>% 
+  filter(X4.Temp ==-8.20)
+```
+##15. Graph PAR_yield
+
+```{r}
+(graph_PAR_Yield_X3 <-  rbind(
+  data_clean %>% 
+    select(X3.PAR, av_moss_PAR, X3.chosen_yield, av_moss_yield),
+  data_clean_23 %>% 
+    select(X3.PAR, av_moss_PAR, X3.chosen_yield, av_moss_yield))%>%
+   filter(X3.chosen_yield >0,
+          X3.PAR >0) %>% 
+  ggplot()+
+  geom_point(aes(X3.PAR, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.7) +
+   geom_smooth(aes(X3.PAR, X3.chosen_yield, color = "Austroplaca soropelta"), alpha = 0.7) +
+   theme_classic()+
+   scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")))
+  
+# not reliable, not saturation
+  
 ```
 

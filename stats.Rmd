@@ -2586,7 +2586,7 @@ data_clean <- data_clean %>%
   mutate(X4.Active = if_else(X4.chosen_yield > 0, TRUE, FALSE))  # If the yield is above 0 the plant is active = TRUE
 
 data_clean_23 <- data_clean_23 %>% 
-  mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
+  mutate(X4.Active = if_else(X4.chosen_yield > 0, TRUE, FALSE)) 
 
 summer_19_20 <- summer_19_20 %>% 
   mutate(X4.Active = if_else(X4.Y > 0, TRUE, FALSE)) 
@@ -2806,6 +2806,7 @@ min_Temp_X4 <- mean_Temp_X4_data %>%
     max_temp = max(X4.Temp),
     min_temp = min(X4.Temp)))  # calculate the mean Temp of the active period
 
+  
 (mean_Temp_active_X4 <- mean_Temp_active_X4_data %>%  # extract the mean Temp of the active period
   filter( X4.Active == TRUE) %>% 
   select( mean_temp))

@@ -465,9 +465,10 @@ for(sample in unique_samples) {
 data_reactivation_summary <- data_reactivation %>% 
   mutate(year = as.factor(year),
          sample = as.factor(sample),
-         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argemteum")) %>% 
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argenteum")) %>% 
   group_by(species, year) %>% 
-  summarise(mean_act_hours = mean(act_hours))
+  summarise(mean_act_hours = mean(act_hours),
+            sd = sd(act_hours))
 
 kruskal.test(act_hours ~ year, data = data_reactivation)
 # teh results are significantly different. Now less check
@@ -476,21 +477,22 @@ dunnTest(act_hours ~ year, data = data_reactivation)
 
 (graph_decline <- data_reactivation_summary %>%
   ggplot(aes(x = year, y = mean_act_hours, color = species, group = species)) +
-  geom_point() +
-  geom_line(size = 1.5) +
-  scale_color_manual(values = c("Bryum argemteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+  geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_act_hours - sd, ymax = mean_act_hours + sd), width = 0.2)+
+  scale_color_manual(values = c("Bryum argenteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
  theme_graphs_env_cond()+
   labs(x = "\nSummer", y = "Nº of Active Hours\n") +
   theme_graphs_env_cond() +
   theme(
-    axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=1, face = "bold"),
-    axis.text.y = element_text(face = "bold", size = 16),
-    axis.title = element_text(face = "bold", size = 18),
-    legend.text = element_text(face = "bold", size = 18),
-    legend.title = element_text(face = "bold", size = 18)
+    axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5, face = "bold", size= 12),
+    axis.text.y = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(face = "bold", size = 14),
+    legend.title = element_blank(),
+    legend.position = "bottom"
   ))
 
-ggsave(filename = "graphs_correlation/graph_decline.png", graph_decline, width = 35, height = 20, units = "cm", device = "png")  # Save graph
+ggsave(filename = "graphs_correlation/graph_decline.png", graph_decline, width = 16, height = 10, units = "cm", device = "png")  # Save graph
 
 ```
 ##6. Correlation Yeild and TT
