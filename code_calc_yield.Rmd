@@ -3699,7 +3699,7 @@ ggsave(filename = "graphs_characterise/bryum/graph_temp_y_22_23_X1.png", graph_t
   theme_graphs_env_cond()+
       ylim(c(0.01, 0.8))+
     xlim(c(-20, 20))+
-  labs(x = "\nTemperature ºC", y = "Yield average moss ") +
+  labs(x = "\nTemperature ºC", y = "Yield moss ") +
    scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
   theme(axis.text.x = element_text(angle = 0),
         legend.position = "none",
@@ -3718,7 +3718,7 @@ ggsave(filename = "graphs_characterise/bryum/graph_temp_y_all_period.png", graph
   geom_point(aes( Rhmean, X1.Y, color = "Bryum argemteum", fill = "Austroplaca soropelta", alpha = 0.1)) +
     # geom_polygon(aes(Rhmean, X3.chosen_yield, alpha = 0.1)) +
   theme_graphs_env_cond()+
-  labs(x = "\nRH %", y = "Yield average moss ") +
+  labs(x = "\nRH %", y = "Yield moss ") +
     ylim(c(0.01, 0.8))+
     xlim(c(0, 100))+
     scale_color_manual(values = c( "Bryum argemteum" = "#119683")) +
@@ -3858,7 +3858,7 @@ ggsave(filename = "graphs_under_snow/combined_plot_19_20_undersnow_2_dec.png", c
 
 
 
-snowfall 9th of feb
+snowfall 9th of jan
 ```{r}
 (temp_plot_19_20_undersnow_9_jan <- summer_19_20 %>% 
    filter (Day_cum > 43837 & Day_cum < 43841) %>%  # filter the 8th, 9th and 10th of jan
@@ -6003,24 +6003,45 @@ ggsave(filename = "graphs_under_snow/combined_plot_21_22_undersnow_16_feb.png", 
 Graph closeup daily PAR
 
 ```{r}
-(PAR_closup_22_23 <- rbind(
+#(PAR_closup_22_23 <- rbind(
   #data_clean %>% 
    # select(Date, X1.PAR, X2.PAR, X3.PAR, X4.PAR, Day_cum),
-  data_clean_23 %>% 
-    select(DateTime, X1.PAR, X2.PAR, X3.PAR, X4.PAR, Day_cum, Date)) %>%
-  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
-   filter(Day_cum > 44906 & Day_cum < 44910) %>% 
-  ggplot() +  # plot it
-  geom_line(aes(DateTime, mean_PAR)) +
-  geom_vline(aes(xintercept = as.numeric(Date)))+ # Add vertical lines at midnight
+ # data_clean_23 %>% 
+#  select(DateTime, X1.PAR, X2.PAR, X3.PAR, X4.PAR, Day_cum, Date)) %>%
+#  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE)) %>%  # calculate mean PAR across all samples
+#   filter(Day_cum > 44906 & Day_cum < 44910) %>% 
+#  ggplot() +  # plot it
+#  geom_line(aes(DateTime, mean_PAR)) +
+#  geom_vline(aes(xintercept = as.numeric(Date)))+ # Add vertical lines at midnight
+#  theme_graphs_env_cond() +
+#  scale_x_datetime(date_breaks = "3 hours") +
+#  ylab("Average PAR\n(µmol m-2 s^-1)\n") +
+# xlab("Date") +
+#  theme(axis.text.x = element_text(face = "bold",size = 11, angle = 45, vjust = 1, hjust = 1))+
+#   theme(axis.text = element_text(face = "bold", size = 12),  # Adjust the size as needed
+ #         axis.title = element_text(face = "bold", size = 14),
+ #       legend.text = element_text(face = "bold", size= 14)))
+
+# Calculate standard deviation
+data_clean_23 <- data_clean_23 %>%
+  filter(Day_cum > 44906 & Day_cum < 44910) %>%
+  mutate(mean_PAR = rowMeans(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), na.rm = TRUE),
+         sd_PAR = apply(select(., c("X1.PAR", "X2.PAR", "X3.PAR", "X4.PAR")), 1, sd, na.rm = TRUE))
+
+# Plot with standard deviation and shadow effect
+(PAR_closup_22_23 <- ggplot(data_clean_23, aes(DateTime)) +
+  geom_ribbon(aes(ymin = mean_PAR - sd_PAR, ymax = mean_PAR + sd_PAR), fill = "gray80") +  # Add shaded area for standard deviation
+  geom_line(aes(y = mean_PAR), color = "black", size = 0.5) +  # Add mean line
+  geom_vline(aes(xintercept = as.numeric(Date))) + 
   theme_graphs_env_cond() +
   scale_x_datetime(date_breaks = "3 hours") +
   ylab("Average PAR\n(µmol m-2 s^-1)\n") +
   xlab("Date") +
-  theme(axis.text.x = element_text(face = "bold",size = 11, angle = 45, vjust = 1, hjust = 1))+
-   theme(axis.text = element_text(face = "bold", size = 12),  # Adjust the size as needed
-          axis.title = element_text(face = "bold", size = 14),
-        legend.text = element_text(face = "bold", size= 14)))
+  theme(axis.text.x = element_text(face = "bold", size = 11, angle = 45, vjust = 1, hjust = 1),
+        axis.text = element_text(face = "bold", size = 12),
+        axis.title = element_text(face = "bold", size = 14),
+        legend.text = element_text(face = "bold", size = 14)))
+
 
 ggsave(filename = "graphs_env_conditions/PAR_closup_22_23.png", PAR_closup_22_23, width = 16,height = 8, units = "cm",device = "png")  # Save graph
 

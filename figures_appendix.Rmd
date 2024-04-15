@@ -226,7 +226,7 @@ theme_temp <- function() {
 
 labs_temp <- function(plot) {
   plot + 
-  labs(x = "\nDate (day)", y = "TT (ºC)\nLichen") +
+  labs(x = "\nDate (day)", y = "TT (ºC)") +
   scale_y_continuous(breaks = seq(-20, 10, by = 10), limits = c(-20, 10))
 }
 
@@ -384,7 +384,7 @@ temp_plot_20_21_X3 <- summer_20_21 %>%
    ggplot(aes(Date, X3.Temp)) +
    geom_line()+  # Add a line that joins the points
    geom_hline(yintercept = 0, color = "blue", linetype = "dashed") +
-   labs(x = "\nDate (day)", y = "Temperature (ºC)\nLichen X3") +
+   labs(x = "\nDate (day)", y = "TT (ºC)") +
    theme_graphs_env_cond() +
    theme_temp()
 
@@ -403,7 +403,7 @@ PAR_plot_20_21_X3 <-summer_20_21 %>%
 Yield_plot_20_21_X3 <- summer_20_21 %>% 
    ggplot(aes(Date, X3.chosen_yield)) +
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "Yield \nLichen") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank())+  # Remove axis label and text for the graph)
@@ -416,7 +416,7 @@ Yield_plot_20_21_X3 <- summer_20_21 %>%
 ETR_plot_20_21_X3 <- summer_20_21 %>% 
    ggplot(aes(Date, X3.chosen_ETR)) +
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \nLichen") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()) +  # Remove axis label and text for the graph)
@@ -428,7 +428,7 @@ theme_ETR()
 Fm_plot_20_21_X3 <- summer_20_21 %>% 
    ggplot(aes(Date, X3.Fm)) +
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "Fm \nLichen") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),) +
     scale_y_continuous(breaks = seq(0, 500, by = 50))+
@@ -539,7 +539,7 @@ Sample X3 (Lichen) **Changed yield!!**
 (Fm_plot_22_23_X3 <- summer_22_23 %>% 
    ggplot(aes(Date, X3.Fm)) +
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Fm \nLichen X3 ") +
+   labs(x = "\nDate (day)", y = "Fm \nLichen") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()) +  # Remove axis label and text for the graph 
@@ -551,7 +551,7 @@ Sample X3 (Lichen) **Changed yield!!**
 (Yield_plot_22_23_X3 <- summer_22_23 %>% 
    ggplot(aes(Date, X3.chosen_yield)) +
    geom_line()+  # Add a line that joins the points
-   labs(x = "\nDate (day)", y = "Yield \n Lichen X3 ") +
+   labs(x = "\nDate (day)", y = "Yield \n Lichen") +
    theme_graphs_env_cond() +
     theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()) +  # Remove axis label and text for the graph
@@ -562,7 +562,7 @@ theme_yield())
 (ETR_plot_22_23_X3 <- summer_22_23 %>% 
   ggplot(aes(Date, X3.chosen_ETR))+
   geom_line()+  # Add a line that joins the points
-  labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \n Lichen X3 ") +  
+  labs(x = "\nDate (day)", y = "ETR\n(μmol e- m−2s−1) \n Lichen") +  
   theme_graphs_env_cond() +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank())) # Remove axis label and text for the graph
