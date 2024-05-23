@@ -1,0 +1,391 @@
+---
+title: "tidy_code"
+author: "Ainhoa Jimenez Molina"
+date: "2024-03-24"
+output: html_document
+---
+
+This is the code to tidy the data.
+1.  Set working directory
+
+```{r}
+setwd("yourworkingdirectoryhere")
+```
+
+2.  Load packages
+
+```{r, message=FALSE}
+library(skimr)  # summary
+library(tidyverse)
+library(lubridate)  # dates management
+library(gridExtra)  # arrange plots
+library(patchwork)  # combine plots
+library(hms)  # use function as.Time()
+library(openxlsx) # write.xlsx 
+library(ggpubr)  # combine plots
+library(viridis)  # colorblid friendly palette
+```
+
+3.  Load the data and see its structure
+
+```{r}
+data <- read_csv("Data_set_PAM_ScottBase_with_calc_yield_until_11-22.csv.csv") # load data until 22
+data_23 <- read_csv("Datset_until_11-23_paste.csv") # load data until nov-23
+skimr::skim(data)  # see a summary of the whole data
+skimr::skim(data_23)
+str(data)  # see the structure of each variable
+str(data_23)
+tail(data)  # view the last 6 rows of data
+tail(data_23)
+head(data)  # view the first 6 rows of data
+head(data_23)
+```
+Data of sensors 1,2 and 4 are for the moss and 3 is for the lichen. Data is from Jan 2019 to Feb 2022. I am going to consider summer form 1 Nov to 15 Feb. I currently have data for 3 summers: 2019-2020, 2020-2021, 2021-2022.
+20th-nov-2023
+Added the data for summer 22-23. Find in section 5.2
+
+## 4. Format data in a way that is going to be useful to me
+
+4.1. Remove weird times and dates and divide the useful ones
+
+```{r}
+data_clean <- data[, -c(2:13)] %>%   # create a new data set without columns 2 to 13
+  mutate(Day_cum = as.numeric(data$Date)) # maintain cumulative date but change column name to more informative one and make it numeric
+
+data_clean <- data_clean %>% 
+  mutate(Date = parse_date_time(Datetime, 'dmy HM'))   # indicate the format the date is wanted
+
+print(data_clean[is.na(data_clean$Date), ])  # Check for rows with parsing issues\
+#  Row 584 is problematic
+
+data_clean[584, 1]<-"10/02/2019 10:08"  # Change the value to the correct one 
+
+data_clean <- data_clean %>% 
+  mutate(Date = parse_date_time(Datetime, 'dmy HM'))   # repeat with all the lines working
+
+data_clean <- data_clean %>%  # create new columns with month, year,
+  mutate(Month = month(Date), # day, minute                     
+         Year = year(Date),
+         Day = day(Date),
+         Hour = hour(Date), 
+         Minute = minute(Date))
+
+data_clean[584,]  # check it worked
+
+```
+
+4.2. Check the new data
+
+```{r, echo= TRUE, results='hide'}
+str(data_clean)
+skimr::skim(data_clean)
+```
+
+4.3. Rename coulmns so it is easy to use
+
+```{r}
+
+colnames(data_clean) <- if_else(grepl("^\\d", colnames(data_clean)), paste0("X", colnames(data_clean)), colnames(data_clean)) # Add an X in front of numeric columns so it is easier to type the names
+
+data_clean <- data_clean %>%  # Rename certain columns to make them friendlier to use
+  rename(X4.calc_yield = `:calc_yield`,
+         X1.F = `X1:F`,
+         X1.Fm = `X1.Fm'`,
+         X2.Fm = `X2.Fm'`,
+         X3.Fm =`X3.Fm'`,
+         X4.Fm = `X4.Fm'`)
+
+```
+4.4. Need to change some variables of format
+
+```{r, warning = FALSE, eval=FALSE}
+# eval= False --> don't run this chunk --> no needed
+ data_clean <- data_clean %>%
+ mutate(X1.PAR = as.numeric(X1.PAR),  # Change PAR of X1, X2 and X3 to numeric
+         X2.PAR = as.numeric(X2.PAR), 
+         X3.PAR = as.numeric(X3.PAR), 
+         X4.PAR = as.numeric(X4.PAR),
+         X3.F = as.numeric(X3.F),  # Change F and Fm to numeric
+         X3.Fm = as.numeric(X3.Fm),
+         X3.Temp = as.numeric(X3.Temp),  # Change Temp 3 to numeric
+         X1.diff = as.numeric(X1.diff),  # Change all diff to numeric
+         X2.diff = as.numeric(X2.diff),
+         X3.diff = as.numeric(X3.diff),
+         X4.diff = as.numeric(X4.diff))
+         #Month = as.factor(Month),  # Change day, month and year to categories -> is it a great idea?
+         #Year = as.factor(Year), 
+         #Day = as.factor(Day))
+```
+
+4.5. Create column for month (in letters) and day-month 
+
+```{r}
+data_clean <- data_clean %>% 
+  mutate(Month_Name = as.factor(case_when(  # Make a column with the names of the months and make them a factor
+  Month == 1 ~ "Jan",  # case_when from dplyr package
+  Month == 2 ~ "Feb",
+  Month == 3 ~ "Mar",
+  Month == 4 ~ "Apr",
+  Month == 5 ~ "May",
+  Month == 6 ~ "Jun",
+  Month == 7 ~ "Jul",
+  Month == 8 ~ "Aug",
+  Month == 9 ~ "Sep",
+  Month == 10 ~ "Oct",
+  Month == 11 ~ "Nov",
+  Month == 12 ~ "Dec"))) %>% 
+  mutate(Date_Combined = as.factor(  # Make a column with the day and month name separated by -
+    paste(Month_Name, Day, sep = "-")))  # Make the column a factor
+
+```
+
+4.6. Fix Day_cum
+
+```{r}
+print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day_cum
+
+# From 25/01/2022 the date format changes and it is not cummulative anymore
+
+data_clean <- data_clean %>%
+  mutate(Date_no_time = as.Date(paste(year(Date), month(Date), day(Date), sep = "-"))) %>%  # Create acolumn with the date but without the time
+  mutate(Day_cum = if_else(No. >= 26510, 44586 + as.numeric(difftime(Date_no_time, as.Date("2022-01-25"), units = "days")), Day_cum))  # Fix the format of Day_cum after the 25/01/2022
+  # Difftime weeks the time passed between 2 days in the units indicated
+ 
+  
+print(data_clean[is.na(data_clean$Day_cum), ])  # Check for rows with NAs in Day_cum
+# There are 256 rows of just NAs at the end
+
+data_clean <- data_clean %>%  # remoove the NAs
+  filter(!is.na(Datetime))
+
+head(data_clean$Date_Combined)  # Check it worked
+tail(data_clean$Date_Combined)
+
+
+```
+
+4.7. Create a column for average moss values of yield, PAR, F, Fm, Temp, ETR and diff
+
+```{r}
+data_clean <- data_clean %>% 
+  mutate(av_moss_yield = rowMeans(data_clean[, c("X1.Y", "X2.Y", "X4.Y")]),  # rowMeans gets the mean of each row in the data frame and stores the result in a new column
+         av_moss_PAR = rowMeans(data_clean[, c("X1.PAR", "X2.PAR", "X4.PAR")]),
+         av_moss_F = rowMeans(data_clean[, c("X1.F", "X2.F", "X4.F")]),
+         av_moss_Fm = rowMeans(data_clean[, c("X1.Fm", "X2.Fm", "X4.Fm")]),
+         av_moss_temp = rowMeans(data_clean[, c("X1.Temp", "X2.Temp", "X4.Temp")]),
+         av_moss_ETR = rowMeans(data_clean[, c("X1.ETR", "X2.ETR", "X4.ETR")]),
+         av_moss_diff = rowMeans(data_clean[, c("X1.diff", "X2.diff", "X4.diff")]))
+```
+
+## 5.2 Format data set 2022-2023 and subset summer 2021-2022 and 2022-2023 
+
+5.2.1 Remove the weird times and divide the useful ones
+
+```{r}
+data_clean_23 <- data_23[, -c(1:3,6,8,9)] %>%   # create a new data set without columns 1, 2, 3, 6, 8, 9
+  mutate(Day_cum = floor(`Excel date`)) %>%  # maintain cumulative date but change column name to more informative one and truncate it to remove decimals (floor function)
+  select(-`Excel date`)  # remove Excel date from the final product
+
+data_clean_23<- data_clean_23 %>% 
+  mutate(Date = parse_date_time(Date, 'dmy'))   # indicate the format the date is wanted
+
+nrow(data_clean_23[is.na(data_clean_23$Date), ])  # Check for rows with parsing issues\
+
+#  No problematic rows
+
+data_clean_23 <- data_clean_23 %>%  # create new columns with month, year,
+  mutate(Month = month(Date), # day, minute                     
+         Year = year(Date),
+         Day = day(Date),
+         Hour = hour(Time), 
+         Minute = minute(Time))
+
+#---
+# 21st- Jan -- Add Time (rel/ms)
+
+data_clean_23 <- data_clean_23 %>% 
+  mutate(time_rel = data_23$`Time (rel/ms)`)
+
+# 16th feb -- Add 'date_time' that included date and time
+
+data_clean_23$DateTime <- as.POSIXct(paste(data_clean_23$Date, data_clean_23$Time), format="%Y-%m-%d %H:%M:%S")
+```
+
+5.2.2. Check the new data
+
+```{r, echo= TRUE, results='hide'}
+str(data_clean_23)
+skimr::skim(data_clean_23)
+```
+5.2.3. Rename columns so it is easy to use
+
+```{r}
+
+colnames(data_clean_23) <- if_else(grepl("^\\d", colnames(data_clean_23)), paste0("X", colnames(data_clean_23)), colnames(data_clean_23)) # Add an X in front of numeric columns so it is easier to type the names
+
+data_clean_23 <- data_clean_23 %>%  # Rename certain columns to make them friendlier to use
+  rename(X2.Y = X2.Y...23,
+         X2.Y_calc = X2.Y...25)
+
+```
+
+5.2.4. Create column for month (in letters) and day-month 
+
+```{r}
+data_clean_23 <- data_clean_23 %>% 
+  mutate(Month_Name = as.factor(case_when(  # Make a column with the names of the months and make them a factor
+  Month == 1 ~ "Jan",  # case_when from dplyr package
+  Month == 2 ~ "Feb",
+  Month == 3 ~ "Mar",
+  Month == 4 ~ "Apr",
+  Month == 5 ~ "May",
+  Month == 6 ~ "Jun",
+  Month == 7 ~ "Jul",
+  Month == 8 ~ "Aug",
+  Month == 9 ~ "Sep",
+  Month == 10 ~ "Oct",
+  Month == 11 ~ "Nov",
+  Month == 12 ~ "Dec"))) %>% 
+  mutate(Date_Combined = as.factor(  # Make a column with the day and month name separated by -
+    paste(Month_Name, Day, sep = "-")))  # Make the column a factor
+
+```
+
+5.2.5. Fix Day_cum
+
+```{r}
+nrow(data_clean_23[is.na(data_clean_23$Day_cum), ])   # Check for rows with NAs in Day_cum
+
+# There is 0, so no need to check anything
+```
+
+5.2.6. Create difference columns
+
+```{r}
+data_clean_23 <- data_clean_23 %>% 
+  mutate(X1.diff = X1.Fm - X1.F,
+         X2.diff = X2.Fm - X2.F,
+         X3.diff = X3.Fm - X3.F,
+         X4.diff = X4.Fm - X4.F)
+```
+
+5.2.7. Create a column for average moss values of yield, PAR, F, Fm, Temp, ETR and diff
+
+```{r}
+data_clean_23 <- data_clean_23 %>% 
+  mutate(av_moss_yield = rowMeans(data_clean_23[, c("X1.Y", "X2.Y", "X4.Y")]),  # rowMeans gets the mean of each row in the data frame and stores the result in a new column
+         av_moss_PAR = rowMeans(data_clean_23[, c("X1.PAR", "X2.PAR", "X4.PAR")]),
+         av_moss_F = rowMeans(data_clean_23[, c("X1.F", "X2.F", "X4.F")]),
+         av_moss_Fm = rowMeans(data_clean_23[, c("X1.Fm", "X2.Fm", "X4.Fm")]),
+         av_moss_temp = rowMeans(data_clean_23[, c("X1.Temp", "X2.Temp", "X4.Temp")]),
+         av_moss_ETR = rowMeans(data_clean_23[, c("X1.ETR", "X2.ETR", "X4.ETR")]),
+         av_moss_diff = rowMeans(data_clean_23[, c("X1.diff", "X2.diff", "X4.diff")]))
+```
+
+
+## 7. Create Chosen_yield and Chosen_ETR column in the plots that require a change in the yield: summer_20_21 X3, summer_22_23 X3, summer_22_23 X4 (2 lichens one moss)
+
+
+```{r}
+
+# summer_20_21 X3  and summer_21_22 X4 yield in data_clean
+
+data_clean <- data_clean %>% 
+  mutate(X3.chosen_yield = case_when( # summer_20_21 X3 yield
+    Day_cum < 44165 ~ X3.Y,  # Days before the 30th of Nov stay with machine yield
+    Day_cum >= 44165 & Day_cum <= 44173 ~ X3.calc_yield,  # Days between the 30th of Nov and 8th of Dec change to calc_yield
+    Day_cum > 44173 ~ X3.Y),  # Days after the 8th of December stay with machine yield
+    X3.chosen_ETR = X3.chosen_yield * X3.PAR, # summer_20_21 X3 ETR
+    X4.chosen_yield = case_when( # summer_21_22 X4 yield
+    Day_cum <= 44606 ~ X4.Y,  # Days before the 14th of Feb stay with machine yield
+    Day_cum > 44606 & Day_cum <= 44620 ~ 0,  # Days between the 14th of Feb and 28th of Feb change to calc_yield
+    Day_cum >= 44620 ~ X4.Y),  # Days after the 28th of Feb stay with machine yield
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR)  # summer_21_2 X4 ETR
+
+
+# Summer 22_23 yield X3 and X4 in data_clean_23
+
+data_clean_23 <- data_clean_23 %>% 
+  mutate(X3.chosen_yield = case_when(  # X3 yield
+    Day_cum <= 44905 ~ X3.Y,  # Days before the 10th of Dec stay with machine yield
+    Day_cum > 44905 & Day_cum <= 44913 ~ X3.Y_calc,  # Days between the 11th of Dec and the 18th of Dec stay with machine yield
+    Day_cum > 44913 & Day_cum <= 44918 ~ X3.Y, # Days between the 19th of Dec and the 23th of Dec stay with machine yield
+    Day_cum > 44918 & Day_cum < 44921 ~ X3.Y_calc, # Days between the 23th of Dec and the 26th of Dec stay with machine yield
+    Day_cum >= 44921 & Day_cum < 44927 ~ X3.Y, # Days between the 26th of Dec and the 1st of Jan stay with machine yield
+    Day_cum >= 44927 & Day_cum <= 44932 ~ X3.Y_calc, # Days between the 1st of Jan and the 6st of Jan stay with machine yield
+    Day_cum > 44932 ~ X3.Y),  # Days after the 7th of Jan stay with machine yield
+    X4.chosen_yield = case_when(  # X4 yield
+    Day_cum < 44898 ~ 0,  # Days before 3rd December change to 0
+    Day_cum >= 44173 ~ X4.Y), # Days after 3rd December keep machine yield
+    X3.chosen_ETR = X3.chosen_yield * X3.PAR, # Summer 22_23 ETR X3
+    X4.chosen_ETR = X4.chosen_yield * X4.PAR) # Summer 22_23 ETR X4
+```
+
+### 9.6. Meteorological
+
+1. Import and take a look at data
+```{r}
+data_met <- read_csv("data_meteorology_complete.csv")
+skimr::skim(data_met)  # see a summary of the whole data
+str(data_met)  # see the structure of each variable
+tail(data_met)  # view the last 6 rows of data
+head(data_met)  # view the first 6 rows of data
+```
+
+### 9.6. Meteorological
+
+1. Import and take a look at data
+```{r}
+data_met <- read_csv("data_meteorology_complete.csv")
+skimr::skim(data_met)  # see a summary of the whole data
+str(data_met)  # see the structure of each variable
+tail(data_met)  # view the last 6 rows of data
+head(data_met)  # view the first 6 rows of data
+```
+3. Structure data so it is useful
+
+```{r}
+# Clean Names and remove unnecessary columns
+
+data_met$DateTime <- paste(data_met$Date.UTC, data_met$Time.UTC)
+
+# Check whether there are NAs (affect calculations)
+
+(colSums(is.na(data_met[, c("Tmean", "Tmax", "Tmin", "Rhmean")]))) # COunt number of NAs in each column
+# remove NAs
+
+# Some of the dates have data from 2 stations. Average both to get 1 useful value
+data_met <- data_met %>% 
+   filter(!is.na(Tmean) & !is.na(Tmax) & !is.na(Tmin) & !is.na(Rhmean)) %>% # remove NAs before grouping
+  group_by(DateTime) %>% # Group by the measurements that have the same date and time
+  summarise(Tmean = mean(Tmean),
+            Tmax = mean(Tmax),
+            Tmin = mean(Tmin),
+            Rhmean = mean(Rhmean),
+            Date.UTC = unique(Date.UTC)) %>% 
+  ungroup()
+
+data_met$DateTime <- as.POSIXct(data_met$DateTime, format="%d/%m/%Y %H:%M:%S", tz="UTC") # put the object as a date
+# check wether there are any NAs
+
+(which(is.na(data_met$Tmean) | is.na(data_met$Tmax) | is.na(data_met$Tmin) | is.na(data_met$Rhmean))) # Gives row of NAs
+# No more NAs
+
+data_met <- data_met %>% # reorder dataset according to DateTime
+  arrange(DateTime)
+```
+
+
+3.2. Create column for year and month
+
+```{r}
+
+data_met<- data_met %>%  # create new columns with month, year,
+  mutate(Month = month(DateTime), # day, minute                     
+         Year = year(DateTime),
+         Day = day(DateTime),
+         Hour = hour(DateTime), 
+         Minute = minute(DateTime))
+```
+
+

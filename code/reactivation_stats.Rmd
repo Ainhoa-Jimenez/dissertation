@@ -1,0 +1,598 @@
+---
+title: "reactivation_stat"
+author: "Ainhoa"
+date: "2024-03-12"
+output: html_document
+---
+
+All the graphs and stats for correlation between active hours and reactivation events
+
+##Index
+1-3 set working directory, load packages and load data
+
+1.  Set working directory
+
+```{r}
+setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/dissertation/dissertation/dissertation")
+```
+
+2.  Load packages
+
+```{r, message=FALSE}
+library(skimr)  # summary
+library(tidyverse)
+library(lubridate)  # dates management
+library(gridExtra)  # arrange plots
+library(patchwork)  # combine plots
+library(hms)  # use function as.Time()
+library(openxlsx) # write.xlsx 
+library(ggpubr)  # combine plots
+library(FSA) # dunn test
+```
+2.2. Creates functions
+
+- Function for graph asthetics
+
+```{r, echo= TRUE, results="hide"}
+theme_graphs_env_cond <- function(){
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90))+
+   theme(axis.text = element_text(size = 11),  # Adjust the size as needed
+          axis.title = element_text(size = 14),
+        legend.text = element_text(size=14))
+  }
+```
+
+3.  Load the data and see its structure
+
+```{r}
+data_reactivation <- read_csv("reactivation_r.csv")
+
+skimr::skim(data_reactivation)  # see a summary of the whole data
+str(data_reactivation)  # see the structure of each variable
+tail(data_reactivation)  # view the last 6 rows of data
+head(data_reactivation)  # view the first 6 rows of data
+
+```
+```{r}
+data_reactivation_wide <- pivot_wider(data_reactivation,
+                                      names_from = "sample",
+                                      values_from = c("act_hours", "event_high", "events_low"))
+```
+
+# 4. Plot each relation to see if tehre is a pattern
+
+4.1. Events low. Separating by sapmles
+```{r}
+
+(graph_correlation_events_low <- data_reactivation_wide %>% 
+  ggplot()+
+  geom_point(aes(events_low_X1, act_hours_X1, color = "Sample X1")) +  # Scatter plot for Sample X1
+  geom_point(aes(events_low_X2, act_hours_X2, color = "Sample X2")) +  # Scatter plot for Sample X2
+  geom_point(aes(events_low_X3, act_hours_X3, color = "Sample X3")) +  # Scatter plot for Sample X3
+  geom_point(aes(events_low_X4, act_hours_X4, color = "Sample X4")) +  # Scatter plot for Sample X4
+  geom_smooth(aes(x = events_low_X1, y = act_hours_X1, color = "Sample X1"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = events_low_X2, y = act_hours_X2, color = "Sample X2"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = events_low_X3, y = act_hours_X3, color = "Sample X3"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = events_low_X4, y = act_hours_X4, color = "Sample X4"), method = "lm", se = FALSE) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond() +  # Custom theme, assuming it's defined elsewhere
+  scale_color_manual(values = c("Sample X1" = "darkgreen", "Sample X2" = "lightgreen", "Sample X3" = "#ff914d", "Sample X4" = "#119683")))  # Custom color scale
+
+ggsave(filename = "graphs_correlation/graph_correlation_events_low.png", graph_correlation_events_low, device = "png")  # Save graph
+```
+
+4.2. Events high. Separating by samples
+
+```{r}
+
+(graph_correlation_events_high <- data_reactivation_wide %>% 
+  ggplot()+
+  geom_point(aes(event_high_X1, act_hours_X1, color = "Sample X1")) +  # Scatter plot for Sample X1
+  geom_point(aes(event_high_X2, act_hours_X2, color = "Sample X2")) +  # Scatter plot for Sample X2
+  geom_point(aes(event_high_X3, act_hours_X3, color = "Sample X3")) +  # Scatter plot for Sample X3
+  geom_point(aes(event_high_X4, act_hours_X4, color = "Sample X4")) +  # Scatter plot for Sample X4
+  geom_smooth(aes(x = event_high_X1, y = act_hours_X1, color = "Sample X1"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = event_high_X2, y = act_hours_X2, color = "Sample X2"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = event_high_X3, y = act_hours_X3, color = "Sample X3"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = event_high_X4, y = act_hours_X4, color = "Sample X4"), method = "lm", se = FALSE) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond() +  # Custom theme, assuming it's defined elsewhere
+  scale_color_manual(values = c("Sample X1" = "darkgreen", "Sample X2" = "lightgreen", "Sample X3" = "#ff914d", "Sample X4" = "#119683")))  # Custom color scale
+
+ggsave(filename = "graphs_correlation/graph_correlation_events_high.png", graph_correlation_events_high, device = "png")  # Save graph
+```
+
+4.3. Events high. Samples together
+```{r}
+
+(graph_correlation_events_high_total <- data_reactivation %>% 
+  ggplot()+
+  geom_point(aes(event_high, act_hours)) +  # Scatter plot for Sample X1
+  geom_smooth(aes(x = event_high, y = act_hours, method = "lm", se = FALSE)) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond())  # Custom theme, assuming it's defined elsewhere
+
+ggsave(filename = "graphs_correlation/graph_correlation_events_high_total.png", graph_correlation_events_high_total, device = "png")  # Save graph
+  
+```
+
+4.4. Events low. Samples together
+```{r}
+
+(graph_correlation_events_low_total <- data_reactivation %>% 
+  ggplot()+
+  geom_point(aes(events_low, act_hours)) +  # Scatter plot for Sample X1
+  geom_smooth(aes(x = events_low, y = act_hours, method = "lm", se = FALSE)) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond())  # Custom theme, assuming it's defined elsewhere
+
+ggsave(filename = "graphs_correlation/graph_correlation_events_low_total.png", graph_correlation_events_low_total, device = "png")  # Save graph
+
+```
+
+5. Spearman Correlation
+
+```{r}
+corr_high_together <- cor.test(x = data_reactivation$event_high, y = data_reactivation$act_hours, method = 'spearman')
+corr_high_together
+
+corr_high_kendall_together <- cor.test(x = data_reactivation$event_high, y = data_reactivation$act_hours, method = 'kendall')
+corr_high_kendall_together
+#---
+corr_low_together <- cor.test(x = data_reactivation$events_low, y = data_reactivation$act_hours, method = 'spearman')
+corr_low_together
+
+corr_low_kendall_together <- cor.test(x = data_reactivation$events_low, y = data_reactivation$act_hours, method = 'kendall')
+corr_low_kendall_together
+#---
+corr_high_X1 <- cor.test(x = data_reactivation_wide$event_high_X1, y = data_reactivation_wide$act_hours_X1, method = 'spearman')
+corr_high_X1
+
+corr_high_kendall_X1 <- cor.test(x = data_reactivation_wide$event_high_X1, y = data_reactivation_wide$act_hours_X1, method = 'kendall')
+corr_high_kendall_X1
+#---
+corr_high_X2 <- cor.test(x = data_reactivation_wide$event_high_X2, y = data_reactivation_wide$act_hours_X2, method = 'spearman')
+corr_high_X2
+
+corr_high_kendall_X2 <- cor.test(x = data_reactivation_wide$event_high_X2, y = data_reactivation_wide$act_hours_X2, method = 'kendall')
+corr_high_kendall_X2
+#---
+corr_high_X3 <- cor.test(x = data_reactivation_wide$event_high_X3, y = data_reactivation_wide$act_hours_X3, method = 'spearman')
+corr_high_X3
+
+corr_high_kendall_X3 <- cor.test(x = data_reactivation_wide$event_high_X3, y = data_reactivation_wide$act_hours_X3, method = 'kendall')
+corr_high_kendall_X3
+#---
+corr_high_X4 <- cor.test(x = data_reactivation_wide$event_high_X4, y = data_reactivation_wide$act_hours_X4, method = 'spearman')
+corr_high_X1
+
+corr_high_kendall_X4 <- cor.test(x = data_reactivation_wide$event_high_X4, y = data_reactivation_wide$act_hours_X4, method = 'kendall')
+corr_high_kendall_X4
+
+#---
+corr_low_X1 <- cor.test(x = data_reactivation_wide$events_low_X1, y = data_reactivation_wide$act_hours_X1, method = 'spearman')
+corr_low_X1
+
+corr_low_kendall_X1 <- cor.test(x = data_reactivation_wide$events_low_X1, y = data_reactivation_wide$act_hours_X1, method = 'kendall')
+corr_low_kendall_X1
+#---
+corr_low_X2 <- cor.test(x = data_reactivation_wide$events_low_X2, y = data_reactivation_wide$act_hours_X2, method = 'spearman')
+corr_low_X2
+
+corr_low_kendall_X2 <- cor.test(x = data_reactivation_wide$events_low_X2, y = data_reactivation_wide$act_hours_X2, method = 'kendall')
+corr_low_kendall_X2
+#---
+corr_low_X3 <- cor.test(x = data_reactivation_wide$events_low_X3, y = data_reactivation_wide$act_hours_X3, method = 'spearman')
+corr_low_X3
+
+corr_low_kendall_X3 <- cor.test(x = data_reactivation_wide$events_low_X3, y = data_reactivation_wide$act_hours_X3, method = 'kendall')
+corr_low_kendall_X3
+#---
+corr_low_X4 <- cor.test(x = data_reactivation_wide$events_low_X4, y = data_reactivation_wide$act_hours_X4, method = 'spearman')
+corr_low_X1
+
+corr_low_kendall_X4 <- cor.test(x = data_reactivation_wide$events_low_X4, y = data_reactivation_wide$act_hours_X4, method = 'kendall')
+corr_low_kendall_X4
+
+```
+
+
+# 5.1 Thallus temperature vs yield grpahs
+(run code_calc_yield.Rmd first)
+
+```{r}
+data_corr_temp <- read.csv("correlation_temp.csv")
+
+data_corr_temp_wide <- pivot_wider(data_corr_temp,
+                                      names_from = "sample",
+                                      values_from = c("act_hours", "av_temp", "av_temp_act"))
+
+```
+
+4. Plot each relation to see if tehre is a pattern
+
+```{r}
+(graph_correlation_temp <- data_corr_temp_wide %>% 
+  ggplot()+
+  geom_point(aes(av_temp_X1, act_hours_X1, color = "Sample X1")) +  # Scatter plot for Sample X1
+  geom_point(aes(av_temp_X2, act_hours_X2, color = "Sample X2")) +  # Scatter plot for Sample X2
+  geom_point(aes(av_temp_X3, act_hours_X3, color = "Sample X3")) +  # Scatter plot for Sample X3
+  geom_point(aes(av_temp_X4, act_hours_X4, color = "Sample X4")) +  # Scatter plot for Sample X4
+  geom_smooth(aes(x = av_temp_X1, y = act_hours_X1, color = "Sample X1"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_X2, y = act_hours_X2, color = "Sample X2"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_X3, y = act_hours_X3, color = "Sample X3"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_X4, y = act_hours_X4, color = "Sample X4"), method = "lm", se = FALSE) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond() +  # Custom theme, assuming it's defined elsewhere
+  scale_color_manual(values = c("Sample X1" = "darkgreen", "Sample X2" = "lightgreen", "Sample X3" = "#ff914d", "Sample X4" = "#119683")))  # Custom color scale
+
+ggsave(filename = "graphs_correlation/graph_correlation_events_low_total.png", graph_correlation_events_low_total, device = "png")  # Save graph
+```
+
+```{r}
+(graph_correlation_temp_act <- data_corr_temp_wide %>% 
+  ggplot()+
+  geom_point(aes(av_temp_act_X1, act_hours_X1, color = "Sample X1")) +  # Scatter plot for Sample X1
+  geom_point(aes(av_temp_act_X2, act_hours_X2, color = "Sample X2")) +  # Scatter plot for Sample X2
+  geom_point(aes(av_temp_act_X3, act_hours_X3, color = "Sample X3")) +  # Scatter plot for Sample X3
+  geom_point(aes(av_temp_act_X4, act_hours_X4, color = "Sample X4")) +  # Scatter plot for Sample X4
+  geom_smooth(aes(x = av_temp_act_X1, y = act_hours_X1, color = "Sample X1"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_act_X2, y = act_hours_X2, color = "Sample X2"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_act_X3, y = act_hours_X3, color = "Sample X3"), method = "lm", se = FALSE) +
+  geom_smooth(aes(x = av_temp_act_X4, y = act_hours_X4, color = "Sample X4"), method = "lm", se = FALSE) +
+  labs(x = "\nAverage Temperature ºC \ne", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond() +  # Custom theme, assuming it's defined elsewhere
+  scale_color_manual(values = c("Sample X1" = "darkgreen", "Sample X2" = "lightgreen", "Sample X3" = "#ff914d", "Sample X4" = "#119683")))  # Custom color scale
+
+ggsave(filename = "graphs_correlation/graph_correlation_temp_act.png", graph_correlation_temp_act , device = "png")  # Save graph
+```
+
+4.4. Temp. Samples together
+```{r}
+
+(graph_correlation_temp_total <- data_corr_temp %>% 
+  ggplot()+
+  geom_point(aes(av_temp, act_hours)) +  # Scatter plot for Sample X1
+  geom_smooth(aes(x = av_temp, y = act_hours, method = "lm", se = FALSE)) +
+  labs(x = "\nNº of reactivation \nevents", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond())  # Custom theme, assuming it's defined elsewhere
+
+```
+
+4.4. Active Temp. Samples together
+```{r}
+
+(graph_correlation_temp_total <- data_corr_temp %>% 
+  ggplot()+
+  geom_point(aes(av_temp_act, act_hours)) +  # Scatter plot for Sample X1
+  geom_smooth(aes(x = av_temp_act, y = act_hours, method = "lm", se = FALSE)) +
+  labs(x = "\nAverage temperature \n when active (ºC)\n", y = "Nº of active hours") +  # Axis labels
+  theme_graphs_env_cond() +  # Custom theme, assuming it's defined elsewhere
+  theme(axis.text.x = element_text(angle = 0)))
+```
+
+# 5.2 Correlation Temp vs nº hours
+
+5.1. With active temperature and normal temperature all samples
+
+```{r}
+# Active temperature
+corr_active_together <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$act_hours, method = 'spearman')
+corr_active_together
+
+corr_active_kendall_together <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$act_hours, method = 'kendall')
+corr_active_kendall_together
+#---
+
+# Measuring temperature
+corr_measuring_together <- cor.test(x = data_corr_temp$av_temp, y = data_corr_temp$act_hours, method = 'spearman')
+corr_measuring_together
+
+corr_measuring_kendall_together <- cor.test(x = data_corr_temp$av_temp, y = data_corr_temp$act_hours, method = 'kendall')
+corr_measuring_kendall_together
+```
+
+5.1. With active temperature and normal temperature different samples
+
+```{r}
+# Active 
+#---
+corr_high_X1 <- cor.test(x = data_corr_temp_wide$av_temp_act_X1, y = data_corr_temp_wide$act_hours_X1, method = 'spearman')
+corr_high_X1
+
+corr_high_kendall_X1 <- cor.test(x = data_corr_temp_wide$av_temp_act_X1, y = data_corr_temp_wide$act_hours_X1, method = 'kendall')
+corr_high_kendall_X1
+#---
+corr_high_X2 <- cor.test(x = data_corr_temp_wide$av_temp_act_X2, y = data_corr_temp_wide$act_hours_X2, method = 'spearman')
+corr_high_X2
+
+corr_high_kendall_X2 <- cor.test(x = data_corr_temp_wide$av_temp_act_X2, y = data_corr_temp_wide$act_hours_X2, method = 'kendall')
+corr_high_kendall_X2
+#---
+corr_high_X3 <- cor.test(x = data_corr_temp_wide$av_temp_act_X3, y = data_corr_temp_wide$act_hours_X3, method = 'spearman')
+corr_high_X3
+
+corr_high_kendall_X3 <- cor.test(x = data_corr_temp_wide$av_temp_act_X3, y = data_corr_temp_wide$act_hours_X3, method = 'kendall')
+corr_high_kendall_X3
+#---
+corr_high_X4 <- cor.test(x = data_corr_temp_wide$av_temp_act_X4, y = data_corr_temp_wide$act_hours_X4, method = 'spearman')
+corr_high_X4
+
+corr_high_kendall_X4 <- cor.test(x = data_corr_temp_wide$av_temp_act_X4, y = data_corr_temp_wide$act_hours_X4, method = 'kendall')
+corr_high_kendall_X4
+
+# Measuring time
+#---
+corr_low_X1 <- cor.test(x = data_corr_temp_wide$av_temp_X1, y = data_corr_temp_wide$act_hours_X1, method = 'spearman')
+corr_low_X1
+
+corr_low_kendall_X1 <- cor.test(x = data_corr_temp_wide$av_temp_X1, y = data_corr_temp_wide$act_hours_X1, method = 'kendall')
+corr_low_kendall_X1
+#---
+corr_low_X2 <- cor.test(x = data_corr_temp_wide$av_temp_X2, y = data_corr_temp_wide$act_hours_X2, method = 'spearman')
+corr_low_X2
+
+corr_low_kendall_X2 <- cor.test(x = data_corr_temp_wide$av_temp_X2, y = data_corr_temp_wide$act_hours_X2, method = 'kendall')
+corr_low_kendall_X2
+#---
+corr_low_X3 <- cor.test(x = data_corr_temp_wide$av_temp_X3, y = data_corr_temp_wide$act_hours_X3, method = 'spearman')
+corr_low_X3
+
+corr_low_kendall_X3 <- cor.test(x = data_corr_temp_wide$av_temp_X3, y = data_corr_temp_wide$act_hours_X3, method = 'kendall')
+corr_low_kendall_X3
+#---
+corr_low_X4 <- cor.test(x = data_corr_temp_wide$av_temp_X4, y = data_corr_temp_wide$act_hours_X4, method = 'spearman')
+corr_low_X1
+
+corr_low_kendall_X4 <- cor.test(x = data_corr_temp_wide$av_temp_X4, y = data_corr_temp_wide$act_hours_X4, method = 'kendall')
+corr_low_kendall_X4
+
+```
+
+5.2 With active temperature different samples
+```{r}
+# Get unique samples in the dataset
+unique_samples <- unique(data_corr_temp$sample)
+
+# Create an empty list to store correlation results
+correlation_results_act <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Spearman correlation test for the current sample
+  corr_result_act <- cor.test(x = subset_data$av_temp_act, y = subset_data$act_hours, method = 'spearman')
+  
+  # Store correlation result
+  correlation_results_act[[sample]] <- corr_result_act
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results[[sample]])
+  cat("\n")
+}
+```
+          Kendall
+```{r}
+
+# Create an empty list to store correlation results
+correlation_results_act_kendall <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Kendall correlation test for the current sample
+  corr_result_act_kendall <- cor.test(x = subset_data$av_temp_act, y = subset_data$act_hours, method = 'kendall')
+  
+  # Store correlation result
+  correlation_results_act_kendall[[sample]] <- corr_result_act_kendall
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results_act_kendall[[sample]])
+  cat("\n")
+}
+```
+
+5.2.2 With normal temperature different samples
+
+```{r}
+# Get unique samples in the dataset
+unique_samples <- unique(data_corr_temp$sample)
+
+# Create an empty list to store correlation results
+correlation_results <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Spearman correlation test for the current sample
+  corr_result <- cor.test(x = subset_data$av_temp, y = subset_data$act_hours, method = 'spearman')
+  
+  # Store correlation result
+  correlation_results[[sample]] <- corr_result
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results[[sample]])
+  cat("\n")
+}
+```
+
+          Kendall
+```{r}
+
+# Create an empty list to store correlation results
+correlation_results_kendall <- list()
+
+# Loop through each unique sample
+for(sample in unique_samples) {
+  # Subset data for the current sample
+  subset_data <- data_corr_temp[data_corr_temp$sample == sample, ]
+  
+  # Perform Kendall correlation test for the current sample
+  corr_result_kendall <- cor.test(x = subset_data$av_temp, y = subset_data$act_hours, method = 'kendall')
+  
+  # Store correlation result
+  correlation_results_kendall[[sample]] <- corr_result_kendall
+}
+
+# Print or access correlation results for each sample
+for(sample in unique_samples) {
+  cat("Correlation test results for sample", sample, ":\n")
+  print(correlation_results_act_kendall[[sample]])
+  cat("\n")
+}
+```
+
+
+# 5.3 Decreasing trend active hours
+
+```{r}
+data_reactivation_summary <- data_reactivation %>% 
+  mutate(year = as.factor(year),
+         sample = as.factor(sample),
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argenteum")) %>% 
+  group_by(species, year) %>% 
+  summarise(mean_act_hours = mean(act_hours),
+            sd = sd(act_hours))
+
+kruskal.test(act_hours ~ year, data = data_reactivation)
+# teh results are significantly different. Now less check
+
+dunnTest(act_hours ~ year, data = data_reactivation)
+
+(graph_decline <- data_reactivation_summary %>%
+  ggplot(aes(x = year, y = mean_act_hours, color = species, group = species)) +
+  geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_act_hours - sd, ymax = mean_act_hours + sd), width = 0.2)+
+  scale_color_manual(values = c("Bryum argenteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+ theme_graphs_env_cond()+
+  labs(x = "\nSummer", y = "Nº of Active Hours\n") +
+  theme_graphs_env_cond() +
+  theme(
+    axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5, face = "bold", size= 12),
+    axis.text.y = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(face = "bold", size = 14),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  ))
+
+ggsave(filename = "graphs_correlation/graph_decline.png", graph_decline, width = 16, height = 10, units = "cm", device = "png")  # Save graph
+
+```
+##6. Correlation Yeild and TT
+
+```{r}
+corr_yield_together <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$av_yield, method = 'spearman')
+corr_yield_together
+
+corr_yield_together_kendall <- cor.test(x = data_corr_temp$av_temp_act, y = data_corr_temp$av_yield, method = 'kendall')
+corr_yield_together_kendall
+```
+
+TT over time
+```{r}
+data_temp_summary <- data_corr_temp %>% 
+  mutate(year = as.factor(year),
+         sample = as.factor(sample),
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argenteum")) %>% 
+  group_by(species, year) %>% 
+  summarise(mean_temp = mean(av_temp_act),
+            sd = sd(act_hours))
+
+
+
+(graph_temp <- data_temp_summary %>%
+  ggplot(aes(x = year, y = mean_temp, color = species, group = species)) +
+  geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_temp - sd, ymax = mean_temp + sd), width = 0.2)+
+  scale_color_manual(values = c("Bryum argenteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+ theme_graphs_env_cond()+
+  labs(x = "\nSummer", y = "TT (ºC") +
+  theme_graphs_env_cond() +
+  theme(
+    axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5, face = "bold", size= 12),
+    axis.text.y = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(face = "bold", size = 14),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  ))
+
+ggsave(filename = "graphs_correlation/graph_TT.png", graph_decline, width = 16, height = 10, units = "cm", device = "png")  # Save graph
+
+```
+
+Yield over time
+
+```{r}
+data_Y_summary <- data_corr_temp %>% 
+  mutate(year = as.factor(year),
+         sample = as.factor(sample),
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argenteum")) %>% 
+  group_by(species, year) %>% 
+  summarise(mean_Y = mean(av_yield),
+            mean_max_Y = mean (mx_yield),
+            sd_mean = sd(av_yield),
+            sd_max = sd(mx_yield))
+
+data_Y_summary_X3 <-  data_corr_temp %>% 
+  mutate(year = as.factor(year),
+         sample = as.factor(sample),
+         species = if_else(sample == "X3", "Austroplaca soropelta", "Bryum argenteum")) %>% 
+  filter(species == "Austroplaca soropelta") 
+
+kruskal.test(av_yield ~ year, data = data_Y_summary_X3)
+# teh results are significantly different. Now less check
+
+(graph_av_yield <- data_Y_summary %>%
+  ggplot(aes(x = year, y = mean_Y, color = species, group = species)) +
+  geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_Y - sd_mean, ymax = mean_Y + sd_mean), width = 0.2)+
+  scale_color_manual(values = c("Bryum argenteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+ theme_graphs_env_cond()+
+  labs(x = "\nSummer", y = " Average \nYield") +
+  theme_graphs_env_cond() +
+  theme(
+    axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5, face = "bold", size= 12),
+    axis.text.y = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(face = "bold", size = 14),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  ))
+
+ggsave(filename = "graphs_correlation/graph_av_yield.png", graph_av_yield, width = 16, height = 10, units = "cm", device = "png")  # Save graph
+
+(graph_max_yield <- data_Y_summary %>%
+  ggplot(aes(x = year, y = mean_max_Y, color = species, group = species)) +
+  geom_point(size = 3) +
+    geom_errorbar(aes(ymin = mean_max_Y - sd_max, ymax = mean_max_Y + sd_max), width = 0.2)+
+  scale_color_manual(values = c("Bryum argenteum" = "#119683", "Austroplaca soropelta" = "#ff914d")) +
+ theme_graphs_env_cond()+
+  labs(x = "\nSummer", y = " Average \nYield") +
+  theme_graphs_env_cond() +
+  theme(
+    axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5, face = "bold", size= 12),
+    axis.text.y = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    legend.text = element_text(face = "bold", size = 14),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  ))
+```

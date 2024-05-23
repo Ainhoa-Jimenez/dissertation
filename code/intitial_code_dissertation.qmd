@@ -1,0 +1,482 @@
+---
+
+---
+title: "DISSERTATION"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+Working directory and load data:
+
+```{r}
+setwd("~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/4th year/dissertation/dissertation")
+data<-read.csv("Data_PAM_Scott_Base.csv")
+
+
+```
+
+1.  Load packages
+
+```{r, message=FALSE}
+library(skimr)  #summary
+library(tidyverse)
+library(lubridate)  #dates management
+library(gridExtra)  #arrange plots
+```
+
+2.  Structure the data
+
+```{r}
+skimr::skim(data)
+str(data)
+tail(data)
+head(data)
+```
+
+-   only light from mid december to end of february
+
+## Format data that is going to be useful to me
+
+1.  Remove weird times and dates and divide the useful ones
+
+```{r}
+data_clean<-data[, -c(2:13)]       #remove columns 2 to 13
+
+data_clean <- data_clean %>% 
+  mutate(Date = parse_date_time(Datetime, 'dmy HM'))   #indicate the format the date is wanted
+
+data_clean<-data_clean%>%                             #create new columns with that
+  mutate(Month=month(Date))%>%
+  mutate(Year=year(Date))%>%
+  mutate(Day=day(Date))%>%
+  mutate(Hour=hour(Date))%>%
+  mutate(Minute=minute(Date))
+
+# Check for rows with parsing issues
+problematic_date_rows <- data_clean[is.na(data_clean$Date), ]
+
+# Print the problematic rows
+print(problematic_date_rows)
+```
+
+Change problematic row 584--\> change value to the correct one and run again
+
+```{r}
+data_clean[584, 1]<-"10/02/2019 10:08"
+
+data_clean<-data_clean%>%                             #create new columns with that
+  mutate(Month=month(Date))%>%
+  mutate(Year=year(Date))%>%
+  mutate(Day=day(Date))%>%
+  mutate(Hour=hour(Date))%>%
+  mutate(Minute=minute(Date))
+
+
+```
+
+Check new data:
+
+```{r, echo= TRUE, results='hide'}
+str(data_clean)
+skimr::skim(data_clean)
+```
+
+Need to change PAR to numeric, and day, month and year to categories
+
+```{r, echo= TRUE, results='hide'}
+data_clean<-data_clean%>%
+  mutate(X1.PAR=as.numeric(X1.PAR), X2.PAR=as.numeric(X2.PAR), X3.PAR=as.numeric(X3.PAR), X4.PAR=as.numeric(X4.PAR))%>%
+  mutate(Month=as.factor(Month), Year=as.factor(Year), Day= as.factor(Day))
+
+
+#check
+str(data_clean)
+```
+
+Data of sensors 1,2 and 4 are for the moss and 3 is for the lichen
+
+### Divide data per year
+
+```{r}
+data_2019 <- data_clean %>%
+  filter(Year == 2019)
+
+data_2020 <- data_clean %>%
+  filter(Year == 2020)
+
+data_2021 <- data_clean %>%
+  filter(Year == 2021)
+
+data_2022 <- data_clean %>%
+  filter(Year == 2022)
+```
+
+# Work with 2019 to see patterns
+
+## Plot the yield and ETR
+
+Yield with months:
+
+```{r}
+data_2019%>%
+  ggplot(aes(Month,X3.Y..II.))+
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Month", y = "Yield")+
+  theme_classic()
+```
+
+**Only activity in november and december: we are going to plot the last three months**
+
+-   Add the data with the cummulative dates to be able to plot it vs day
+
+```{r}
+#filter the values corresponding to the last 3 months
+
+data_clean<- data_clean%>%          #add cummulative dates to data_clean
+  mutate(Day.cum=as.factor(data$Date))
+
+data_19_act <- data_clean %>%   # create a data set that only includes info from 2019 Oct, Nov and Dec
+  filter(Year == 2019,
+         Month %in% c(10, 11, 12))
+  
+
+```
+
+Plot the yield data vs by day for the lichen
+
+```{r}
+
+# barplot
+data_19_act%>%
+  ggplot(aes(Day.cum,X3.Y..II.))+
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Day", y = "Yield")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90))         #set the x-axis text to be rotated by 90 degrees (vertical) and adjust its horizontal alignment using hjust = 1 to align it to the right. 
+
+#plot with line
+data_19_act%>%
+  ggplot(aes(Day.cum,X3.Y..II.))+
+  geom_point()+
+  geom_line()+
+  labs(x = "Day", y = "Yield")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90)) 
+```
+
+**Plot the yield vs day for lichens and mosses**
+
+1.  Calculate average yield value for the moss
+
+```{r}
+data_19_act$av.moss.yield<-rowMeans(data_19_act[, c("X1.Y..II.", "X2.Y..II.", "X4.Y..II.")])
+```
+
+2.  plot
+
+```{r}
+
+#one option without legend
+(p<-data_19_act %>%
+  ggplot() +                                                               #don't put aesthetics here
+  geom_point(aes(x = Day.cum, y = X3.Y..II.), color = "blue") +           #put asthetics for each different value
+  geom_line(aes(x = Day.cum, y = X3.Y..II.), color = "blue") +
+  geom_point(aes(x = Day.cum, y = av.moss.yield), color = "red") +
+  geom_line(aes(x = Day.cum, y = av.moss.yield), color = "red") +
+  labs(x = "Day", y = "Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)))
+
+#___________________________________________________________________________#
+
+# Create a data frame for the legend
+legend_df <- data.frame(
+  Group = c("Lichen", "Moss"),
+  Color = c("blue", "darkgreen"))
+
+# Create a scatter plot
+(ggplot(data_19_act, aes(x = Day.cum)) +
+  geom_point(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  labs(x = "Day", y = "Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group))
+
+
+
+```
+
+\*\*Put the text as day and month
+
+```{r}
+data_19_act <- data_19_act %>%
+  mutate(Cum_Date_Combined = paste(Month, Day, sep = "-"))%>%   # create a column combining day and month
+  mutate(Cum_Date_Combined=as.factor(Cum_Date_Combined))
+
+
+
+data_19_act<- data_19_act %>%                                   #put the months as names
+  mutate(Month_Name = as.factor(case_when(
+    Month == 10 ~ "Oct",
+    Month == 11 ~ "Nov",
+    Month == 12 ~ "Dec",
+    TRUE ~ as.character(Month)  # Keep other months as factors
+  )))
+
+str(data_19_act)                                               #check structure
+
+# create a column combining day and month name
+data_19_act <- data_19_act %>%
+  mutate(Cum_Date_Combined = paste(Day, Month_Name, sep = "-"))%>%   
+  mutate(Cum_Date_Combine=as.factor(Cum_Date_Combined))
+
+
+# Create a data frame for the legend
+legend_df <- data.frame(
+  Group = c("Lichen", "Moss"),
+  Color = c("#ff914d", "#119683"))
+
+
+
+# Create a scatter plot
+  
+ggplot(data_19_act, aes(x = Day.cum)) +
+  geom_point(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  labs(x = "Day", y = "Photosynthetic Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+   scale_x_discrete(
+    breaks = data_19_act$Day.cum,  # Specify the numeric values on the axis
+    labels = data_19_act$Cum_Date_Combined  # Specify the custom text labels
+  )+
+  theme(axis.text = element_text(size = 12),  # Adjust the size as needed
+          axis.title = element_text(size = 18))
+
+
+```
+
+Create a graph from mid November, to see everything closer
+
+```{r}
+#reduce days
+
+str(data_19_act)
+data_19_act$Day.cum<-as.numeric(data_19_act$Day.cum) #put  Day as number and not factor 
+
+d1<-data_19_act%>%
+  filter(Day.cum >313)
+
+
+
+
+ggplot(d1,aes(x = Day.cum)) +
+  geom_point(aes(y = X3.Y..II., color = "Lichen"), data = d1) +
+  geom_line(aes(y = X3.Y..II., color = "Lichen"), data = d1) +
+  geom_point(aes(y = av.moss.yield, color = "Moss"), data = d1) +
+  geom_line(aes(y = av.moss.yield, color = "Moss"), data = d1) +
+  labs(x = "Day", y = "Photosynthetic Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+  labs(color=NULL)+ #remove legend title
+   scale_x_continuous(      #now change to continous, because Day.cum is numeric
+    breaks = d1$Day.cumm,  # Specify the numeric values on the axis
+    labels = d1$Cum_Date_Combined  # Specify the custom text labels
+  )+
+  theme(axis.text = element_text(size = 11),  # Adjust the size as needed
+          axis.title = element_text(size = 18),
+        legend.text = element_text(size=14)) 
+
+```
+
+**Plot Yield vs PAR for lichens and mosses**
+
+1.  Calculate average PAR value for the moss
+
+```{r}
+data_19_act$av.moss.PAR<-rowMeans(data_19_act[, c("X1.PAR", "X2.PAR", "X4.PAR")])
+```
+
+2.  Plot
+
+```{r}
+legend_df <- data.frame(
+  Group = c("Lichen", "Moss"),
+  Color = c("blue", "red"))
+
+
+
+# Create a scatter plot
+ggplot() +
+  geom_point(aes(x= X3.PAR, y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_line(aes(x= X3.PAR, y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_point(aes(x=av.moss.PAR, y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  geom_line(aes(x=av.moss.PAR, y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  labs(x = "PAR (µmol m-2 s-1)", y = "Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 0)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)
+```
+
+**Plot yield and PAR vs date**
+
+```{r}
+legend_df <- data.frame(
+  Group = c("Lichen", "Moss"),
+  Color = c("blue", "red"))
+
+
+
+# Create plot for Yield
+plot1<-ggplot(data_19_act, aes(x = Day.cum)) +
+  geom_point(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  labs(x = "", y = "Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+   scale_x_discrete(
+    breaks = data_19_act$Day.cumm,  # Specify the numeric values on the axis
+    labels = data_19_act$Cum_Date_Combined # Specify the custom text labels
+  )
+
+#create plot fior PAR
+plot2<-ggplot(data_19_act, aes(Day.cum))+
+  geom_point(aes(y = X3.PAR, color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.PAR, color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.PAR, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.PAR, color = "Moss"), data = data_19_act) +
+  labs(y = "PAR (µmol m-2 s-1)", x="Day") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+  scale_x_discrete(
+    breaks = data_19_act$Day.cumm,  # Specify the numeric values on the axis
+    labels = data_19_act$Cum_Date_Combined  # Specify the custom text labels
+  )
+
+#combine 2 plots in 1
+combined_plot <- grid.arrange(plot1, plot2, ncol = 1) 
+```
+
+-   Check lichen PAR→ X3 PAR
+
+    ```{r}
+    skimr::skim(data_19_act$X3.PAR)  # it is a character 
+    skimr::skim(data_19_act$av.moss.PAR)
+    ```
+
+-   put X3.PAR as numeric and run again
+
+```{r}
+data_19_act <- data_19_act %>% 
+  mutate(X3.PAR = as.numeric(X3.PAR))  # put as numeric
+
+
+```
+
+2.  Plot
+
+    ```{r}
+    legend_df <- data.frame(
+      Group = c("Lichen", "Moss"),
+      Color = c("blue", "red"))
+
+
+
+    # Create a scatter plot
+    ggplot() +
+      geom_point(aes(x= X3.PAR, y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+      geom_line(aes(x= X3.PAR, y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+      geom_point(aes(x=av.moss.PAR, y = av.moss.yield, color = "Moss"), data = data_19_act) +
+      geom_line(aes(x=av.moss.PAR, y = av.moss.yield, color = "Moss"), data = data_19_act) +
+      labs(x = "PAR (µmol m-2 s-1)", y = "Yield") +
+      theme_classic() +
+      theme(axis.text.x = element_text(angle = 0)) +
+      scale_color_manual(
+        values = legend_df$Color,
+        labels = legend_df$Group)
+    ```
+
+**Plot yield and PAR vs date**
+
+```{r}
+legend_df <- data.frame(
+  Group = c("Lichen", "Moss"),
+  Color = c("blue", "red"))
+
+
+
+# Create plot for Yield
+(plot1<-ggplot(data_19_act, aes(x = Day.cum)) +
+  geom_point(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.Y..II., color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.yield, color = "Moss"), data = data_19_act) +
+  labs(x = "", y = "Yield") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+   scale_x_discrete(
+    breaks = unique(data_19_act$Day.cum),  # Specify the numeric values on the axis
+    labels = unique(data_19_act$Cum_Date_Combined)  # Specify the custom text labels
+  )+
+    theme(axis.text = element_text(size = 11),  # Adjust the size as needed
+          axis.title = element_text(size = 18),
+        legend.text = element_text(size=14)))
+#create plot fior PAR
+(plot2<-ggplot(data_19_act, aes(x = Day.cum))+
+  geom_point(aes(y = X3.PAR, color = "Lichen"), data = data_19_act) +
+  geom_line(aes(y = X3.PAR, color = "Lichen"), data = data_19_act) +
+  geom_point(aes(y = av.moss.PAR, color = "Moss"), data = data_19_act) +
+  geom_line(aes(y = av.moss.PAR, color = "Moss"), data = data_19_act) +
+  labs(y = "PAR (µmol m-2 s-1)", x="Day") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_manual(
+    values = legend_df$Color,
+    labels = legend_df$Group)+
+  scale_x_discrete(
+    breaks = unique(data_19_act$Day.cum),  # Specify the numeric values on the axis
+    labels = unique(data_19_act$Cum_Date_Combined)  # Specify the custom text labels
+  ) +
+  theme(axis.text = element_text(size = 11),  # Adjust the size as needed
+          axis.title = element_text(size = 18),
+        legend.text = element_text(size=14)))
+
+#combine 2 plots in 1
+combined_plot <- grid.arrange(plot1, plot2, ncol = 1) 
+```
+
+# Notes
+
+14/03/2023
+
+19:06:23
+
+WinControl (rev 1134) report file
